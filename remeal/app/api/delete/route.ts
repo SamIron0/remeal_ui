@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/client'
+import { normalizeIngredient } from '@/utils/helper'
 import redis from '@/utils/redis'
 
 export async function DELETE(
@@ -7,7 +8,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const recipeId = parseInt(params.id)
-
+  
   try {
     const supabase = createClient()
     const { error } = await supabase
@@ -26,20 +27,36 @@ export async function DELETE(
 }
 
 async function removeRecipeFromIndex(recipeId: number) {
-  const supabase = createClient()
-  await supabase.rpc('remove_recipe_from_index', { p_recipe_id: recipeId })
+  const supabase = createClient();
+  
+  // Get the recipe ingredients before deletion
+  const { data: recipe, error: recipeError } = await supabase
+    .from('recipes')
+    .select('ingredients')
+    .eq('id', recipeId)
+    .single();
+
+  if (recipeError) throw recipeError;
+
+  // Remove recipe from Supabase ingredient index
+  for (const ingredient of recipe.ingredients) {
+    await supabase.rpc('remove_ingredient_from_index', {
+      p_ingredient: normalizeIngredient(ingredient),
+      p_recipe_id: recipeId
+    });
+  }
 
   // Update Redis
-  const allKeys = await redis.keys('ingredient:*')
+  const allKeys = await redis.keys('ingredient:*');
   for (const key of allKeys) {
-    const recipes = await redis.get(key)
+    const recipes = await redis.get(key);
     if (recipes) {
-      const recipeList = recipes.split(',')
-      const updatedList = recipeList.filter(id => id !== recipeId.toString())
+      const recipeList = recipes.split(',');
+      const updatedList = recipeList.filter(id => id !== recipeId.toString());
       if (updatedList.length > 0) {
-        await redis.set(key, updatedList.join(','))
+        await redis.set(key, updatedList.join(','));
       } else {
-        await redis.del(key)
+        await redis.del(key);
       }
     }
   }

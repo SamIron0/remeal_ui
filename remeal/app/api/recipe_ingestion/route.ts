@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 import redis from "@/utils/redis";
-
+import { normalizeIngredient } from "@/utils/helper";
 export async function POST(request: Request) {
   try {
     const recipeData = await request.json();
@@ -50,10 +50,3 @@ async function indexRecipe(recipeId: number, ingredients: string[]) {
   }
 }
 
-function normalizeIngredient(ingredient: string): string {
-  return ingredient
-    .toLowerCase()
-    .replace(/[^\w\s]/g, "")
-    .replace(/\b(s|es)$/, "")
-    .trim();
-}

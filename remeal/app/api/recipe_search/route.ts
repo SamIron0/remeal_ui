@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import redis from '@/utils/redis';
 import { cookies } from 'next/headers';
+import { normalizeIngredient } from '@/utils/helper';
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +12,13 @@ export async function POST(request: Request) {
     // First, try to get results from Redis
     const redisResults = await getRecipesFromRedis(normalizedIngredients);
     if (redisResults.length > 0) {
-      return NextResponse.json(redisResults);
+      // Sort Redis results by the number of matching ingredients
+      const sortedRedisResults = redisResults.sort((a, b) => {
+        const aMatches = a.ingredients.filter((i: string) => normalizedIngredients.includes(normalizeIngredient(i))).length;
+        const bMatches = b.ingredients.filter((i: string) => normalizedIngredients.includes(normalizeIngredient(i))).length;
+        return bMatches - aMatches;
+      });
+      return NextResponse.json(sortedRedisResults);
     }
 
     // If no results from Redis, query Supabase
@@ -50,13 +57,7 @@ async function getRecipesFromSupabase(ingredients: string[]) {
     .rpc('search_recipes_by_ingredients', { p_ingredients: ingredients });
 
   if (error) throw error;
-  return data;
-}
 
-function normalizeIngredient(ingredient: string): string {
-  return ingredient
-    .toLowerCase()
-    .replace(/[^\w\s]/g, '')
-    .replace(/\b(s|es)$/, '')
-    .trim();
+  // The results are already sorted by match_count in descending order
+  return data;
 }
