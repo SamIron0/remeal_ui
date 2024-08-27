@@ -29,35 +29,50 @@ export async function DELETE(
 async function removeRecipeFromIndex(recipeId: number) {
   const supabase = createClient();
   
-  // Get the recipe ingredients before deletion
-  const { data: recipe, error: recipeError } = await supabase
-    .from('recipes')
-    .select('ingredients')
-    .eq('id', recipeId)
-    .single();
+  try {
+    // Get the recipe ingredients from the junction table
+    const { data: recipeIngredients, error: ingredientsError } = await supabase
+      .from('recipe_ingredients')
+      .select('ingredient_id')
+      .eq('recipe_id', recipeId);
 
-  if (recipeError) throw recipeError;
+    if (ingredientsError) throw ingredientsError;
 
-  // Remove recipe from Supabase ingredient index
-  for (const ingredient of recipe.ingredients) {
-    await supabase.rpc('remove_ingredient_from_index', {
-      p_ingredient: normalizeIngredient(ingredient),
-      p_recipe_id: recipeId
-    });
-  }
+    // Remove recipe from Supabase ingredient index
+    for (const { ingredient_id } of recipeIngredients) {
+      console.log(`Removing recipe ${recipeId} from index for ingredient: ${ingredient_id}`);
+      const { error } = await supabase.rpc('remove_ingredient_from_index', {
+        p_ingredient: ingredient_id.toString(),
+        p_recipe_id: recipeId
+      });
 
-  // Update Redis
-  const allKeys = await redis.keys('ingredient:*');
-  for (const key of allKeys) {
-    const recipes = await redis.get(key);
-    if (recipes) {
-      const recipeList = recipes.split(',');
-      const updatedList = recipeList.filter(id => id !== recipeId.toString());
-      if (updatedList.length > 0) {
-        await redis.set(key, updatedList.join(','));
-      } else {
-        await redis.del(key);
+      if (error) {
+        console.error(`Error removing ingredient ${ingredient_id} from index:`, error);
+        throw error;
       }
     }
+
+    console.log(`Successfully removed recipe ${recipeId} from all ingredient indexes`);
+
+    // Update Redis (keep this part as it is)
+    await redis.del(`recipe:${recipeId}`);
+    const allKeys = await redis.keys('ingredient:*');
+    for (const key of allKeys) {
+      const ingredient = key.split(':')[1];
+      const recipes = await redis.get(key);
+      if (recipes) {
+        const recipeList = new Set(recipes.split(','));
+        recipeList.delete(recipeId.toString());
+        if (recipeList.size > 0) {
+          await redis.set(key, Array.from(recipeList).join(','));
+        } else {
+          await redis.del(key);
+        }
+      }
+    }
+    console.log(`Successfully updated Redis for recipe ${recipeId}`);
+  } catch (error) {
+    console.error('Error in removeRecipeFromIndex:', error);
+    throw error;
   }
 }

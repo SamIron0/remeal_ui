@@ -42,13 +42,29 @@ async function getRecipesFromRedis(ingredients: string[]) {
   if (recipeIds.size === 0) return [];
 
   const supabase = createClient(cookies());
-  const { data, error } = await supabase
+  const { data: recipes, error } = await supabase
     .from('recipes')
-    .select('id, name, description, ingredients')
+    .select('id, name, description')
     .in('id', Array.from(recipeIds));
 
   if (error) throw error;
-  return data;
+
+  const { data: recipeIngredients, error: ingredientsError } = await supabase
+    .from('recipe_ingredients')
+    .select('recipe_id, ingredient_id, ingredients(name)')
+    .in('recipe_id', Array.from(recipeIds));
+
+  if (ingredientsError) throw ingredientsError;
+
+  const recipesWithIngredients = recipes?.map(recipe => ({
+    ...recipe,
+    ingredients: recipeIngredients
+      ?.filter(ri => ri.recipe_id === recipe.id)
+      .map(ri => ri.ingredients?.name)
+      .filter(Boolean) as string[]
+  }));
+
+  return recipesWithIngredients || [];
 }
 
 async function getRecipesFromSupabase(ingredients: string[]) {

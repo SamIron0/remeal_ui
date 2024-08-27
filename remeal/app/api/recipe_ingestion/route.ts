@@ -37,7 +37,7 @@ async function indexRecipe(recipeId: number, ingredients: string[]) {
     await supabase.rpc("index_ingredient", {
       p_ingredient: ingredient,
       p_recipe_id: recipeId,
-    });
+    })
 
     // Update Redis
     const redisKey = `ingredient:${ingredient}`;

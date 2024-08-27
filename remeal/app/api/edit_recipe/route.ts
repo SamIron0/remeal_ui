@@ -2,31 +2,31 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import redis from '@/utils/redis';
 import { cookies } from 'next/headers';
+import { normalizeIngredient } from '@/utils/helper';
 
 export async function PUT(request: Request) {
   try {
     const { id, name, ingredients, instructions } = await request.json();
     const supabase = createClient(cookies());
 
-    // Get the old recipe data
-    const { data: oldRecipe, error: oldRecipeError } = await supabase
-      .from('recipes')
-      .select('ingredients')
-      .eq('id', id)
-      .single();
+    // Get the old recipe ingredients from the junction table
+    const { data: oldIngredients, error: oldIngredientsError } = await supabase
+      .from('recipe_ingredients')
+      .select('ingredient_id')
+      .eq('recipe_id', id);
 
-    if (oldRecipeError) throw oldRecipeError;
+    if (oldIngredientsError) throw oldIngredientsError;
+
+    // Update the ingredient index
+    await updateIngredientIndex(id, oldIngredients.map(item => item.ingredient_id.toString()), ingredients);
 
     // Update the recipe
     const { error: updateError } = await supabase
       .from('recipes')
-      .update({ name, ingredients, instructions })
+      .update({ name, instructions })
       .eq('id', id);
 
     if (updateError) throw updateError;
-
-    // Update the ingredient index
-    await updateIngredientIndex(id, oldRecipe.ingredients, ingredients);
 
     return NextResponse.json({ message: 'Recipe updated successfully' });
   } catch (error: any) {
@@ -76,12 +76,4 @@ async function updateIngredientIndex(recipeId: number, oldIngredients: string[],
       }
     }
   }
-}
-
-function normalizeIngredient(ingredient: string): string {
-  return ingredient
-    .toLowerCase()
-    .replace(/[^\w\s]/g, '')
-    .replace(/\b(s|es)$/, '')
-    .trim();
 }
