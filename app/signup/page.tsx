@@ -6,74 +6,46 @@ import { redirect } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default async function Signup({
-  searchParams,
-}: {
-  searchParams: {
-    message: string;
-    role: "driver" | "rider";
-    callbackUrl: string;
-  };
-}) {
-  const supabase = createClient(cookies());
-  const session = await supabase.auth.getSession();
-  if (session.data.session) {
-    return redirect("/dashboard");
-  }
+export default function Signup() {
   const signUp = async (formData: FormData) => {
     "use server";
     const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
 
-    const origin = headers().get("origin");
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const role = searchParams.role;
-    const supabase = createClient(cookieStore);
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          role,
-        },
-        emailRedirectTo: `${origin}/auth/callback`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
       },
     });
 
     if (error) {
-      const signupUrl =
-        role === "driver" ? "/signup?role=driver" : "/signup?role=rider";
-      const callbackParam = searchParams.callbackUrl
-        ? `&callbackUrl=${searchParams.callbackUrl}`
-        : "";
-      return redirect(`${signupUrl}${callbackParam}&message=${error.message}`);
+      return redirect("/signup?error=" + error.message);
     }
-    const setupUrl =
-      role === "driver" ? "/setup?role=driver" : "/setup?role=rider";
-    const callbackParam = searchParams.callbackUrl
-      ? `&callbackUrl=${searchParams.callbackUrl}`
-      : "";
-    return redirect(`${setupUrl}${callbackParam}`);
+
+    return redirect("/login?message=Check your email to confirm your account");
   };
 
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
       <form className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
-        <Label className="text-md" htmlFor="email">
+        <label className="text-md" htmlFor="email">
           Email
-        </Label>
+        </label>
         <Input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
           name="email"
           placeholder="you@example.com"
           required
         />
-        <Label className="text-md" htmlFor="password">
+
+        <label className="text-md" htmlFor="password">
           Password
-        </Label>
+        </label>
         <Input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
           type="password"
           name="password"
           placeholder="••••••••"
@@ -81,30 +53,16 @@ export default async function Signup({
         />
         <Button
           formAction={signUp}
-          className="border border-foreground/20 rounded-md px-4 py-2 bg-primary text-foreground mb-7"
+          className="bg-primary rounded-md px-4 py-2 text-foreground mb-2"
         >
           Sign Up
         </Button>
-        <p className="text-sm font-light text-zinc-500">
+        <p className="text-sm text-center">
           Already have an account?{" "}
-          <a
-            href={`/login?${
-              searchParams.role ? `role=${searchParams.role}` : ""
-            }${
-              searchParams.callbackUrl
-                ? `&callbackUrl=${searchParams.callbackUrl}`
-                : ""
-            }`}
-            className="font-medium hover:underline"
-          >
-            Login
-          </a>
+          <Link href="/login" className="text-primary hover:underline">
+            Log In
+          </Link>
         </p>
-        {searchParams?.message && (
-          <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-            {searchParams.message}
-          </p>
-        )}
       </form>
     </div>
   );

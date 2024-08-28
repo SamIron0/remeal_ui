@@ -5,6 +5,7 @@ import "./globals.css";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Database } from "@/supabase/types";  
+import Navigation from "@/components/Navigation";
 
 const defaultUrl = "https://remeal.food"
 
@@ -58,7 +59,8 @@ export default async function RootLayout({
       </head>
       <body className="hide-scrollbar bg-background text-foreground">
         <SpeedInsights />
-        <main className="min-h-screen  pt-12 space-y-12 flex flex-col items-center">
+        <Navigation />
+        <main className="min-h-screen pt-12 space-y-12 flex flex-col items-center">
           {children}
           <Toaster />
         </main>

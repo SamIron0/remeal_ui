@@ -3,13 +3,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default async function Login() {
-  const supabase = createClient(cookies());
-  const session = await supabase.auth.getSession();
-  if (session.data.session) {
-    return redirect("/dashboard");
-  }
   const signIn = async (formData: FormData) => {
     "use server";
 
@@ -24,9 +20,7 @@ export default async function Login() {
     });
 
     if (error) {
-      const loginUrl = "/login";
-      const callbackParam = "";
-      return redirect(`${loginUrl}${callbackParam}&message=${error.message}`);
+      return redirect("/login?error=" + error.message);
     }
     return redirect("/dashboard");
   };
@@ -37,8 +31,7 @@ export default async function Login() {
         <label className="text-md" htmlFor="email">
           Email
         </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+        <Input
           name="email"
           placeholder="you@example.com"
           required
@@ -47,8 +40,7 @@ export default async function Login() {
         <label className="text-md" htmlFor="password">
           Password
         </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+        <Input
           type="password"
           name="password"
           placeholder="••••••••"
@@ -56,18 +48,15 @@ export default async function Login() {
         />
         <Button
           formAction={signIn}
-          className="bg-primary rounded-md px-4 py-2 text-foreground mb-7"
+          className="bg-primary rounded-md px-4 py-2 text-foreground mb-2"
         >
           Sign In
         </Button>
-        <p className="text-sm font-light text-zinc-500">
-          Don&apos;t have an account?{" "}
-          <a
-            href={`/signup`}
-            className="font-medium hover:underline text-primary-500 mb-3"
-          >
+        <p className="text-sm text-center">
+          Don't have an account?{" "}
+          <Link href="/signup" className="text-primary hover:underline">
             Sign Up
-          </a>
+          </Link>
         </p>
       </form>
     </div>

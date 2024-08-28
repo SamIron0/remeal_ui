@@ -25,6 +25,13 @@ export default function RecipeManagement() {
         }),
       });
 
+      if (response.status === 401) {
+        toast.error('You must be logged in to save recipes');
+        // Redirect to login page
+        window.location.href = '/login';
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Failed to save recipe');
       }
