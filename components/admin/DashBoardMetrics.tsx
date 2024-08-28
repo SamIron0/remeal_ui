@@ -9,7 +9,7 @@ export default function DashboardMetrics({ data }: { data: any }) {
           <CardTitle className="text-sm font-medium">Total Recipes</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.totalRecipes}</div>
+          <div className="text-2xl font-bold">{data.total_recipes}</div>
         </CardContent>
       </Card>
       <Card>
@@ -17,7 +17,7 @@ export default function DashboardMetrics({ data }: { data: any }) {
           <CardTitle className="text-sm font-medium">Total Users</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.totalUsers}</div>
+          <div className="text-2xl font-bold">{data.total_users}</div>
         </CardContent>
       </Card>
       <Card>
@@ -25,7 +25,7 @@ export default function DashboardMetrics({ data }: { data: any }) {
           <CardTitle className="text-sm font-medium">Recipes This Month</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.recipesThisMonth}</div>
+          <div className="text-2xl font-bold">{data.recipes_this_month}</div>
         </CardContent>
       </Card>
       <Card>
@@ -33,7 +33,7 @@ export default function DashboardMetrics({ data }: { data: any }) {
           <CardTitle className="text-sm font-medium">Active Users</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.activeUsers}</div>
+          <div className="text-2xl font-bold">{data.active_users}</div>
         </CardContent>
       </Card>
     </div>
