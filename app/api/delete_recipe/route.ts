@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/client'
 import { normalizeIngredient } from '@/utils/helper'
-import redis from '@/utils/redis'
+import getRedisClient from '@/utils/redis'
 
 export async function DELETE(
   request: Request,
@@ -54,7 +54,8 @@ async function removeRecipeFromIndex(recipeId: number) {
 
     console.log(`Successfully removed recipe ${recipeId} from all ingredient indexes`);
 
-    // Update Redis (keep this part as it is)
+    // Update Redis
+    const redis = getRedisClient();
     await redis.del(`recipe:${recipeId}`);
     const allKeys = await redis.keys('ingredient:*');
     for (const key of allKeys) {
@@ -65,12 +66,14 @@ async function removeRecipeFromIndex(recipeId: number) {
         recipeList.delete(recipeId.toString());
         if (recipeList.size > 0) {
           await redis.set(key, Array.from(recipeList).join(','));
+          console.log(`Updated Redis key ${key} for deleted recipe ${recipeId}`);
         } else {
           await redis.del(key);
+          console.log(`Deleted Redis key ${key} as it no longer has any recipes`);
         }
       }
     }
-    console.log(`Successfully updated Redis for recipe ${recipeId}`);
+    console.log(`Successfully updated Redis for deleted recipe ${recipeId}`);
   } catch (error) {
     console.error('Error in removeRecipeFromIndex:', error);
     throw error;

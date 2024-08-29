@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import redis from '@/utils/redis';
+import getRedisClient from '@/utils/redis';
 import { cookies } from 'next/headers';
 import { normalizeIngredient } from '@/utils/helper';
 
@@ -30,6 +30,7 @@ export async function POST(request: Request) {
 }
 
 async function getRecipesFromRedis(ingredients: string[]) {
+  const redis = getRedisClient();
   const recipeIds = new Set<string>();
   for (const ingredient of ingredients) {
     const key = `ingredient:${ingredient}`;

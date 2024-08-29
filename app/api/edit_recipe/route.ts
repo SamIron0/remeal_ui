@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import redis from '@/utils/redis';
 import { cookies } from 'next/headers';
 import { normalizeIngredient } from '@/utils/helper';
+import getRedisClient from '@/utils/redis';
 
 export async function PUT(request: Request) {
   try {
@@ -54,6 +55,7 @@ async function updateIngredientIndex(recipeId: number, oldIngredients: string[],
   }
 
   // Update Redis
+  const redis = getRedisClient();
   const allKeys = await redis.keys('ingredient:*');
   for (const key of allKeys) {
     const ingredient = key.split(':')[1];
@@ -68,11 +70,14 @@ async function updateIngredientIndex(recipeId: number, oldIngredients: string[],
         }
         if (recipeList.size > 0) {
           await redis.set(key, Array.from(recipeList).join(','));
+          console.log(`Updated Redis key ${key} for recipe ${recipeId}`);
         } else {
           await redis.del(key);
+          console.log(`Deleted Redis key ${key} as it no longer has any recipes`);
         }
       } else if (newIngredients.includes(ingredient)) {
         await redis.set(key, recipeId.toString());
+        console.log(`Created new Redis key ${key} for recipe ${recipeId}`);
       }
     }
   }

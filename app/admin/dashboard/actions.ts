@@ -8,7 +8,10 @@ export async function getDashboardData() {
 
   try {
     const { data, error: metricsError } = await supabase.rpc('get_dashboard_metrics');
-    if (metricsError) throw metricsError;
+    if (metricsError) {
+      console.error('Error fetching dashboard metrics:', metricsError);
+      throw metricsError;
+    }
     metricsData = data[0] as {
       total_recipes: number;
       total_users: number;
@@ -17,6 +20,13 @@ export async function getDashboardData() {
     };
   } catch (error) {
     console.error('Error fetching dashboard metrics:', error);
+    // You might want to set a default value for metricsData here
+    metricsData = {
+      total_recipes: 0,
+      total_users: 0,
+      recipes_this_month: 0,
+      active_users: 0
+    };
   }
 
   try {

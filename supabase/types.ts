@@ -436,6 +436,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       remove_ingredient_from_index: {
         Args: {
           p_ingredient: string
