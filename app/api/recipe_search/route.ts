@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import getRedisClient from '@/utils/redis';
 import { cookies } from 'next/headers';
-import { normalizeIngredient } from '@/utils/helper';
+import { normalizeIngredient } from '@/utils/helpers';
 
 export async function POST(request: Request) {
   try {

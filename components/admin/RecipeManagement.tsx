@@ -17,15 +17,32 @@ export default function RecipeManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const recipeData = {
-        name,
-        ingredients: ingredients.split('\n').map(ingredient => ingredient.trim()),
-        instructions,
-        description,
-        cook_time: parseInt(cookTime),
-        prep_time: parseInt(prepTime),
-        servings: parseInt(servings),
-      };
+      let recipeData;
+      if (!name && !ingredients && !instructions && !description && !cookTime && !prepTime && !servings) {
+        // Use sample recipe if form is empty
+        recipeData = {
+          name: "Sample Pasta Dish",
+          ingredients: [
+            "200g spaghetti",
+          
+          ],
+          instructions: "1. Cook spaghetti according to package instructions.",
+          description: "A simple and delicious pasta dish with garlic and Parmesan.",
+          cook_time: 15,
+          prep_time: 10,
+          servings: 2,
+        };
+      } else {
+        recipeData = {
+          name,
+          ingredients: ingredients.split('\n').map(ingredient => ingredient.trim()),
+          instructions,
+          description,
+          cook_time: parseInt(cookTime),
+          prep_time: parseInt(prepTime),
+          servings: parseInt(servings),
+        };
+      }
 
       const response = await fetch('/api/recipe_ingestion', {
         method: 'POST',
@@ -64,7 +81,7 @@ export default function RecipeManagement() {
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
+            
           />
         </div>
         <div>
@@ -73,7 +90,7 @@ export default function RecipeManagement() {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            required
+            
           />
         </div>
         <div>
@@ -82,7 +99,7 @@ export default function RecipeManagement() {
             id="ingredients"
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
-            required
+            
             rows={5}
           />
         </div>
@@ -92,7 +109,7 @@ export default function RecipeManagement() {
             id="instructions"
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
-            required
+            
             rows={5}
           />
         </div>
@@ -103,7 +120,7 @@ export default function RecipeManagement() {
             type="number"
             value={cookTime}
             onChange={(e) => setCookTime(e.target.value)}
-            required
+            
           />
         </div>
         <div>
@@ -113,7 +130,7 @@ export default function RecipeManagement() {
             type="number"
             value={prepTime}
             onChange={(e) => setPrepTime(e.target.value)}
-            required
+            
           />
         </div>
         <div>
@@ -123,7 +140,7 @@ export default function RecipeManagement() {
             type="number"
             value={servings}
             onChange={(e) => setServings(e.target.value)}
-            required
+            
           />
         </div>
         <Button type="submit">Save Recipe</Button>

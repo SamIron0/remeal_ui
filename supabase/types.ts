@@ -76,16 +76,28 @@ export type Database = {
       }
       ingredients: {
         Row: {
+          calories: number | null
+          carbohydrates: number | null
+          fat: number | null
           ingredient_id: number
           name: string
+          protein: number | null
         }
         Insert: {
+          calories?: number | null
+          carbohydrates?: number | null
+          fat?: number | null
           ingredient_id?: number
           name: string
+          protein?: number | null
         }
         Update: {
+          calories?: number | null
+          carbohydrates?: number | null
+          fat?: number | null
           ingredient_id?: number
           name?: string
+          protein?: number | null
         }
         Relationships: []
       }
@@ -431,8 +443,14 @@ export type Database = {
       }
       index_ingredient: {
         Args: {
-          p_ingredient: string
           p_recipe_id: number
+          p_ingredient: string
+          p_quantity: number
+          p_unit: string
+          p_calories: number
+          p_protein: number
+          p_fat: number
+          p_carbohydrates: number
         }
         Returns: undefined
       }

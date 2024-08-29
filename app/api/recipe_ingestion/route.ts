@@ -1,7 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import getRedisClient from "@/utils/redis";
-import { normalizeIngredient } from "@/utils/helper";
+import { normalizeIngredient } from "@/utils/helpers";
+import { getTopNutritionMatch } from "@/utils/usda_api";
+import { extractIngredientName } from "@/utils/extract_ingredient_name";
 
 export async function POST(request: Request) {
   try {
@@ -9,6 +11,7 @@ export async function POST(request: Request) {
     const recipeData = await request.json();
     console.log("Received recipe data:", recipeData);
 
+  
     const cookieStore = cookies();
     const supabase = createClient(cookieStore, true); // Use service role
     console.log("Inserting recipe into database");
@@ -48,24 +51,43 @@ export async function POST(request: Request) {
 }
 
 async function indexRecipe(recipeId: number, ingredients: string[]) {
+  console.log(`Starting indexRecipe for recipeId: ${recipeId}`);
   const normalizedIngredients = ingredients.map(normalizeIngredient);
+  console.log(
+    `Normalized ingredients: ${JSON.stringify(normalizedIngredients)}`
+  );
   const cookieStore = cookies();
   const supabase = createClient(cookieStore, true); // Use service role
   const redis = getRedisClient();
+
   for (const ingredient of normalizedIngredients) {
+    console.log(`Processing ingredient: ${ingredient}`);
+    const extractedName = await extractIngredientName(ingredient);
+    console.log(`Extracted ingredient name: ${extractedName}`);
+    const nutritionInfo = await getTopNutritionMatch(extractedName);
+    console.log(`Nutrition info for ${extractedName}:`, nutritionInfo);
+
+    console.log(`Calling index_ingredient for ${extractedName}`);
     const { data, error } = await supabase.rpc("index_ingredient", {
-      p_ingredient: ingredient,
       p_recipe_id: recipeId,
+      p_ingredient: extractedName,
+      p_quantity: 1, // Default quantity, adjust as needed
+      p_unit: "", // Default empty unit, adjust as needed
+      p_calories: nutritionInfo?.calories || 0,
+      p_protein: nutritionInfo?.protein || 0,
+      p_fat: nutritionInfo?.fat || 0,
+      p_carbohydrates: nutritionInfo?.carbohydrates || 0,
     });
 
     if (error) {
-      console.error("Error in index_ingredient:", error);
+      console.error(`Error in index_ingredient for ${extractedName}:`, error);
       throw error;
     }
+    console.log(`Successfully indexed ${extractedName} with nutrition info`);
 
     // Update Redis
-    console.log(`Updating Redis for ingredient: ${ingredient}`);
-    const redisKey = `ingredient:${ingredient}`;
+    console.log(`Updating Redis for ingredient: ${extractedName}`);
+    const redisKey = `ingredient:${extractedName}`;
     const existingRecipes = await redis.get(redisKey);
     if (existingRecipes) {
       await redis.set(redisKey, `${existingRecipes},${recipeId}`);
@@ -75,4 +97,5 @@ async function indexRecipe(recipeId: number, ingredients: string[]) {
       console.log(`Created new Redis key ${redisKey} with recipe ${recipeId}`);
     }
   }
+  console.log(`Finished indexRecipe for recipeId: ${recipeId}`);
 }

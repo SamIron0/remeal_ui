@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import redis from '@/utils/redis';
 import { cookies } from 'next/headers';
-import { normalizeIngredient } from '@/utils/helper';
+import { normalizeIngredient } from '@/utils/helpers';
 import getRedisClient from '@/utils/redis';
+import { getTopNutritionMatch } from '@/utils/usda_api';
+
 
 export async function PUT(request: Request) {
   try {
@@ -48,13 +50,19 @@ async function updateIngredientIndex(recipeId: number, oldIngredients: string[],
 
   // Add new ingredients to index
   for (const ingredient of newIngredients) {
+    const nutritionInfo = await getTopNutritionMatch(ingredient);
     await supabase.rpc('index_ingredient', {
       p_ingredient: normalizeIngredient(ingredient),
-      p_recipe_id: recipeId
+      p_recipe_id: recipeId,
+      p_quantity: 1, // Default quantity, adjust as needed
+      p_unit: 'unit', // Default unit, adjust as needed
+      p_calories: nutritionInfo?.calories || 0,
+      p_protein: nutritionInfo?.protein || 0,
+      p_fat: nutritionInfo?.fat || 0,
+      p_carbohydrates: nutritionInfo?.carbohydrates || 0,
     });
   }
 
-  // Update Redis
   const redis = getRedisClient();
   const allKeys = await redis.keys('ingredient:*');
   for (const key of allKeys) {
