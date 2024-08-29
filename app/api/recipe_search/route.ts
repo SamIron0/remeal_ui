@@ -34,7 +34,7 @@ async function getRecipesFromRedis(ingredients: string[]) {
   const recipeIds = new Set<string>();
   for (const ingredient of ingredients) {
     const key = `ingredient:${ingredient}`;
-    const ids = await redis.get(key);
+    const ids = await redis.get(key) as string | null;
     if (ids) {
       ids.split(',').forEach(id => recipeIds.add(id));
     }

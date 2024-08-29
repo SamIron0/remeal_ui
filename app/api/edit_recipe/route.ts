@@ -60,7 +60,7 @@ async function updateIngredientIndex(recipeId: number, oldIngredients: string[],
   for (const key of allKeys) {
     const ingredient = key.split(':')[1];
     if (oldIngredients.includes(ingredient) || newIngredients.includes(ingredient)) {
-      const recipes = await redis.get(key);
+      const recipes = await redis.get(key) as string | null;
       if (recipes) {
         const recipeList = new Set(recipes.split(','));
         if (newIngredients.includes(ingredient)) {
