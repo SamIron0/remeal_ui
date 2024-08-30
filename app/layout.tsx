@@ -4,16 +4,16 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { Database } from "@/supabase/types";  
+import { Database } from "@/supabase/types";
 import Navigation from "@/components/Navigation";
 
-const defaultUrl = "https://remeal.food"
-
+const defaultUrl = "https://remeal.food";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Remeal",
-  description: "Discover recipes based on ingredients you have. Remeal helps you cook delicious meals with what's in your kitchen.",
+  description:
+    "Discover recipes based on ingredients you have. Remeal helps you cook delicious meals with what's in your kitchen.",
 };
 
 export default async function RootLayout({
@@ -60,7 +60,7 @@ export default async function RootLayout({
       <body className="hide-scrollbar bg-background text-foreground">
         <SpeedInsights />
         <Navigation />
-        <main className="pt-12 space-y-12 flex flex-col items-center">
+        <main className=" space-y-12 flex flex-col items-center">
           {children}
           <Toaster />
         </main>

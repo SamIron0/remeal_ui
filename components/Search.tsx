@@ -20,6 +20,10 @@ const RecipeSearch: React.FC = () => {
   const { user } = useAuth();
   const router = useRouter();
 
+  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
+  const [maxCookTime, setMaxCookTime] = useState<number | null>(null);
+  const [minRating, setMinRating] = useState<number | null>(null);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -45,7 +49,7 @@ const RecipeSearch: React.FC = () => {
 
   const searchRecipes = async () => {
     if (!user) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     setLoading(true);
@@ -56,7 +60,12 @@ const RecipeSearch: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ingredients }),
+        body: JSON.stringify({
+          ingredients,
+          dietaryRestrictions: user.is_premium ? dietaryRestrictions : [],
+          maxCookTime: user.is_premium ? maxCookTime : null,
+          minRating: user.is_premium ? minRating : null,
+        }),
       });
       if (!response.ok) {
         throw new Error('Failed to fetch recipes');
@@ -65,19 +74,18 @@ const RecipeSearch: React.FC = () => {
       setRecipes(data);
     } catch (err) {
       setError('An error occurred while fetching recipes. Please try again.');
-      setRecipes([]); // Clear recipes on error
+      setRecipes([]);
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     if (ingredients.length > 0 && user) {
       searchRecipes();
     } else {
       setRecipes([]);
     }
-  }, [ingredients, user]);
+  }, [ingredients, user, dietaryRestrictions, maxCookTime, minRating]);
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
@@ -114,6 +122,49 @@ const RecipeSearch: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {user?.is_premium && (
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold mb-2">Advanced Filters</h3>
+          <div className="space-y-2">
+            <div>
+              <label className="block text-sm font-medium">Dietary Restrictions</label>
+              <select
+                multiple
+                value={dietaryRestrictions}
+                onChange={(e) => setDietaryRestrictions(Array.from(e.target.selectedOptions, option => option.value))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              >
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="gluten-free">Gluten-free</option>
+                <option value="dairy-free">Dairy-free</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Max Cook Time (minutes)</label>
+              <input
+                type="number"
+                value={maxCookTime || ''}
+                onChange={(e) => setMaxCookTime(e.target.value ? parseInt(e.target.value) : null)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Minimum Rating</label>
+              <input
+                type="number"
+                min="1"
+                max="5"
+                step="0.1"
+                value={minRating || ''}
+                onChange={(e) => setMinRating(e.target.value ? parseFloat(e.target.value) : null)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {loading && <p className="text-center">Searching for recipes...</p>}
       

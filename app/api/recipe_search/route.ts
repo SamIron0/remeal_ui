@@ -3,11 +3,10 @@ import { createClient } from "@/utils/supabase/server";
 import getRedisClient from "@/utils/redis";
 import { cookies } from "next/headers";
 import { normalizeIngredient } from "@/utils/helpers";
-import { levenshteinDistance } from "@/utils/helpers"; // Implement this function
 
 export async function POST(request: Request) {
   try {
-    const { ingredients } = await request.json();
+    const { ingredients, dietaryRestrictions, maxCookTime, minRating } = await request.json();
     const normalizedIngredients = ingredients.map(normalizeIngredient);
     console.log("Normalized ingredients:", normalizedIngredients);
 
@@ -36,7 +35,7 @@ export async function POST(request: Request) {
 
     // If no results from Redis, query Supabase
     console.log("No Redis results, querying Supabase...");
-    const supabaseResults = await getRecipesFromSupabase(ingredients);
+    const supabaseResults = await getRecipesFromSupabase(normalizedIngredients, dietaryRestrictions, maxCookTime, minRating);
     console.log(`Supabase results count: ${supabaseResults.length}`);
     return NextResponse.json(supabaseResults);
   } catch (error: any) {
@@ -59,18 +58,6 @@ async function getRecipesFromRedis(ingredients: string[]) {
       addIdsToSet(recipeIds, exactMatchIds);
       continue;
     }
-
-    // Fuzzy match
-      // const allKeys = await redis.keys("*");
-      // for (const key of allKeys) {
-      //   if (levenshteinDistance(normalizedIngredient, key) <= 2) {
-      //     // Adjust threshold as needed
-      //     const fuzzyMatchIds = await redis.get(key);
-      //     if (fuzzyMatchIds) {
-      //       addIdsToSet(recipeIds, fuzzyMatchIds);
-      //     }
-      //   }
-      // }
   }
 
   console.log(`Total unique recipe IDs from Redis: ${recipeIds.size}`);
@@ -131,22 +118,23 @@ function addIdsToSet(set: Set<string>, ids: string | string[] | number | {}) {
   }
 }
 
-async function getRecipesFromSupabase(ingredients: string[]) {
+async function getRecipesFromSupabase(ingredients: string[], dietaryRestrictions: string[], maxCookTime: number | null, minRating: number | null) {
   console.log("Entering getRecipesFromSupabase");
   const supabase = createClient(cookies());
 
+  let query = supabase
+    .rpc("search_recipes_by_ingredients", {
+      p_ingredients: ingredients,
+      similarity_threshold: 0.3,
+    })
+    .select('*');
 
-  console.log("Calling search_recipes_by_ingredients RPC with ingredients:", ingredients);
-  const { data, error } = await supabase.rpc("search_recipes_by_ingredients", {
-    p_ingredients: ingredients,
-    similarity_threshold: 0.3,
-  });
+  const { data, error } = await query;
 
   if (error) {
     console.error("Error in search_recipes_by_ingredients RPC:", error);
     throw error;
   }
-  console.log("data", data);
   console.log(`RPC returned ${data ? data.length : 0} results`);
   return data || [];
 }
