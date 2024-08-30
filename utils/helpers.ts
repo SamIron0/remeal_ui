@@ -81,12 +81,7 @@ export async function callLLMJson(prompt: string): Promise<string> {
     return content;
   } catch (error) {
     console.error("LLM returned invalid JSON:", content);
-    // Return a fallback JSON string
-    return JSON.stringify([
-      { fdcId: 167802, score: 0.8 },
-      { fdcId: 167747, score: 0.6 },
-      { fdcId: 167749, score: 0.4 },
-    ]);
+    throw error;
   }
 }
 

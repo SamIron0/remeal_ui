@@ -1,4 +1,5 @@
 import { callLLM } from "./helpers";
+import { normalizeIngredient } from "./helpers";
 
 export async function extractIngredientName(input: string): Promise<string> {
   const prompt = `
@@ -12,11 +13,13 @@ export async function extractIngredientName(input: string): Promise<string> {
     const response = await callLLM(prompt);
     console.log("LLM response:", response);
 
-    const ingredient = response;
+    const extractedIngredient = response;
+    const normalizedIngredient = normalizeIngredient(extractedIngredient);
 
-    return ingredient;
+    console.log("Normalized ingredient:", normalizedIngredient);
+    return normalizedIngredient;
   } catch (error) {
     console.error("Error extracting ingredient name:", error);
-    return input; // Return the original input if extraction fails
+    return normalizeIngredient(input); // Normalize the original input if extraction fails
   }
 }

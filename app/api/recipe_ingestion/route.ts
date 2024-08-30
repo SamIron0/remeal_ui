@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import getRedisClient from "@/utils/redis";
 import { normalizeIngredient } from "@/utils/helpers";
-import { getTopNutritionMatch } from "@/utils/usda_api";
+import { getNutritionInfo } from "@/utils/nutrition_api";
 import { extractIngredientName } from "@/utils/extract_ingredient_name";
 
 export async function POST(request: Request) {
@@ -64,7 +64,7 @@ async function indexRecipe(recipeId: number, ingredients: string[]) {
     console.log(`Processing ingredient: ${ingredient}`);
     const extractedName = await extractIngredientName(ingredient);
     console.log(`Extracted ingredient name: ${extractedName}`);
-    const nutritionInfo = await getTopNutritionMatch(extractedName);
+    const nutritionInfo = await getNutritionInfo(extractedName);
     console.log(`Nutrition info for ${extractedName}:`, nutritionInfo);
 
     console.log(`Calling index_ingredient for ${extractedName}`);
