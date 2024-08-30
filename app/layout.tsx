@@ -60,7 +60,7 @@ export default async function RootLayout({
       <body className="hide-scrollbar bg-background text-foreground">
         <SpeedInsights />
         <Navigation />
-        <main className="min-h-screen pt-12 space-y-12 flex flex-col items-center">
+        <main className="pt-12 space-y-12 flex flex-col items-center">
           {children}
           <Toaster />
         </main>

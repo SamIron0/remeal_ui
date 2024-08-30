@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { XCircle, Search, ChevronDown } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 interface Recipe {
   id: number;
@@ -15,6 +17,8 @@ const RecipeSearch: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -22,9 +26,17 @@ const RecipeSearch: React.FC = () => {
 
   const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputValue.trim() !== '') {
-      setIngredients([...ingredients, inputValue.trim()]);
-      setInputValue('');
+      addIngredient(inputValue.trim());
     }
+  };
+
+  const addIngredient = (ingredient: string) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    setIngredients([...ingredients, ingredient]);
+    setInputValue('');
   };
 
   const removeIngredient = (index: number) => {
@@ -32,6 +44,10 @@ const RecipeSearch: React.FC = () => {
   };
 
   const searchRecipes = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -49,18 +65,19 @@ const RecipeSearch: React.FC = () => {
       setRecipes(data);
     } catch (err) {
       setError('An error occurred while fetching recipes. Please try again.');
+      setRecipes([]); // Clear recipes on error
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (ingredients.length > 0) {
+    if (ingredients.length > 0 && user) {
       searchRecipes();
     } else {
       setRecipes([]);
     }
-  }, [ingredients]);
+  }, [ingredients, user]);
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
@@ -77,7 +94,7 @@ const RecipeSearch: React.FC = () => {
             className="w-64 mr-2 p-2 border border-gray-300 rounded"
           />
           <button 
-            onClick={() => inputValue.trim() && setIngredients([...ingredients, inputValue.trim()])}
+            onClick={() => inputValue.trim() && addIngredient(inputValue.trim())}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 whitespace-nowrap"
           >
             Add

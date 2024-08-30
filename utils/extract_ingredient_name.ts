@@ -14,10 +14,8 @@ export async function extractIngredientName(input: string): Promise<string> {
     console.log("LLM response:", response);
 
     const extractedIngredient = response;
-    const normalizedIngredient = normalizeIngredient(extractedIngredient);
 
-    console.log("Normalized ingredient:", normalizedIngredient);
-    return normalizedIngredient;
+    return extractedIngredient;
   } catch (error) {
     console.error("Error extracting ingredient name:", error);
     return normalizeIngredient(input); // Normalize the original input if extraction fails

@@ -13,76 +13,92 @@ export default function RecipeManagement() {
   const [cookTime, setCookTime] = useState("");
   const [prepTime, setPrepTime] = useState("");
   const [servings, setServings] = useState("");
+  const [aiPrompt, setAiPrompt] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       let recipeData;
-      if (
-        !name &&
-        !ingredients &&
-        !instructions &&
-        !description &&
-        !cookTime &&
-        !prepTime &&
-        !servings
-      ) {
-        // Use sample recipe if form is empty
+      if (aiPrompt) {
+        const response = await fetch("/api/ai_recipe_generation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: aiPrompt }),
+        });
+        if (!response.ok) throw new Error("Failed to generate AI recipe");
+        recipeData = await response.json();
+      } else {
         recipeData = {
-          name: "Sample Pasta Dish",
-          ingredients: ["200g pasta", "1 cup of parmesan cheese"],
-          instructions: "1. Cook spaghetti according to package instructions.",
+          name: "Parmesan Pasta",
+          ingredients: ["200g pasta", "5 onions", "1 cup of parmesan cheese"],
+          instructions:
+            "1. Cook spaghetti according to package instructions. 2. In a large pan, sauté onions in olive oil until softened. 3. Add the cooked spaghetti to the pan and toss with the onions. 4. Sprinkle with parmesan cheese and serve.",
           description:
             "A simple and delicious pasta dish with garlic and Parmesan.",
           cook_time: 15,
           prep_time: 10,
           servings: 2,
         };
-      } else {
-        recipeData = {
-          name,
-          ingredients: ingredients
-            .split("\n")
-            .map((ingredient) => ingredient.trim()),
-          instructions,
-          description,
-          cook_time: parseInt(cookTime),
-          prep_time: parseInt(prepTime),
-          servings: parseInt(servings),
-        };
+        // recipeData = {
+        //   name,
+        //   ingredients: ingredients
+        //     .split("\n")
+        //     .map((ingredient) => ingredient.trim()),
+        //   instructions,
+        //   description,
+        //   cook_time: parseInt(cookTime),
+        //   prep_time: parseInt(prepTime),
+        //   servings: parseInt(servings),
+        // };
       }
 
       const response = await fetch("/api/recipe_ingestion", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(recipeData),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to save recipe");
-      }
+      if (!response.ok) throw new Error("Failed to save recipe");
 
       toast.success("Recipe saved successfully");
-      // Reset form fields
-      setName("");
-      setIngredients("");
-      setInstructions("");
-      setDescription("");
-      setCookTime("");
-      setPrepTime("");
-      setServings("");
+      resetForm();
     } catch (error) {
       toast.error("Error saving recipe");
       console.error("Error:", error);
     }
   };
 
+  const resetForm = () => {
+    setName("");
+    setIngredients("");
+    setInstructions("");
+    setDescription("");
+    setCookTime("");
+    setPrepTime("");
+    setServings("");
+    setAiPrompt("");
+  };
+
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-semibold mb-4">Add New Recipe</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label
+            htmlFor="aiPrompt"
+            className="block text-sm font-medium text-gray-700"
+          >
+            AI Recipe Generation Prompt
+          </label>
+          <Textarea
+            id="aiPrompt"
+            value={aiPrompt}
+            onChange={(e) => setAiPrompt(e.target.value)}
+            placeholder="Describe the recipe you want to generate..."
+          />
+        </div>
+        <Button type="submit">Generate and Save AI Recipe</Button>
+        <hr className="my-6" />
         <div>
           <label
             htmlFor="name"
@@ -179,7 +195,7 @@ export default function RecipeManagement() {
             onChange={(e) => setServings(e.target.value)}
           />
         </div>
-        <Button type="submit">Save Recipe</Button>
+        <Button type="submit">Save Manual Recipe</Button>
       </form>
     </div>
   );

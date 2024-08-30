@@ -57,9 +57,8 @@ async function removeRecipeFromIndex(recipeId: number) {
     // Update Redis
     const redis = getRedisClient();
     await redis.del(`recipe:${recipeId}`);
-    const allKeys = await redis.keys('ingredient:*');
+    const allKeys = await redis.keys('*');
     for (const key of allKeys) {
-      const ingredient = key.split(':')[1];
       const recipes = await redis.get(key) as string | null;
       if (recipes) {
         const recipeList = new Set(recipes.split(','));

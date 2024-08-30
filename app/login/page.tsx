@@ -30,8 +30,8 @@ export default function Login() {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
+    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md pt-32 justify-center gap-2">
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col w-full gap-2 text-foreground">
         <label className="text-md" htmlFor="email">
           Email
         </label>

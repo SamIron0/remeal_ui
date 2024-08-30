@@ -477,6 +477,7 @@ export type Database = {
       search_recipes_by_ingredients: {
         Args: {
           p_ingredients: string[]
+          similarity_threshold: number
         }
         Returns: {
           id: number
