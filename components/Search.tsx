@@ -1,8 +1,13 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { XCircle, Search, ChevronDown } from 'lucide-react';
+import { XCircle, Search as SearchIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import SearchResults from './SearchResults';
 
 interface Recipe {
   id: number;
@@ -21,8 +26,8 @@ const RecipeSearch: React.FC = () => {
   const router = useRouter();
 
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
-  const [maxCookTime, setMaxCookTime] = useState<number | null>(null);
-  const [minRating, setMinRating] = useState<number | null>(null);
+  const [maxCookTime, setMaxCookTime] = useState<number>(60);
+  const [minRating, setMinRating] = useState<number>(3);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -79,6 +84,7 @@ const RecipeSearch: React.FC = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (ingredients.length > 0 && user) {
       searchRecipes();
@@ -93,25 +99,25 @@ const RecipeSearch: React.FC = () => {
       
       <div className="mb-6 w-full flex flex-col items-center">
         <div className="flex w-full justify-center max-w-md">
-          <input
+          <Input
             type="text"
             placeholder="Enter an ingredient"
             value={inputValue}
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}
-            className="w-64 mr-2 p-2 border border-gray-300 rounded"
+            className="w-full mr-2"
           />
-          <button 
+          <Button 
             onClick={() => inputValue.trim() && addIngredient(inputValue.trim())}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 whitespace-nowrap"
+            className="whitespace-nowrap"
           >
-            Add
-          </button>
+            <SearchIcon className="mr-2 h-4 w-4" /> Add
+          </Button>
         </div>
         
         <div className="flex flex-wrap justify-center gap-2 mt-4">
           {ingredients.map((ingredient, index) => (
-            <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center">
+            <span key={index} className="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm flex items-center">
               {ingredient}
               <XCircle 
                 className="ml-1 cursor-pointer" 
@@ -124,72 +130,52 @@ const RecipeSearch: React.FC = () => {
       </div>
 
       {user?.is_premium && (
-        <div className="mb-4">
+        <div className="mb-4 bg-gray-100 p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">Advanced Filters</h3>
-          <div className="space-y-2">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium">Dietary Restrictions</label>
-              <select
-                multiple
-                value={dietaryRestrictions}
-                onChange={(e) => setDietaryRestrictions(Array.from(e.target.selectedOptions, option => option.value))}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              >
-                <option value="vegetarian">Vegetarian</option>
-                <option value="vegan">Vegan</option>
-                <option value="gluten-free">Gluten-free</option>
-                <option value="dairy-free">Dairy-free</option>
-              </select>
+              <label className="block text-sm font-medium mb-1">Dietary Restrictions</label>
+              <div className="flex flex-wrap gap-2">
+                {['vegetarian', 'vegan', 'gluten-free', 'dairy-free'].map((restriction) => (
+                  <label key={restriction} className="flex items-center">
+                    <Checkbox
+                      checked={dietaryRestrictions.includes(restriction)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setDietaryRestrictions([...dietaryRestrictions, restriction]);
+                        } else {
+                          setDietaryRestrictions(dietaryRestrictions.filter(r => r !== restriction));
+                        }
+                      }}
+                    />
+                    <span className="ml-2 capitalize">{restriction}</span>
+                  </label>
+                ))}
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium">Max Cook Time (minutes)</label>
-              <input
-                type="number"
-                value={maxCookTime || ''}
-                onChange={(e) => setMaxCookTime(e.target.value ? parseInt(e.target.value) : null)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              <label className="block text-sm font-medium mb-1">Max Cook Time: {maxCookTime} minutes</label>
+              <Slider
+                value={[maxCookTime]}
+                onValueChange={(value) => setMaxCookTime(value[0])}
+                max={120}
+                step={5}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium">Minimum Rating</label>
-              <input
-                type="number"
-                min="1"
-                max="5"
-                step="0.1"
-                value={minRating || ''}
-                onChange={(e) => setMinRating(e.target.value ? parseFloat(e.target.value) : null)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              <label className="block text-sm font-medium mb-1">Minimum Rating: {minRating}</label>
+              <Slider
+                value={[minRating]}
+                onValueChange={(value) => setMinRating(value[0])}
+                max={5}
+                step={0.5}
               />
             </div>
           </div>
         </div>
       )}
 
-      {loading && <p className="text-center">Searching for recipes...</p>}
-      
-      {error && <p className="text-red-500 text-center">{error}</p>}
-      
-      {recipes.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {recipes.map((recipe) => (
-            <div key={recipe.id} className="border rounded-lg p-4 shadow-sm">
-              <h2 className="text-xl font-semibold mb-2">{recipe.name}</h2>
-              <p className="text-gray-600 mb-4">{recipe.description}</p>
-              <h4 className="font-semibold mb-2">Ingredients:</h4>
-              <ul className="list-disc list-inside">
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index}>{ingredient}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-      
-      {recipes.length === 0 && ingredients.length > 0 && !loading && (
-        <p className="text-center">No recipes found with these ingredients. Try adding more!</p>
-      )}
+      <SearchResults recipes={recipes} loading={loading} error={error} />
     </div>
   );
 };
