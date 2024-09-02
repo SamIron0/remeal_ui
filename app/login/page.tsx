@@ -1,7 +1,7 @@
 'use client';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,16 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.push("/search");
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,12 +35,12 @@ export default function Login() {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/");
+      router.push("/search");
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md pt-32 justify-center gap-2">
+    <div className="flex flex-col w-full px-8 sm:max-w-md justify-center items-center gap-2">
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col w-full gap-2 text-foreground">
         <label className="text-md" htmlFor="email">
           Email
@@ -57,6 +67,11 @@ export default function Login() {
           Sign In
         </Button>
         {error && <p className="text-red-500">{error}</p>}
+        <p className="text-sm text-center">
+          <Link href="/reset_password" className="text-primary hover:underline">
+            Forgot Password?
+          </Link>
+        </p>
         <p className="text-sm text-center">
           Don't have an account?{" "}
           <Link href="/signup" className="text-primary hover:underline">

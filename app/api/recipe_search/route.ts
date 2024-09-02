@@ -11,9 +11,9 @@ export async function POST(request: Request) {
     const normalizedIngredients = ingredients.map(normalizeIngredient);
     console.log("Normalized ingredients:", normalizedIngredients);
 
-    console.log("Attempting to fetch recipes from Redis...");
+    console.log("Attempting to fetch recipes...");
     const results = await getRecipes(normalizedIngredients);
-    console.log(`results count: ${results.length}`);
+    
     return NextResponse.json(results);
   } catch (error: any) {
     console.error("Error in recipe search:", error);
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 }
 
 async function getRecipes(ingredients: string[]) {
-  console.log("Entering getRecipesFromRedis");
+  console.log("Entering getRecipes");
   const redis = getRedisClient();
   const supabase = createClient(cookies());
   const recipeIds = new Set<string>();
@@ -42,81 +42,76 @@ async function getRecipes(ingredients: string[]) {
   );
 
   let recipes: any[] = [];
-  let recipesWithIngredients: any[] = []; 
+  let recipesWithIngredients: any[] = [];
   let recipesWithIngredientsFromRedis: any[] = [];
   let recipesWithIngredientsFromSupabase: any[] = [];
+  // Remove duplicates from recipeIds
+  const uniqueRecipeIds = Array.from(new Set(recipeIds));
+
+  console.log(`Unique recipe IDs: ${uniqueRecipeIds.length}`);
+
   // Fetch details for recipes found in Redis
-  if (recipeIds.size > 0) {
-    const { data: recipes, error } = await supabase
+  if (uniqueRecipeIds.length > 0) {
+    const { data, error } = await supabase
       .from("recipes")
-      .select("id, name, description")
-      .in("id", Array.from(recipeIds));
+      .select(`
+      *,
+      nutrition_info(*),
+      recipe_images(file_path, file_name),
+      recipe_ingredients(
+        quantity,
+        unit,
+        ingredients(name)
+      )
+    `) 
+      .in("id", uniqueRecipeIds);
 
     if (error) {
-      console.error("Error fetching recipes:", error);
+      console.error("Error fetching recipes with ingredients:", error);
       throw error;
     }
 
-    console.log("Fetching recipe ingredients...");
-    const { data: recipeIngredients, error: ingredientsError } = await supabase
-      .from("recipe_ingredients")
-      .select("recipe_id, ingredient_id, ingredients(name)")
-      .in("recipe_id", Array.from(recipeIds));
-
-    if (ingredientsError) {
-      console.error("Error fetching recipe ingredients:", ingredientsError);
-      throw ingredientsError;
-    }
-
-    console.log(
-      `Fetched ingredients for ${
-        recipeIngredients?.length || 0
-      } recipe-ingredient combinations`
-    );
-
-    recipesWithIngredientsFromRedis = recipes?.map((recipe) => ({
-      ...recipe,
-      ingredients: recipeIngredients
-        ?.filter((ri) => ri.recipe_id === recipe.id)
-        .map((ri) => ri.ingredients?.name)
-        .filter(Boolean) as string[],
-    }));
+    recipesWithIngredientsFromRedis = data || [];
     recipesWithIngredients = recipesWithIngredientsFromRedis;
+   
+    console.log(
+      `Fetched ${recipesWithIngredients.length} recipes with ingredients`
+    );
   }
+
   // Check Supabase for ingredients not found in Redis using RPC
   if (notFoundInRedis.size > 0) {
     console.log(
       "Checking Supabase for ingredients:",
       Array.from(notFoundInRedis)
     );
-    const { data: recipesWithIngredientsFromSupabase, error } = await supabase.rpc(
-      "search_recipes_by_ingredients",
-      {
+    const { data: recipesWithIngredientsFromSupabase, error } =
+      await supabase.rpc("search_recipes_by_ingredients", {
         p_ingredients: Array.from(notFoundInRedis),
         similarity_threshold: 0.3,
-      }
-    );
-  
+      });
+
     if (error) {
       console.error("Error fetching from Supabase:", error);
     } else if (recipesWithIngredientsFromSupabase) {
-      recipesWithIngredients = [...recipesWithIngredientsFromRedis, ...recipesWithIngredientsFromSupabase];
+      recipesWithIngredients = [
+        ...recipesWithIngredientsFromRedis,
+        ...recipesWithIngredientsFromSupabase,
+      ];
     }
   }
-
   // Remove duplicates
   const uniqueRecipes = recipesWithIngredients.filter(
     (recipe, index, self) => index === self.findIndex((t) => t.id === recipe.id)
   );
-  console.log("unique recipes", uniqueRecipes);
-
+  console.log("uniqueRecipes", uniqueRecipes);
   // Sort recipes by the number of matching ingredients
   const sortedRecipes = uniqueRecipes.sort((a, b) => {
-    const aMatches = a.ingredients.filter((i: string) =>
-      normalizedIngredients.includes(normalizeIngredient(i))
+    const aMatches = a.recipe_ingredients.filter((i: any) =>
+      normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))
     ).length;
-    const bMatches = b.ingredients.filter((i: string) =>
-      normalizedIngredients.includes(normalizeIngredient(i))
+      const bMatches = b.recipe_ingredients.filter((i: any) =>
+      normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))
     ).length;
     return bMatches - aMatches;
   });

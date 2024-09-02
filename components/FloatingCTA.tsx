@@ -20,7 +20,7 @@ export default function FloatingCTA() {
           size="lg"
           className="bg-white text-primary hover:bg-gray-100 hover:text-primary-dark"
         >
-          Get Started for Free
+          Get Started
         </Button>
       </Link>
     </motion.div>

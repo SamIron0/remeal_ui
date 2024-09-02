@@ -1,20 +1,18 @@
-import React from 'react';
-import { Loader2 } from 'lucide-react';
-
-interface Recipe {
-  id: number;
-  name: string;
-  description: string;
-  ingredients: string[];
-}
-
+import React from "react";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Recipe } from "@/types";
 interface SearchResultsProps {
   recipes: Recipe[];
   loading: boolean;
   error: string | null;
 }
 
-const SearchResults: React.FC<SearchResultsProps> = ({ recipes, loading, error }) => {
+const SearchResults: React.FC<SearchResultsProps> = ({
+  recipes,
+  loading,
+  error,
+}) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -43,18 +41,39 @@ const SearchResults: React.FC<SearchResultsProps> = ({ recipes, loading, error }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {recipes.map((recipe) => (
-        <div key={recipe.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-4">
-            <h2 className="text-xl font-semibold mb-2">{recipe.name}</h2>
-            <p className="text-gray-600 mb-4">{recipe.description}</p>
-            <h4 className="font-semibold mb-2">Ingredients:</h4>
-            <ul className="list-disc list-inside">
-              {recipe.ingredients.map((ingredient, index) => (
-                <li key={index} className="text-sm text-gray-700">{ingredient}</li>
-              ))}
-            </ul>
+        <Link href={`/recipe/${recipe.id}`} key={recipe.id}>
+          <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+            <h3 className="text-lg font-semibold mb-2">{recipe.name}</h3>
+            <p className="text-sm text-gray-600 mb-2">{recipe.description}</p>
+            <div className="mb-2">
+              <strong>Ingredients:</strong>
+              <ul className="list-disc list-inside">
+                {recipe.recipe_ingredients
+                  .slice(0, 3)
+                  .map((ingredient, index) => (
+                    <li key={index}>
+                      {ingredient.quantity} {ingredient.unit}{" "}
+                      {ingredient.ingredients.name}
+                    </li>
+                  ))}
+                {recipe.recipe_ingredients.length > 3 && (
+                  <li className="text-sm text-gray-500">
+                    + {recipe.recipe_ingredients.length - 3} more
+                  </li>
+                )}
+              </ul>
+            </div>
+            {recipe.nutrition_info && (
+              <div className="text-sm">
+                <strong>Nutrition:</strong> {recipe.nutrition_info.calories}{" "}
+                cal,
+                {recipe.nutrition_info.protein}g protein,
+                {recipe.nutrition_info.fat}g fat,
+                {recipe.nutrition_info.carbohydrates}g carbs
+              </div>
+            )}
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

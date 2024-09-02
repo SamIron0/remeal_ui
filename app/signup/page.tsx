@@ -6,7 +6,16 @@ import { redirect } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function Signup() {
+export default async function Signup() {
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
+  
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session) {
+    redirect("/search");
+  }
+
   const signUp = async (formData: FormData) => {
     "use server";
     const cookieStore = cookies();
@@ -15,7 +24,7 @@ export default function Signup() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const { error } = await supabase.auth.signUp({
+    const { data: user, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -27,20 +36,33 @@ export default function Signup() {
       return redirect("/signup?error=" + error.message);
     }
 
-    return redirect("/login?message=Check your email to confirm your account");
+    if (!user.user?.id) {
+      return redirect("/signup?error=User ID not found");
+    }
+
+    const { error: userError } = await supabase
+      .from("users")
+      .update({
+        subscription_status: "pending",
+      })
+      .eq("id", user.user?.id as string);
+
+    if (userError) {
+      console.error("Error updating user status:", userError);
+      return redirect("/signup?error=Failed to create account");
+    }
+
+    return redirect("/membership");
   };
 
+  
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
       <form className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
         <label className="text-md" htmlFor="email">
           Email
         </label>
-        <Input
-          name="email"
-          placeholder="you@example.com"
-          required
-        />
+        <Input name="email" placeholder="you@example.com" required />
 
         <label className="text-md" htmlFor="password">
           Password

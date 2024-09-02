@@ -15,7 +15,7 @@ import FloatingCTA from "@/components/FloatingCTA";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col w-full items-center">
       {/* Hero Section with Parallax */}
       <ParallaxHero />
 

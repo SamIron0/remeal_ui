@@ -33,6 +33,7 @@ export default function Navigation() {
             <Link href="/signup" className="mr-4">
               Sign Up
             </Link>
+            <Link href="/profile" className="mr-4">Profile</Link>
           </>
         )}
       </div>

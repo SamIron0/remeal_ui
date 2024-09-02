@@ -8,13 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import SearchResults from './SearchResults';
-
-interface Recipe {
-  id: number;
-  name: string;
-  description: string;
-  ingredients: string[];
-}
+import { Recipe } from '@/types';
 
 const RecipeSearch: React.FC = () => {
   const [ingredients, setIngredients] = useState<string[]>([]);

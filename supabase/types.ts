@@ -50,6 +50,21 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          id: string
+          stripe_customer_id: string | null
+        }
+        Insert: {
+          id: string
+          stripe_customer_id?: string | null
+        }
+        Update: {
+          id?: string
+          stripe_customer_id?: string | null
+        }
+        Relationships: []
+      }
       ingredient_index: {
         Row: {
           id: number
@@ -138,6 +153,77 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      prices: {
+        Row: {
+          active: boolean | null
+          currency: string | null
+          id: string
+          interval: Database["public"]["Enums"]["pricing_plan_interval"] | null
+          interval_count: number | null
+          product_id: string | null
+          trial_period_days: number | null
+          type: Database["public"]["Enums"]["pricing_type"] | null
+          unit_amount: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          currency?: string | null
+          id: string
+          interval?: Database["public"]["Enums"]["pricing_plan_interval"] | null
+          interval_count?: number | null
+          product_id?: string | null
+          trial_period_days?: number | null
+          type?: Database["public"]["Enums"]["pricing_type"] | null
+          unit_amount?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          currency?: string | null
+          id?: string
+          interval?: Database["public"]["Enums"]["pricing_plan_interval"] | null
+          interval_count?: number | null
+          product_id?: string | null
+          trial_period_days?: number | null
+          type?: Database["public"]["Enums"]["pricing_type"] | null
+          unit_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prices_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean | null
+          description: string | null
+          id: string
+          image: string | null
+          metadata: Json | null
+          name: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          description?: string | null
+          id: string
+          image?: string | null
+          metadata?: Json | null
+          name?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          metadata?: Json | null
+          name?: string | null
+        }
+        Relationships: []
       }
       recipe_categories: {
         Row: {
@@ -323,6 +409,68 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          cancel_at: string | null
+          cancel_at_period_end: boolean | null
+          canceled_at: string | null
+          created: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          ended_at: string | null
+          id: string
+          metadata: Json | null
+          price_id: string | null
+          quantity: number | null
+          status: Database["public"]["Enums"]["subscription_status"] | null
+          trial_end: string | null
+          trial_start: string | null
+          user_id: string | null
+        }
+        Insert: {
+          cancel_at?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          ended_at?: string | null
+          id: string
+          metadata?: Json | null
+          price_id?: string | null
+          quantity?: number | null
+          status?: Database["public"]["Enums"]["subscription_status"] | null
+          trial_end?: string | null
+          trial_start?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          cancel_at?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          price_id?: string | null
+          quantity?: number | null
+          status?: Database["public"]["Enums"]["subscription_status"] | null
+          trial_end?: string | null
+          trial_start?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_price_id_fkey"
+            columns: ["price_id"]
+            isOneToOne: false
+            referencedRelation: "prices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           name: string
@@ -343,33 +491,39 @@ export type Database = {
           auth_user_id: string
           avatar_url: string | null
           created_at: string | null
-          email: string | null
+          email: string
           full_name: string | null
           id: string
-          is_premium: boolean | null
-          role: string | null
+          payment_method: Json | null
+          subscription_end_date: string | null
+          trial_end_date: string | null
+          trial_start_date: string | null
           updated_at: string | null
         }
         Insert: {
           auth_user_id: string
           avatar_url?: string | null
           created_at?: string | null
-          email?: string | null
+          email: string
           full_name?: string | null
           id: string
-          is_premium?: boolean | null
-          role?: string | null
+          payment_method?: Json | null
+          subscription_end_date?: string | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
           updated_at?: string | null
         }
         Update: {
           auth_user_id?: string
           avatar_url?: string | null
           created_at?: string | null
-          email?: string | null
+          email?: string
           full_name?: string | null
           id?: string
-          is_premium?: boolean | null
-          role?: string | null
+          payment_method?: Json | null
+          subscription_end_date?: string | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -480,13 +634,22 @@ export type Database = {
       search_recipes_by_ingredients: {
         Args: {
           p_ingredients: string[]
-          similarity_threshold: number
+          similarity_threshold?: number
         }
         Returns: {
           id: number
           name: string
           description: string
-          ingredients: string[]
+          prep_time: number
+          cook_time: number
+          servings: number
+          instructions: string
+          created_at: string
+          updated_at: string
+          user_id: string
+          nutrition_info: Json
+          recipe_images: Json
+          recipe_ingredients: Json
           match_count: number
         }[]
       }
@@ -509,6 +672,17 @@ export type Database = {
     }
     Enums: {
       meal_type: "Breakfast" | "Lunch" | "Dinner" | "Snack" | "Dessert"
+      pricing_plan_interval: "day" | "week" | "month" | "year"
+      pricing_type: "one_time" | "recurring"
+      subscription_status:
+        | "trialing"
+        | "active"
+        | "canceled"
+        | "incomplete"
+        | "incomplete_expired"
+        | "past_due"
+        | "unpaid"
+        | "paused"
     }
     CompositeTypes: {
       [_ in never]: never
