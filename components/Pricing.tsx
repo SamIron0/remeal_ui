@@ -2,13 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import type { Tables } from "@/supabase/types";
-import { getStripe } from "@/utils/stripe/client";
-import { checkoutWithStripe } from "@/utils/stripe/server";
-import { getErrorRedirect } from "@/utils/helpers";
-import { User } from "@supabase/supabase-js";
 import cn from "classnames";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
@@ -42,60 +40,59 @@ export default function Pricing({ user, products, subscription }: Props) {
   const router = useRouter();
   const [billingInterval, setBillingInterval] =
     useState<BillingInterval>("month");
-  const [priceIdLoading, setPriceIdLoading] = useState<string>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const currentPath = usePathname();
-
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const supabase = createClient();
   const handleStripeCheckout = async (price: Price) => {
-    setPriceIdLoading(price.id);
+    setIsLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      setPriceIdLoading(undefined);
-      return router.push("/signup");
+      router.push("/login");
+      return;
     }
-
-    const { errorRedirect, sessionId } = await checkoutWithStripe(
-      price,
-      currentPath
-    );
-
-    if (errorRedirect) {
-      setPriceIdLoading(undefined);
-      return router.push(errorRedirect);
+    const response = await fetch("/api/create_customer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: user.email,
+        name: user.user_metadata.full_name,
+      }),
+    });
+    const data = await response.json();
+    setCustomerId(data.id);
+    if (data.error) {
+      console.error("Error creating customer:", data.error);
     }
+    const subscriptionResponse = await fetch("/api/create-subscription", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        priceId: price.id,
+        customerId: customerId,
+      }),
+    });
+    const subscriptionData = await subscriptionResponse.json();
 
-    if (!sessionId) {
-      setPriceIdLoading(undefined);
-      return router.push(
-        getErrorRedirect(
-          currentPath,
-          "An unknown error occurred.",
-          "Please try again later or contact a system administrator."
-        )
-      );
+    if (subscriptionData.error) {
+      console.error("Error creating subscription:", subscriptionData.error);
     }
-
-    const stripe = await getStripe();
-    stripe?.redirectToCheckout({ sessionId });
-
-    setPriceIdLoading(undefined);
+    router.push("/checkout?client_secret=" + subscriptionData.client_secret);
   };
-
   if (!products.length) {
     return (
       <section className="bg-black">
         <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
           <div className="sm:flex sm:flex-col sm:align-center"></div>
           <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            No subscription pricing plans found. Create them in your{" "}
-            <a
-              className="text-pink-500 underline"
-              href="https://dashboard.stripe.com/products"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Stripe Dashboard
-            </a>
-            .
+            No subscription pricing plans found. ÏS
           </p>
         </div>
       </section>
@@ -108,10 +105,6 @@ export default function Pricing({ user, products, subscription }: Props) {
             <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
               Pricing Plans
             </h1>
-            <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-              Start building for free, then add a site plan to go live. Account
-              plans unlock additional features.
-            </p>
             <div className="relative self-center mt-6 bg-zinc-900 rounded-lg p-0.5 flex sm:mt-8 border border-zinc-800">
               {intervals.includes("month") && (
                 <button

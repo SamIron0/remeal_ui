@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/create_subscription/route.js", "app/checkout/page.jsx", "app/checkout/complete/page.jsx", "utils/stripe.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/create_subscription/route.js"],
   "exclude": ["node_modules"]
 }

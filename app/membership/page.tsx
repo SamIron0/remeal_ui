@@ -10,9 +10,9 @@ import { cookies } from 'next/headers';
 export default async function PricingPage() {
   const supabase = createClient(cookies());
   const [user, products, subscription] = await Promise.all([
-    getUser(supabase),
-    getProducts(supabase),
-    getSubscription(supabase)
+    getUser(),
+    getProducts(),
+    getSubscription()
   ]);
 
   return (

@@ -10,27 +10,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
-import { UserProfile } from "@/types";
 import { Tables } from "@/supabase/types";
+
+type UserWithSubscription = Tables<"users"> & {
+  subscriptions: Tables<"subscriptions"> | null;
+};
 
 export default function ProfileForm() {
   const supabase = createClient();
   const router = useRouter();
-  const [profile, setProfile] = useState<Tables<"users">>({
-    auth_user_id: "",
-    avatar_url: "",
-    created_at: "",
-    email: "",
-    full_name: "",
-    id: "",
-    subscription_end_date: "",
-    subscription_status: null,
-    trial_end_date: "",
-    trial_start_date: "",
-    updated_at: "",
-  });
+  const [profile, setProfile] = useState<UserWithSubscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -45,7 +35,7 @@ export default function ProfileForm() {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("users")
-        .select("*")
+        .select("*, subscriptions(*)")
         .eq("auth_user_id", user.id)
         .single();
 
@@ -53,7 +43,7 @@ export default function ProfileForm() {
         console.error("Error fetching profile:", error);
         toast.error("Failed to load profile");
       } else {
-        setProfile(data);
+        setProfile(data as unknown as UserWithSubscription);
       }
       setIsLoading(false);
     }
@@ -65,31 +55,20 @@ export default function ProfileForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setProfile((prev: any) => (prev ? { ...prev, [name]: value } : null));
-  };
-
-  const handleSwitchChange = (name: string) => (checked: boolean) => {
-    setProfile((prev: any) =>
-      prev
-        ? {
-            ...prev,
-            notification_settings: {
-              ...prev.notification_settings,
-              [name]: checked,
-            },
-          }
-        : null
-    );
+    setProfile((prev) => (prev ? { ...prev, [name]: value } : null));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!profile) return;
 
-    setIsSaving(true);
+    setIsLoading(true);
     const { error } = await supabase
       .from("users")
-      .update(profile)
+      .update({
+        full_name: profile.full_name,
+        // Add other fields you want to update
+      })
       .eq("id", profile.id);
 
     if (error) {
@@ -98,30 +77,22 @@ export default function ProfileForm() {
     } else {
       toast.success("Profile updated successfully");
     }
-    setIsSaving(false);
-  };
-
-  const handleUpgrade = async () => {
-   // router.push("/checkout");
+    setIsLoading(false);
   };
 
   const handleCancelSubscription = async () => {
     if (confirm("Are you sure you want to cancel your subscription?")) {
-      setIsSaving(true);
-      const { error } = await supabase
-        .from("users")
-        .update({ subscription_status: "cancelled" })
-        .eq("id", profile.id);
+      setIsLoading(true);
 
-      if (error) {
-        console.error("Error cancelling subscription:", error);
-        toast.error("Failed to cancel subscription");
-      } else {
-        toast.success("Subscription cancelled successfully");
-        setProfile({ ...profile, subscription_status: "cancelled" });
-      }
-      setIsSaving(false);
+      // TODO: Implement subscription cancellation logic
+      // This might involve calling a server-side API to handle the cancellation with Stripe
+
+      setIsLoading(false);
     }
+  };
+
+  const handleUpgrade = () => {
+    router.push("/upgrade"); // Assuming you have an upgrade page
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -146,44 +117,51 @@ export default function ProfileForm() {
 
       <div>
         <h2 className="text-2xl font-bold mt-8 mb-4">Membership Status</h2>
-        {profile.subscription_status === "trial" && (
-          <div>
-            <p>You are currently on a free trial.</p>
-            <p>
-              Trial ends on:{" "}
-              {new Date(profile.trial_end_date || "").toLocaleDateString()}
-            </p>
-            <Button onClick={() => handleUpgrade()} className="mt-4">
-              Upgrade to Premium
-            </Button>
-          </div>
-        )}
-        {profile.subscription_status === "active" && (
+        {profile.subscriptions &&
+          profile.subscriptions.status === "trialing" && (
+            <div>
+              <p>You are currently on a free trial.</p>
+              <p>
+                Trial ends on:{" "}
+                {new Date(
+                  profile.subscriptions.trial_end || ""
+                ).toLocaleDateString()}
+              </p>
+              <Button onClick={handleUpgrade} className="mt-4">
+                Upgrade to Premium
+              </Button>
+            </div>
+          )}
+        {profile.subscriptions && profile.subscriptions.status === "active" && (
           <div>
             <p>You have an active premium membership.</p>
             <p>
               Subscription renews on:{" "}
               {new Date(
-                profile.subscription_end_date || ""
+                profile.subscriptions.current_period_end || ""
               ).toLocaleDateString()}
             </p>
-            <Button onClick={() => handleCancelSubscription()} className="mt-4">
+            <Button onClick={handleCancelSubscription} className="mt-4">
               Cancel Subscription
             </Button>
           </div>
         )}
-        {profile.subscription_status === "expired" && (
+        {(!profile.subscriptions ||
+          profile.subscriptions.status === "canceled") && (
           <div>
-            <p>Your membership has expired.</p>
-            <Button onClick={() => handleUpgrade()} className="mt-4">
-              Renew Membership
+            <p>
+              Your membership has expired or you don't have an active
+              subscription.
+            </p>
+            <Button onClick={handleUpgrade} className="mt-4">
+              Upgrade to Premium
             </Button>
           </div>
         )}
       </div>
 
-      <Button type="submit" disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save Changes"}
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? "Saving..." : "Save Changes"}
       </Button>
     </form>
   );

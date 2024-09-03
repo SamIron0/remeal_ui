@@ -1,8 +1,9 @@
 import { toDateTime } from "@/utils/helpers";
 import { stripe } from "@/utils/stripe/config";
-import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
-import type { Database, Tables, TablesInsert } from "@/supabase/types"
+import type { Database, Tables, TablesInsert } from "@/supabase/types";
+import { createClient } from "./server";
+import { cookies } from "next/headers";
 
 type Product = Tables<"products">;
 type Price = Tables<"prices">;
@@ -12,12 +13,9 @@ const TRIAL_PERIOD_DAYS = 0;
 
 // Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
 // as it has admin privileges and overwrites RLS policies!
-const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-);
 
 const upsertProductRecord = async (product: Stripe.Product) => {
+  const supabaseAdmin = createClient(cookies());
   const productData: Product = {
     id: product.id,
     active: product.active,
@@ -51,7 +49,7 @@ const upsertPriceRecord = async (
     interval_count: price.recurring?.interval_count ?? null,
     trial_period_days: price.recurring?.trial_period_days ?? TRIAL_PERIOD_DAYS,
   };
-
+  const supabaseAdmin = createClient(cookies());
   const { error: upsertError } = await supabaseAdmin
     .from("prices")
     .upsert([priceData]);
@@ -74,6 +72,7 @@ const upsertPriceRecord = async (
 };
 
 const deleteProductRecord = async (product: Stripe.Product) => {
+  const supabaseAdmin = createClient(cookies());
   const { error: deletionError } = await supabaseAdmin
     .from("products")
     .delete()
@@ -84,6 +83,7 @@ const deleteProductRecord = async (product: Stripe.Product) => {
 };
 
 const deletePriceRecord = async (price: Stripe.Price) => {
+  const supabaseAdmin = createClient(cookies());
   const { error: deletionError } = await supabaseAdmin
     .from("prices")
     .delete()
@@ -94,6 +94,7 @@ const deletePriceRecord = async (price: Stripe.Price) => {
 };
 
 const upsertCustomerToSupabase = async (uuid: string, customerId: string) => {
+  const supabaseAdmin = createClient(cookies());
   const { error: upsertError } = await supabaseAdmin
     .from("customers")
     .upsert([{ id: uuid, stripe_customer_id: customerId }]);
@@ -121,6 +122,7 @@ const createOrRetrieveCustomer = async ({
   email: string;
   uuid: string;
 }) => {
+  const supabaseAdmin = createClient(cookies());
   // Check if the customer already exists in Supabase
   const { data: existingSupabaseCustomer, error: queryError } =
     await supabaseAdmin
@@ -201,6 +203,7 @@ const copyBillingDetailsToCustomer = async (
   if (!name || !phone || !address) return;
   //@ts-ignore
   await stripe.customers.update(customer, { name, phone, address });
+  const supabaseAdmin = createClient(cookies());
   const { error: updateError } = await supabaseAdmin
     .from("users")
     .update({
@@ -211,12 +214,12 @@ const copyBillingDetailsToCustomer = async (
   if (updateError)
     throw new Error(`Customer update failed: ${updateError.message}`);
 };
-
 const manageSubscriptionStatusChange = async (
   subscriptionId: string,
   customerId: string,
   createAction = false
 ) => {
+  const supabaseAdmin = createClient(cookies());
   // Get customer's UUID from mapping table.
   const { data: customerData, error: noCustomerError } = await supabaseAdmin
     .from("customers")
