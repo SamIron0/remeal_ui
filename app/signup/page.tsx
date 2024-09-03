@@ -29,7 +29,7 @@ export default async function Signup() {
       email,
       password,
       options: {
-        emailRedirectTo: `https://remeal.vercel.app/membership`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/membership`,
       },
     });
 

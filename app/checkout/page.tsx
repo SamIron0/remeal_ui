@@ -29,7 +29,7 @@ export default function Checkout() {
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "https://remeal.vercel.app/checkout/complete",
+        return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/complete`,
       },
     });
 
