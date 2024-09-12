@@ -7,6 +7,9 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { checkoutWithStripe } from "@/utils/stripe/server";
+import { getErrorRedirect } from "@/utils/helpers";
+import { getStripe } from "@/utils/stripe/client";
 
 type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
@@ -40,51 +43,42 @@ export default function Pricing({ user, products, subscription }: Props) {
   const router = useRouter();
   const [billingInterval, setBillingInterval] =
     useState<BillingInterval>("month");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [priceIdLoading, setPriceIdLoading] = useState<string>();
   const currentPath = usePathname();
-  const [customerId, setCustomerId] = useState<string | null>(null);
-  const supabase = createClient();
+
   const handleStripeCheckout = async (price: Price) => {
-    setIsLoading(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    setPriceIdLoading(price.id);
 
     if (!user) {
-      router.push("/login");
-      return;
+      setPriceIdLoading(undefined);
+      return router.push("/signin/signup");
     }
-    const response = await fetch("/api/create_customer", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: user.email,
-        name: user.user_metadata.full_name,
-      }),
-    });
-    const data = await response.json();
-    setCustomerId(data.id);
-    if (data.error) {
-      console.error("Error creating customer:", data.error);
-    }
-    const subscriptionResponse = await fetch("/api/create-subscription", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        priceId: price.id,
-        customerId: customerId,
-      }),
-    });
-    const subscriptionData = await subscriptionResponse.json();
 
-    if (subscriptionData.error) {
-      console.error("Error creating subscription:", subscriptionData.error);
+    const { errorRedirect, sessionId } = await checkoutWithStripe(
+      price,
+      currentPath
+    );
+
+    if (errorRedirect) {
+      setPriceIdLoading(undefined);
+      return router.push(errorRedirect);
     }
-    router.push("/checkout?client_secret=" + subscriptionData.client_secret);
+
+    if (!sessionId) {
+      setPriceIdLoading(undefined);
+      return router.push(
+        getErrorRedirect(
+          currentPath,
+          "An unknown error occurred.",
+          "Please try again later or contact a system administrator."
+        )
+      );
+    }
+
+    const stripe = await getStripe();
+    stripe?.redirectToCheckout({ sessionId });
+
+    setPriceIdLoading(undefined);
   };
   if (!products.length) {
     return (
@@ -92,7 +86,7 @@ export default function Pricing({ user, products, subscription }: Props) {
         <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
           <div className="sm:flex sm:flex-col sm:align-center"></div>
           <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            No subscription pricing plans found. ÏS
+            No subscription pricing plans found.
           </p>
         </div>
       </section>
