@@ -1,25 +1,25 @@
-import { Tables } from '@/supabase/types';
-type Price = Tables<'prices'>;
+import { Tables } from "@/supabase/types";
+type Price = Tables<"prices">;
 
-export const getURL = (path: string = '') => {
+export const getURL = (path: string = "") => {
   // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
   let url =
     process?.env?.NEXT_PUBLIC_SITE_URL &&
-    process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''
+    process.env.NEXT_PUBLIC_SITE_URL.trim() !== ""
       ? process.env.NEXT_PUBLIC_SITE_URL
       : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-        process?.env?.NEXT_PUBLIC_VERCEL_URL &&
-          process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ''
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : // If neither is set, default to localhost for local development.
-          'http://localhost:3000/';
+      process?.env?.NEXT_PUBLIC_VERCEL_URL &&
+        process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
+      ? process.env.NEXT_PUBLIC_VERCEL_URL
+      : // If neither is set, default to localhost for local development.
+        "http://localhost:3000/";
 
   // Trim the URL and remove trailing slash if exists.
-  url = url.replace(/\/+$/, '');
+  url = url.replace(/\/+$/, "");
   // Make sure to include `https://` when not localhost.
-  url = url.includes('http') ? url : `https://${url}`;
+  url = url.includes("http") ? url : `https://${url}`;
   // Ensure path starts without a slash to avoid double slashes in the final URL.
-  path = path.replace(/^\/+/, '');
+  path = path.replace(/^\/+/, "");
 
   // Concatenate the URL and the path.
   return path ? `${url}/${path}` : url;
@@ -27,16 +27,16 @@ export const getURL = (path: string = '') => {
 
 export const postData = async ({
   url,
-  data
+  data,
 }: {
   url: string;
   data?: { price: Price };
 }) => {
   const res = await fetch(url, {
-    method: 'POST',
-    headers: new Headers({ 'Content-Type': 'application/json' }),
-    credentials: 'same-origin',
-    body: JSON.stringify(data)
+    method: "POST",
+    headers: new Headers({ "Content-Type": "application/json" }),
+    credentials: "same-origin",
+    body: JSON.stringify(data),
   });
 
   return res.json();
@@ -68,24 +68,26 @@ export const calculateTrialEndUnixTimestamp = (
 };
 
 const toastKeyMap: { [key: string]: string[] } = {
-  status: ['status', 'status_description'],
-  error: ['error', 'error_description']
+  status: ["status", "status_description"],
+  error: ["error", "error_description"],
 };
 
 const getToastRedirect = (
   path: string,
   toastType: string,
   toastName: string,
-  toastDescription: string = '',
+  toastDescription: string = "",
   disableButton: boolean = false,
-  arbitraryParams: string = ''
+  arbitraryParams: string = ""
 ): string => {
   const [nameKey, descriptionKey] = toastKeyMap[toastType];
 
   let redirectPath = `${path}?${nameKey}=${encodeURIComponent(toastName)}`;
 
   if (toastDescription) {
-    redirectPath += `&${descriptionKey}=${encodeURIComponent(toastDescription)}`;
+    redirectPath += `&${descriptionKey}=${encodeURIComponent(
+      toastDescription
+    )}`;
   }
 
   if (disableButton) {
@@ -102,13 +104,13 @@ const getToastRedirect = (
 export const getStatusRedirect = (
   path: string,
   statusName: string,
-  statusDescription: string = '',
+  statusDescription: string = "",
   disableButton: boolean = false,
-  arbitraryParams: string = ''
+  arbitraryParams: string = ""
 ) =>
   getToastRedirect(
     path,
-    'status',
+    "status",
     statusName,
     statusDescription,
     disableButton,
@@ -118,21 +120,20 @@ export const getStatusRedirect = (
 export const getErrorRedirect = (
   path: string,
   errorName: string,
-  errorDescription: string = '',
+  errorDescription: string = "",
   disableButton: boolean = false,
-  arbitraryParams: string = ''
+  arbitraryParams: string = ""
 ) =>
   getToastRedirect(
     path,
-    'error',
+    "error",
     errorName,
     errorDescription,
     disableButton,
     arbitraryParams
   );
 
-
-  export function normalizeIngredient(ingredient: string): string {
+export function normalizeIngredient(ingredient: string): string {
   return ingredient
     .toLowerCase()
     .replace(/[^\w\s]/g, "")
@@ -153,8 +154,7 @@ export async function callLLM(prompt: string): Promise<string> {
         messages: [
           {
             role: "system",
-            content:
-              "You are a helpful assistant.",
+            content: "You are a helpful assistant.",
           },
           {
             role: "user",
@@ -192,7 +192,7 @@ export async function callLLMJson(prompt: string): Promise<string> {
             content:
               "You are a helpful assistant that must respond only with valid JSON. Do not include any other text or formatting.",
           },
-          { 
+          {
             role: "user",
             content: prompt,
           },
@@ -218,5 +218,3 @@ export async function callLLMJson(prompt: string): Promise<string> {
     throw error;
   }
 }
-
-

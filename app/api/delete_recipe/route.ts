@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/client'
-import { normalizeIngredient } from '@/utils/helpers'
 import getRedisClient from '@/utils/redis'
 
 export async function DELETE(
