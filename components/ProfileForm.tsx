@@ -13,7 +13,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/supabase/types";
 
 type UserWithSubscription = Tables<"users"> & {
-  subscriptions: Tables<"subscriptions"> | null;
+  subscriptions: Tables<"subscriptions">[] | null;
 };
 
 export default function ProfileForm() {
@@ -95,6 +95,9 @@ export default function ProfileForm() {
     router.push("/upgrade"); // Assuming you have an upgrade page
   };
 
+  const subscription = profile?.subscriptions?.[0];
+  const subscriptionStatus = subscription?.status;
+
   if (isLoading) return <div>Loading...</div>;
   if (!profile) return <div>Profile not found</div>;
 
@@ -117,28 +120,28 @@ export default function ProfileForm() {
 
       <div>
         <h2 className="text-2xl font-bold mt-8 mb-4">Membership Status</h2>
-        {profile.subscriptions &&
-          profile.subscriptions.status === "trialing" && (
-            <div>
-              <p>You are currently on a free trial.</p>
-              <p>
-                Trial ends on:{" "}
-                {new Date(
-                  profile.subscriptions.trial_end || ""
-                ).toLocaleDateString()}
-              </p>
-              <Button onClick={handleUpgrade} className="mt-4">
-                Upgrade to Premium
-              </Button>
-            </div>
-          )}
-        {profile.subscriptions && profile.subscriptions.status === "active" && (
+        Profile status: {subscriptionStatus || 'No active subscription'}
+        {subscription && subscriptionStatus === "trialing" && (
+          <div>
+            <p>You are currently on a free trial.</p>
+            <p>
+              Trial ends on:{" "}
+              {new Date(
+                subscription.trial_end || ""
+              ).toLocaleDateString()}
+            </p>
+            <Button onClick={handleUpgrade} className="mt-4">
+              Upgrade to Premium
+            </Button>
+          </div>
+        )}
+        {subscription && subscriptionStatus === "active" && (
           <div>
             <p>You have an active premium membership.</p>
             <p>
               Subscription renews on:{" "}
               {new Date(
-                profile.subscriptions.current_period_end || ""
+                subscription.current_period_end || ""
               ).toLocaleDateString()}
             </p>
             <Button onClick={handleCancelSubscription} className="mt-4">
@@ -146,8 +149,7 @@ export default function ProfileForm() {
             </Button>
           </div>
         )}
-        {(!profile.subscriptions ||
-          profile.subscriptions.status === "canceled") && (
+        {(!subscription || subscriptionStatus === "canceled") && (
           <div>
             <p>
               Your membership has expired or you don't have an active

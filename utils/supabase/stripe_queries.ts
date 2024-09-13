@@ -1,8 +1,9 @@
-import { createClient } from "./client";
+import { createClient } from "./server";
+import { cookies } from "next/headers";
 import { cache } from "react";
 
 export const getUser = cache(async () => {
-  const supabase = createClient();
+  const supabase = createClient(cookies());
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -10,7 +11,7 @@ export const getUser = cache(async () => {
 });
 
 export const getSubscription = cache(async () => {
-  const supabase = createClient();
+  const supabase = createClient(cookies());
   const { data: subscription, error } = await supabase
     .from("subscriptions")
     .select("*, prices(*, products(*))")
@@ -21,7 +22,7 @@ export const getSubscription = cache(async () => {
 });
 
 export const getProducts = cache(async () => {
-  const supabase = createClient();
+  const supabase = createClient(cookies());
   const { data: products, error } = await supabase
     .from("products")
     .select("*, prices(*)")
@@ -29,12 +30,11 @@ export const getProducts = cache(async () => {
     .eq("prices.active", true)
     .order("metadata->index")
     .order("unit_amount", { referencedTable: "prices" });
-
   return products;
 });
 
 export const getUserDetails = cache(async () => {
-  const supabase = createClient();
+  const supabase = createClient(cookies());
   const { data: userDetails } = await supabase
     .from("users")
     .select("*")

@@ -94,7 +94,7 @@ const deletePriceRecord = async (price: Stripe.Price) => {
 };
 
 const upsertCustomerToSupabase = async (uuid: string, customerId: string) => {
-  const supabaseAdmin = createClient(cookies());
+  const supabaseAdmin = createClient(cookies()); // Ensure service role is used
   const { error: upsertError } = await supabaseAdmin
     .from("customers")
     .upsert([{ id: uuid, stripe_customer_id: customerId }]);

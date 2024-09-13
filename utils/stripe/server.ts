@@ -26,7 +26,9 @@ export async function checkoutWithStripe(
   try {
     // Get the user from Supabase auth
     const supabase = createClient(cookies());
-    const {
+    const { data: { session } } = await supabase.auth.getSession();
+
+   const {
       error,
       data: { user }
     } = await supabase.auth.getUser();
@@ -85,17 +87,17 @@ export async function checkoutWithStripe(
     }
 
     // Create a checkout session in Stripe
-    let session;
+    let stripe_session;
     try {
-      session = await stripe.checkout.sessions.create(params);
+      stripe_session = await stripe.checkout.sessions.create(params);
     } catch (err) {
       console.error(err);
       throw new Error('Unable to create checkout session.');
     }
 
     // Instead of returning a Response, just return the data or error.
-    if (session) {
-      return { sessionId: session.id };
+    if (stripe_session) {
+      return { sessionId: stripe_session.id };
     } else {
       throw new Error('Unable to create checkout session.');
     }

@@ -29,7 +29,7 @@ export default async function Signup() {
       email,
       password,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/membership`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/search`,
       },
     });
 

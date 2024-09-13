@@ -5,9 +5,7 @@ import type { Tables } from "@/supabase/types";
 import cn from "classnames";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { checkoutWithStripe } from "@/utils/stripe/server";
 import { getErrorRedirect } from "@/utils/helpers";
 import { getStripe } from "@/utils/stripe/client";
 
@@ -51,32 +49,30 @@ export default function Pricing({ user, products, subscription }: Props) {
 
     if (!user) {
       setPriceIdLoading(undefined);
-      return router.push("/signin/signup");
+      return router.push("/signup");
     }
 
-    const { errorRedirect, sessionId } = await checkoutWithStripe(
-      price,
-      currentPath
-    );
+    const response = await fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ price, redirectPath: currentPath }),
+    });
 
-    if (errorRedirect) {
-      setPriceIdLoading(undefined);
-      return router.push(errorRedirect);
+    const result = await response.json();
+
+    if (response.ok) {
+      if (result.sessionId) {
+        const stripe = await getStripe();
+        stripe?.redirectToCheckout({ sessionId: result.sessionId });
+      } else if (result.errorRedirect) {
+        router.push(result.errorRedirect);
+      }
+    } else {
+      console.error("Checkout error:", result.error);
+      // Handle error (e.g., show error message to user)
     }
-
-    if (!sessionId) {
-      setPriceIdLoading(undefined);
-      return router.push(
-        getErrorRedirect(
-          currentPath,
-          "An unknown error occurred.",
-          "Please try again later or contact a system administrator."
-        )
-      );
-    }
-
-    const stripe = await getStripe();
-    stripe?.redirectToCheckout({ sessionId });
 
     setPriceIdLoading(undefined);
   };
@@ -97,7 +93,7 @@ export default function Pricing({ user, products, subscription }: Props) {
         <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
           <div className="sm:flex sm:flex-col sm:align-center">
             <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-              Pricing Plans
+              PPP
             </h1>
             <div className="relative self-center mt-6 bg-zinc-900 rounded-lg p-0.5 flex sm:mt-8 border border-zinc-800">
               {intervals.includes("month") && (
