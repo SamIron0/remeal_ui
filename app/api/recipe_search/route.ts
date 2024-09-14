@@ -9,9 +9,7 @@ export async function POST(request: Request) {
     const { ingredients, dietaryRestrictions, maxCookTime, minRating } =
       await request.json();
     const normalizedIngredients = ingredients.map(normalizeIngredient);
-    console.log("Normalized ingredients:", normalizedIngredients);
 
-    console.log("Attempting to fetch recipes...");
     const results = await getRecipes(normalizedIngredients);
     
     return NextResponse.json(results);
@@ -22,7 +20,6 @@ export async function POST(request: Request) {
 }
 
 async function getRecipes(ingredients: string[]) {
-  console.log("Entering getRecipes");
   const redis = getRedisClient();
   const supabase = createClient(cookies());
   const recipeIds = new Set<string>();
@@ -48,7 +45,6 @@ async function getRecipes(ingredients: string[]) {
   // Remove duplicates from recipeIds
   const uniqueRecipeIds = Array.from(new Set(recipeIds));
 
-  console.log(`Unique recipe IDs: ${uniqueRecipeIds.length}`);
 
   // Fetch details for recipes found in Redis
   if (uniqueRecipeIds.length > 0) {
@@ -74,17 +70,12 @@ async function getRecipes(ingredients: string[]) {
     recipesWithIngredientsFromRedis = data || [];
     recipesWithIngredients = recipesWithIngredientsFromRedis;
    
-    console.log(
-      `Fetched ${recipesWithIngredients.length} recipes with ingredients`
-    );
+   
   }
 
   // Check Supabase for ingredients not found in Redis using RPC
   if (notFoundInRedis.size > 0) {
-    console.log(
-      "Checking Supabase for ingredients:",
-      Array.from(notFoundInRedis)
-    );
+  
     const { data: recipesWithIngredientsFromSupabase, error } =
       await supabase.rpc("search_recipes_by_ingredients", {
         p_ingredients: Array.from(notFoundInRedis),
@@ -104,7 +95,6 @@ async function getRecipes(ingredients: string[]) {
   const uniqueRecipes = recipesWithIngredients.filter(
     (recipe, index, self) => index === self.findIndex((t) => t.id === recipe.id)
   );
-  console.log("uniqueRecipes", uniqueRecipes);
   // Sort recipes by the number of matching ingredients
   const sortedRecipes = uniqueRecipes.sort((a, b) => {
     const aMatches = a.recipe_ingredients.filter((i: any) =>
@@ -116,7 +106,6 @@ async function getRecipes(ingredients: string[]) {
     return bMatches - aMatches;
   });
 
-  console.log(`Returning ${sortedRecipes.length} sorted unique recipes`);
   return sortedRecipes;
 }
 

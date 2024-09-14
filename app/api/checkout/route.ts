@@ -63,10 +63,7 @@ export async function POST(request: Request) {
       success_url: "https://remeal.vercel.app/search",
     };
 
-    console.log(
-      "Trial end:",
-      calculateTrialEndUnixTimestamp(price.trial_period_days)
-    );
+  
     if (price.type === "recurring") {
       params = {
         ...params,

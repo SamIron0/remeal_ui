@@ -364,13 +364,13 @@ export type Database = {
       }
       recipes: {
         Row: {
-          cook_time: number | null
+          cook_time: number
           created_at: string | null
           description: string | null
           id: number
           instructions: string
           name: string
-          prep_time: number | null
+          prep_time: number
           servings: number | null
           updated_at: string | null
           user_id: string | null

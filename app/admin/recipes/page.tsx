@@ -18,7 +18,7 @@ export default function ManageRecipes() {
 
   const fetchRecipes = async () => {
     try {
-      const response = await fetch('/api/admin/recipes');
+      const response = await fetch('/api/get_all_recipes');
       if (!response.ok) throw new Error('Failed to fetch recipes');
       const data = await response.json();
       setRecipes(data);
@@ -32,7 +32,13 @@ export default function ManageRecipes() {
   const deleteRecipe = async (id: number) => {
     if (confirm('Are you sure you want to delete this recipe?')) {
       try {
-        const response = await fetch(`/api/admin/recipes/${id}`, { method: 'DELETE' });
+        const response = await fetch(`/api/delete_recipe`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ recipeId: id }),
+        });
         if (!response.ok) throw new Error('Failed to delete recipe');
         setRecipes(recipes.filter(recipe => recipe.id !== id));
       } catch (error) {

@@ -7,7 +7,6 @@ const apiUrl = `${baseUrl}/api/recipe_ingestion`;
 
 export async function POST(request: Request) {
   try {
-    console.log("Received POST request in admin/recipes");
     const supabase = createClient(cookies());
     const { data: { session } } = await supabase.auth.getSession();
 
@@ -25,10 +24,8 @@ export async function POST(request: Request) {
       servings,
     } = await request.json();
 
-    console.log("Parsed request data:", { name, ingredients, instructions, description, cook_time, prep_time, servings });
 
     // Call the recipe ingestion function to update indexes
-    console.log("Calling recipe ingestion API");
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
@@ -46,9 +43,7 @@ export async function POST(request: Request) {
       }),
     });
 
-    console.log("Recipe ingestion API response status:", response.status);
     const responseData = await response.json();
-    console.log("Recipe ingestion API response data:", responseData);
 
     if (!response.ok) {
       throw new Error(`Recipe ingestion failed: ${responseData.error || 'Unknown error'}`);
