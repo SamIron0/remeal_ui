@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Tables } from "@/supabase/types";
+import { useApp } from "@/context/AppContext";
 
 type UserWithSubscription = Tables<"users"> & {
   subscriptions: Tables<"subscriptions">[] | null;
@@ -36,38 +37,18 @@ type UserWithSubscription = Tables<"users"> & {
 export default function ProfileForm() {
   const supabase = createClient();
   const router = useRouter();
+  const { user, subscription, loading } = useApp();
   const [profile, setProfile] = useState<UserWithSubscription | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    async function fetchProfile() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/login");
-        return;
-      }
-
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from("users")
-        .select("*, subscriptions(*)")
-        .eq("auth_user_id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching profile:", error);
-        toast.error("Failed to load profile");
-      } else {
-        setProfile(data as unknown as UserWithSubscription);
-      }
-      setIsLoading(false);
+    if (user) {
+      setProfile({
+        ...user,
+        subscriptions: subscription ? [subscription] : null,
+      });
     }
-
-    fetchProfile();
-  }, [supabase, router]);
+  }, [user, subscription]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -77,7 +58,7 @@ export default function ProfileForm() {
   const handleSubmit = async () => {
     if (!profile) return;
 
-    setIsLoading(true);
+    setIsEditing(false);
     const { error } = await supabase
       .from("users")
       .update({
@@ -91,29 +72,23 @@ export default function ProfileForm() {
       toast.error("Failed to update profile");
     } else {
       toast.success("Profile updated successfully");
-      setIsEditing(false);
     }
-    setIsLoading(false);
   };
 
   const handleCancelSubscription = async () => {
-    setIsLoading(true);
-
     // TODO: Implement subscription cancellation logic
     // This might involve calling a server-side API to handle the cancellation with Stripe
 
     toast.success("Subscription cancelled successfully");
-    setIsLoading(false);
   };
 
   const handleUpgrade = () => {
     router.push("/membership"); // Assuming you have an upgrade page
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
   if (!profile) return <div>Profile not found</div>;
 
-  const subscription = profile.subscriptions?.[0];
   const subscriptionStatus = subscription?.status || "No active subscription";
 
   return (
@@ -182,7 +157,6 @@ export default function ProfileForm() {
           </div>
         </div>
         <p className="text-sm text-gray-600">
-          
           Subscription renews on:{" "}
           {subscription?.current_period_end
             ? new Date(subscription.current_period_end).toLocaleDateString()
@@ -195,9 +169,7 @@ export default function ProfileForm() {
             <Button variant="outline" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? "Saving..." : "Save Changes"}
-            </Button>
+            <Button onClick={handleSubmit}>Save Changes</Button>
           </>
         ) : (
           <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>

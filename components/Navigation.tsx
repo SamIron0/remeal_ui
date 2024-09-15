@@ -1,20 +1,33 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useApp } from "@/context/AppContext"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { useApp } from "@/context/AppContext";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LogIn, LogOut, User, CreditCard } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LogIn, LogOut, User, CreditCard } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function Navbar() {
-  const { user, subscription, loading } = useApp()
+  const { user, subscription, loading } = useApp();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error);
+    } else {
+      router.push("/search");
+    }
+  };
 
   return (
     <nav className="bg-background border-b">
@@ -29,17 +42,27 @@ export default function Navbar() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar_url || ""} alt={user.full_name || ""} />
-                      <AvatarFallback>{user.full_name?.charAt(0) || "U"}</AvatarFallback>
+                      <AvatarImage
+                        src={user.avatar_url || ""}
+                        alt={user.full_name || ""}
+                      />
+                      <AvatarFallback>
+                        {user.full_name?.charAt(0) || "U"}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuItem className="flex-col items-start">
                     <div className="font-medium">{user.full_name}</div>
-                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {user.email}
+                    </div>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
@@ -64,11 +87,9 @@ export default function Navbar() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/signout" className="cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Sign out</span>
-                    </Link>
+                  <DropdownMenuItem onSelect={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -95,5 +116,5 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }

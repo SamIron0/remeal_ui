@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/supabase/types";
 import { Recipe } from "@/types";
-
+import { useRouter } from "next/navigation";
 interface AppContextType {
   user: Tables<"users"> | null;
   subscription: any | null;
@@ -28,61 +28,63 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [savedRecipes, setSavedRecipes] = useState<number[]>([]);
   const supabase = createClient();
-
+  const router = useRouter();
   useEffect(() => {
-    async function loadUserAndSubscription() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("*")
-          .eq("auth_user_id", user.id)
-          .single();
+    const loadUserAndSubscription = async () => {
+      try {
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser();
+        if (authUser) {
+          const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select("*")
+            .eq("auth_user_id", authUser.id)
+            .single();
 
-        if (userData) {
-          setUser(userData);
+          if (userData) {
+            setUser(userData);
+          } else if (userError) {
+            console.error("Error fetching user profile:", userError);
+          }
 
           const { data: subscriptionData, error: subscriptionError } =
             await supabase
               .from("subscriptions")
               .select("*")
-              .eq("user_id", user.id)
-              .single();
+              .eq("user_id", authUser.id);
 
-          if (subscriptionData) {
-            setSubscription(subscriptionData);
+          if (subscriptionData && subscriptionData[0]) {
+            setSubscription(subscriptionData[0]);
           } else if (subscriptionError) {
             console.error("Error fetching subscription:", subscriptionError);
-            setSubscription(null);
-          } else {
-            // No subscription found
-            setSubscription(null);
           }
 
-          const { data, error } = await supabase
-            .from('saved_recipes')
-            .select('recipe_id')
-            .eq('user_id', userData.auth_user_id);
+          const { data: savedRecipesData, error: savedRecipesError } =
+            await supabase
+              .from("saved_recipes")
+              .select("recipe_id")
+              .eq("user_id", userData?.auth_user_id || authUser.id);
 
-          if (error) {
-            console.error('Error fetching saved recipes:', error);
-            setSavedRecipes([]);
-          } else {
-            const savedRecipeIds = data.map(item => item.recipe_id);
+          if (savedRecipesData) {
+            const savedRecipeIds = savedRecipesData.map(
+              (item) => item.recipe_id
+            );
             setSavedRecipes(savedRecipeIds);
+          } else if (savedRecipesError) {
+            console.error("Error fetching saved recipes:", savedRecipesError);
           }
-
-        } else if (userError) {
-          console.error("Error fetching user profile:", userError);
+        } else {
+          setUser(null);
+          setSubscription(null);
+          setSavedRecipes([]);
         }
-      } else {
-        setUser(null);
-        setSubscription(null);
+      } catch (error) {
+        console.error("Error loading user data:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }
+    };
 
     loadUserAndSubscription();
 
@@ -93,6 +95,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         } else if (event === "SIGNED_OUT") {
           setUser(null);
           setSubscription(null);
+          setSavedRecipes([]);
         }
       }
     );
@@ -100,15 +103,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []); // Add supabase.auth as a dependency
+  }, [supabase]);
 
-  return (
-    <AppContext.Provider
-      value={{ user, subscription, loading, recipes, setRecipes, ingredients, setIngredients, savedRecipes, setSavedRecipes }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
+  const value = {
+    user,
+    subscription,
+    loading,
+    recipes,
+    setRecipes,
+    ingredients,
+    setIngredients,
+    savedRecipes,
+    setSavedRecipes,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export const useApp = () => {

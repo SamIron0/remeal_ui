@@ -6,12 +6,27 @@ import { normalizeIngredient } from "@/utils/helpers";
 
 export async function POST(request: Request) {
   try {
+    const supabase = createClient(cookies());
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    const { data: userSubscription } = await supabase
+      .from("subscriptions")
+      .select("status")
+      .eq("user_id", user.id)
+      .single();
+
+    const isPremium = userSubscription?.status === "active";
+
     const { ingredients, dietaryRestrictions, maxCookTime, minRating } =
       await request.json();
     const normalizedIngredients = ingredients.map(normalizeIngredient);
 
-    const results = await getRecipes(normalizedIngredients);
-    
+    const results = await getRecipes(normalizedIngredients, isPremium);
+
     return NextResponse.json(results);
   } catch (error: any) {
     console.error("Error in recipe search:", error);
@@ -19,7 +34,7 @@ export async function POST(request: Request) {
   }
 }
 
-async function getRecipes(ingredients: string[]) {
+async function getRecipes(ingredients: string[], isPremium: boolean) {
   const redis = getRedisClient();
   const supabase = createClient(cookies());
   const recipeIds = new Set<string>();
@@ -45,12 +60,12 @@ async function getRecipes(ingredients: string[]) {
   // Remove duplicates from recipeIds
   const uniqueRecipeIds = Array.from(new Set(recipeIds));
 
-
   // Fetch details for recipes found in Redis
   if (uniqueRecipeIds.length > 0) {
     const { data, error } = await supabase
       .from("recipes")
-      .select(`
+      .select(
+        `
       *,
       nutrition_info(*),
       recipe_images(file_path, file_name),
@@ -59,7 +74,8 @@ async function getRecipes(ingredients: string[]) {
         unit,
         ingredients(name)
       )
-    `) 
+    `
+      )
       .in("id", uniqueRecipeIds);
 
     if (error) {
@@ -69,13 +85,10 @@ async function getRecipes(ingredients: string[]) {
 
     recipesWithIngredientsFromRedis = data || [];
     recipesWithIngredients = recipesWithIngredientsFromRedis;
-   
-   
   }
 
   // Check Supabase for ingredients not found in Redis using RPC
   if (notFoundInRedis.size > 0) {
-  
     const { data: recipesWithIngredientsFromSupabase, error } =
       await supabase.rpc("search_recipes_by_ingredients", {
         p_ingredients: Array.from(notFoundInRedis),
@@ -95,12 +108,23 @@ async function getRecipes(ingredients: string[]) {
   const uniqueRecipes = recipesWithIngredients.filter(
     (recipe, index, self) => index === self.findIndex((t) => t.id === recipe.id)
   );
+
+  // Modify the recipe data based on premium status
+  const modifiedRecipes = uniqueRecipes.map((recipe) => {
+    if (!isPremium) {
+      // Remove nutrition_info for non-premium users
+      const { nutrition_info, ...recipeWithoutNutrition } = recipe;
+      return recipeWithoutNutrition;
+    }
+    return recipe;
+  });
+
   // Sort recipes by the number of matching ingredients
-  const sortedRecipes = uniqueRecipes.sort((a, b) => {
+  const sortedRecipes = modifiedRecipes.sort((a, b) => {
     const aMatches = a.recipe_ingredients.filter((i: any) =>
       normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))
     ).length;
-      const bMatches = b.recipe_ingredients.filter((i: any) =>
+    const bMatches = b.recipe_ingredients.filter((i: any) =>
       normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))
     ).length;
     return bMatches - aMatches;

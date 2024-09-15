@@ -15,11 +15,9 @@ export async function POST(request: Request) {
   const { price, redirectPath } = await request.json();
 
   const supabase = createClient(cookies());
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (error || !user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
