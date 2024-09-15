@@ -7,12 +7,29 @@ import { Button } from "@/components/ui/button";
 import NutritionCard from "@/components/RecipePage/NutritionCard";
 import IngredientList from "@/components/RecipePage/IngredientList";
 import InstructionSteps from "@/components/RecipePage/InstructionSteps";
+import Link from "next/link";
+
 export default async function RecipePage({
   params,
 }: {
   params: { id: string };
 }) {
   const supabase = createClient(cookies());
+  
+  // Fetch user and subscription status
+  const { data: { user } } = await supabase.auth.getUser();
+  let isActiveMember = false;
+  
+  if (user) {
+    const { data: subscriptionData } = await supabase
+      .from('subscriptions')
+      .select('status')
+      .eq('user_id', user.id)
+      .single();
+    
+    isActiveMember = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+  }
+
   const { data: recipe, error } = await supabase
     .from("recipes")
     .select(
@@ -67,10 +84,19 @@ export default async function RecipePage({
           )}
 
           <div className="flex space-x-4 mb-8">
-            <Button variant="outline" className="flex items-center">
-              <Bookmark className="w-4 h-4 mr-2" />
-              Save Recipe
-            </Button>
+            {isActiveMember ? (
+              <Button variant="outline" className="flex items-center">
+                <Bookmark className="w-4 h-4 mr-2" />
+                Save Recipe
+              </Button>
+            ) : (
+              <div className="bg-gray-100 rounded-lg p-4">
+                <p className="mb-2">Upgrade to Premium to save recipes!</p>
+                <Link href="/membership">
+                  <Button className="w-full">Upgrade to Premium</Button>
+                </Link>
+              </div>
+            )}
             <Button variant="outline" className="flex items-center">
               <Share2 className="w-4 h-4 mr-2" />
               Share
@@ -88,7 +114,17 @@ export default async function RecipePage({
 
         <div className="lg:col-span-1">
           <div className="sticky top-8">
-            <NutritionCard nutritionInfo={recipe.nutrition_info} />
+            {isActiveMember ? (
+              <NutritionCard nutritionInfo={recipe.nutrition_info} />
+            ) : (
+              <div className="bg-gray-100 rounded-lg p-4 mb-8">
+                <h3 className="text-xl font-semibold mb-4">Nutrition Information</h3>
+                <p className="mb-4">Unlock detailed nutrition information with a premium membership!</p>
+                <Link href="/membership">
+                  <Button className="w-full">Upgrade to Premium</Button>
+                </Link>
+              </div>
+            )}
             <div className="mt-8">
               <h3 className="text-xl font-semibold mb-4">Recipe Details</h3>
               <div className="bg-gray-100 rounded-lg p-4">

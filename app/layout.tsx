@@ -6,6 +6,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Database } from "@/supabase/types";
 import Navigation from "@/components/Navigation";
+import { AppProvider } from '@/context/AppContext';
 
 const defaultUrl = "https://remeal.food";
 
@@ -80,12 +81,14 @@ export default async function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className="hide-scrollbar bg-background text-foreground">
-        <SpeedInsights />
-        <Navigation />
-        <main className="space-y-12 flex flex-col items-center">
-          {children}
-          <Toaster />
-        </main>
+        <AppProvider>
+          <SpeedInsights />
+          <Navigation />
+          <main className="space-y-12 flex flex-col items-center">
+            {children}
+            <Toaster />
+          </main>
+        </AppProvider>
       </body>
     </html>
   );

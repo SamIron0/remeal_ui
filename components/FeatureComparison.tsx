@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 const features = [
   { name: 'Recipe Search', free: true, premium: true },
   { name: 'Basic Ingredient Matching', free: true, premium: true },
-  { name: 'Save Favorite Recipes', free: true, premium: true },
+  { name: 'Save Favorite Recipes', free: false, premium: true },
   { name: 'Advanced Filters', free: false, premium: true },
   { name: 'Personalized Recommendations', free: false, premium: true },
   { name: 'Meal Planning', free: false, premium: true },

@@ -1,42 +1,99 @@
-"use client";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from '@/hooks/useAuth';
+"use client"
 
-export default function Navigation() {
-  const router = useRouter();
-  const { user, supabase } = useAuth();
+import Link from "next/link"
+import { useApp } from "@/context/AppContext"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { LogIn, LogOut, User, CreditCard } from "lucide-react"
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
-  };
+export default function Navbar() {
+  const { user, subscription, loading } = useApp()
 
   return (
-    <nav className="sticky top-0 z-50 flex justify-between items-center p-4 bg-gray-100">
-      <Link href="/" className="text-xl font-bold">
-        Remeal
-      </Link>
-      <div>
-        {user ? (
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Logout
-          </button>
-        ) : (
-          <>
-            <Link href="/login" className="mr-4">
-              Login
+    <nav className="bg-background border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link href="/" className="flex-shrink-0 flex items-center">
+              <span className="text-2xl font-semi bold">Remeal</span>
             </Link>
-            <Link href="/signup" className="mr-4">
-              Sign Up
-            </Link>
-            <Link href="/profile" className="mr-4">Profile</Link>
-          </>
-        )}
+          </div>
+          <div className="flex items-center">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.avatar_url || ""} alt={user.full_name || ""} />
+                      <AvatarFallback>{user.full_name?.charAt(0) || "U"}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuItem className="flex-col items-start">
+                    <div className="font-medium">{user.full_name}</div>
+                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/pricing" className="cursor-pointer">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Pricing</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  {subscription?.status !== "active" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/upgrade" className="cursor-pointer">
+                        <Button className="w-full" variant="default">
+                          Upgrade to Premium
+                        </Button>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/signout" className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign out</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Link href="/signin">
+                  <Button variant="ghost">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/pricing">
+                  <Button variant="ghost">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Pricing
+                  </Button>
+                </Link>
+                <Link href="/upgrade">
+                  <Button variant="default">Upgrade to Premium</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </nav>
-  );
+  )
 }

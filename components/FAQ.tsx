@@ -19,6 +19,10 @@ const faqs = [
     question: 'How often are new recipes added?',
     answer: 'We add new recipes to our database weekly, ensuring you always have fresh meal ideas!'
   },
+  {
+    question: 'What features are included in the premium version?',
+    answer: 'Premium features include advanced filters, personalized recommendations, meal planning, detailed nutritional information, and the ability to save favorite recipes.'
+  },
 ];
 
 const FAQSection: React.FC = () => {

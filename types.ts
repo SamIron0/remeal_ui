@@ -13,7 +13,6 @@ export interface UserProfile {
   trial_end_date: string;
   trial_start_date: string; 
 }
-
 export interface Recipe {
   id: number;
   name: string;

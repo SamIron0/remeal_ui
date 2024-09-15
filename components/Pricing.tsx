@@ -2,45 +2,33 @@
 
 import { Button } from "@/components/ui/button";
 import type { Tables } from "@/supabase/types";
-import cn from "classnames";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
-import { User } from "@supabase/supabase-js";
-import { getErrorRedirect } from "@/utils/helpers";
 import { getStripe } from "@/utils/stripe/client";
+import { Check } from "lucide-react";
+import { useApp } from "@/context/AppContext";
 
-type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
 type Price = Tables<"prices">;
 interface ProductWithPrices extends Product {
   prices: Price[];
 }
-interface PriceWithProduct extends Price {
-  products: Product | null;
-}
-interface SubscriptionWithProduct extends Subscription {
-  prices: PriceWithProduct | null;
-}
-
 interface Props {
-  user: User | null | undefined;
   products: ProductWithPrices[];
-  subscription: SubscriptionWithProduct | null;
 }
 
-type BillingInterval = "lifetime" | "year" | "month";
-
-export default function Pricing({ user, products, subscription }: Props) {
-  const intervals = Array.from(
-    new Set(
-      products.flatMap((product) =>
-        product?.prices?.map((price) => price?.interval)
-      )
-    )
-  );
+const features = [
+  { name: "Recipe Search", free: true, premium: true },
+  { name: "Basic Ingredient Matching", free: true, premium: true },
+  { name: "Save Favorite Recipes", free: false, premium: true },
+  { name: "Advanced Filters", free: false, premium: true },
+  { name: "Personalized Recommendations", free: false, premium: true },
+  { name: "Meal Planning", free: false, premium: true },
+  { name: "Nutritional Information", free: false, premium: true },
+];
+export default function Pricing({ products }: Props) {
+  const { user, subscription } = useApp();
   const router = useRouter();
-  const [billingInterval, setBillingInterval] =
-    useState<BillingInterval>("month");
   const [priceIdLoading, setPriceIdLoading] = useState<string>();
   const currentPath = usePathname();
 
@@ -76,107 +64,160 @@ export default function Pricing({ user, products, subscription }: Props) {
 
     setPriceIdLoading(undefined);
   };
+
+  const handleManageSubscription = async () => {
+    const response = await fetch("/api/create-portal-link", {
+      method: "POST",
+    });
+    const { url } = await response.json();
+    router.push(url);
+  };
+
+  const handleFreeSignup = () => router.push("/signup");
+
   if (!products.length) {
     return (
-      <section className="bg-black">
-        <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
-          <div className="sm:flex sm:flex-col sm:align-center"></div>
-          <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
+      <div className="bg-gray-50 py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="text-3xl font-extrabold text-gray-900 sm:text-4xl text-center">
             No subscription pricing plans found.
           </p>
         </div>
-      </section>
-    );
-  } else {
-    return (
-      <section className="bg-black">
-        <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
-          <div className="sm:flex sm:flex-col sm:align-center">
-            <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-              PPP
-            </h1>
-            <div className="relative self-center mt-6 bg-zinc-900 rounded-lg p-0.5 flex sm:mt-8 border border-zinc-800">
-              {intervals.includes("month") && (
-                <button
-                  onClick={() => setBillingInterval("month")}
-                  type="button"
-                  className={`${
-                    billingInterval === "month"
-                      ? "relative w-1/2 bg-zinc-700 border-zinc-800 shadow-sm text-white"
-                      : "ml-0.5 relative w-1/2 border border-transparent text-zinc-400"
-                  } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
-                >
-                  Monthly billing
-                </button>
-              )}
-              {intervals.includes("year") && (
-                <button
-                  onClick={() => setBillingInterval("year")}
-                  type="button"
-                  className={`${
-                    billingInterval === "year"
-                      ? "relative w-1/2 bg-zinc-700 border-zinc-800 shadow-sm text-white"
-                      : "ml-0.5 relative w-1/2 border border-transparent text-zinc-400"
-                  } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
-                >
-                  Yearly billing
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="mt-12 space-y-0 sm:mt-16 flex flex-wrap justify-center gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0">
-            {products.map((product) => {
-              const price = product?.prices?.find(
-                (price) => price.interval === billingInterval
-              );
-              if (!price) return null;
-              const priceString = new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: price.currency!,
-                minimumFractionDigits: 0,
-              }).format((price?.unit_amount || 0) / 100);
-              return (
-                <div
-                  key={product.id}
-                  className={cn(
-                    "flex flex-col rounded-lg shadow-sm divide-y divide-zinc-600 bg-zinc-900",
-                    {
-                      "border border-pink-500": subscription
-                        ? product.name === subscription?.prices?.products?.name
-                        : product.name === "Freelancer",
-                    },
-                    "flex-1", // This makes the flex item grow to fill the space
-                    "basis-1/3", // Assuming you want each card to take up roughly a third of the container's width
-                    "max-w-xs" // Sets a maximum width to the cards to prevent them from getting too large
-                  )}
-                >
-                  <div className="p-6">
-                    <h2 className="text-2xl font-semibold leading-6 text-white">
-                      {product.name}
-                    </h2>
-                    <p className="mt-4 text-zinc-300">{product.description}</p>
-                    <p className="mt-8">
-                      <span className="text-5xl font-extrabold white">
-                        {priceString}
-                      </span>
-                      <span className="text-base font-medium text-zinc-100">
-                        /{billingInterval}
-                      </span>
-                    </p>
-                    <Button
-                      type="button"
-                      onClick={() => handleStripeCheckout(price)}
-                      className="block w-full py-2 mt-8 text-sm font-semibold text-center text-white rounded-md hover:bg-zinc-900"
-                    >
-                      {subscription ? "Manage" : "Subscribe"}
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      </div>
     );
   }
+
+  const freeTier = {
+    name: "Free",
+    description: "Basic features for casual users",
+    id: "free-tier",
+    prices: [
+      { id: "free", currency: "usd", interval: "month", unit_amount: 0 },
+    ],
+  };
+  const premiumTier = products[0];
+
+  return (
+    <div className="py-12 sm:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Simple, transparent pricing
+          </h2>
+          <p className="mt-4 text-xl text-gray-600">
+            Choose the plan that's right for you
+          </p>
+        </div>
+        <div className="mt-12 space-y-4 sm:mt-16 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:mx-auto lg:max-w-4xl">
+          {[freeTier, premiumTier].map((product, index) => {
+            const price = product.prices[0];
+            const priceString =
+              index === 0
+                ? "Free"
+                : new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: price.currency!,
+                    minimumFractionDigits: 0,
+                  }).format((price?.unit_amount || 0) / 100);
+
+            const isFreeTier = index === 0;
+            const isPremiumTier = index === 1;
+            const hasActiveSubscription =
+              subscription?.status === "active" ||
+              subscription?.status === "trialing";
+
+            let buttonText = isFreeTier
+              ? "Get started for free"
+              : "Upgrade to Premium";
+            let buttonAction = isFreeTier
+              ? handleFreeSignup
+              : () => handleStripeCheckout(price as Price);
+            let buttonDisabled = false;
+
+            if (hasActiveSubscription) {
+              if (isPremiumTier) {
+                buttonText = "Manage Subscription";
+                buttonAction = handleManageSubscription;
+              } else {
+                buttonText = "Current Plan";
+                buttonDisabled = true;
+              }
+            } else if (isFreeTier && user) {
+              buttonText = "Current Plan";
+              buttonDisabled = true;
+            }
+
+            return (
+              <div
+                key={product.id}
+                className="divide-y divide-gray-200 rounded-lg border border-gray-200 shadow-sm"
+              >
+                <div className="p-6">
+                  <h3 className="text-lg font-medium leading-6 text-gray-900">
+                    {product.name}
+                  </h3>
+                  <p className="mt-4 text-sm text-gray-500">
+                    {product.description}
+                  </p>
+                  <p className="mt-8">
+                    <span className="text-4xl font-extrabold text-gray-900">
+                      {priceString}
+                    </span>
+                    {index !== 0 && (
+                      <span className="text-base font-medium text-gray-500">
+                        /{price.interval}
+                      </span>
+                    )}
+                  </p>
+                  <Button
+                    onClick={buttonAction}
+                    disabled={buttonDisabled}
+                    className={`mt-8 block w-full rounded-md py-2 text-center text-sm font-semibold text-white ${
+                      isFreeTier
+                        ? "bg-gray-800 hover:bg-gray-900"
+                        : "bg-primary hover:bg-primary-dark"
+                    } ${buttonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    {buttonText}
+                  </Button>
+                </div>
+                <div className="px-6 pt-6 pb-8">
+                  <h4 className="text-sm font-medium text-gray-900">
+                    What's included
+                  </h4>
+                  <ul role="list" className="mt-6 space-y-4">
+                    {features.map((feature) => (
+                      <li key={feature.name} className="flex space-x-3">
+                        <Check
+                          className={`h-5 w-5 flex-shrink-0 ${
+                            index === 0
+                              ? feature.free
+                                ? "text-green-500"
+                                : "text-gray-300"
+                              : "text-green-500"
+                          }`}
+                          aria-hidden="true"
+                        />
+                        <span
+                          className={`text-sm ${
+                            index === 0
+                              ? feature.free
+                                ? "text-gray-500"
+                                : "text-gray-300"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {feature.name}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }
