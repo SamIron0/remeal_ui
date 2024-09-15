@@ -98,12 +98,12 @@ const RecipeSearch: React.FC = () => {
   };
 
   useEffect(() => {
-    if (ingredients.length > 0 && user) {
+    if (ingredients.length > 0 && user ) {
       searchRecipes();
     } else if (ingredients.length === 0) {
       setRecipes([]);
     }
-  }, [ingredients, user]);
+  }, [ingredients]);
 
   return (
     <div className="p-4 max-w-4xl mx-auto">

@@ -379,9 +379,9 @@ export type Database = {
           cook_time?: number | null
           created_at?: string | null
           description?: string | null
-          id: number
-          instructions?: string
-          name?: string
+          id?: number
+          instructions: string
+          name: string
           prep_time?: number | null
           servings?: number | null
           updated_at?: string | null
@@ -391,7 +391,7 @@ export type Database = {
           cook_time?: number | null
           created_at?: string | null
           description?: string | null
-          id: number
+          id?: number
           instructions?: string
           name?: string
           prep_time?: number | null
@@ -533,28 +533,34 @@ export type Database = {
         Row: {
           auth_user_id: string
           avatar_url: string | null
+          billing_address: Json | null
           created_at: string | null
           email: string
           full_name: string | null
           id: string
+          payment_method: Json | null
           updated_at: string | null
         }
         Insert: {
           auth_user_id: string
           avatar_url?: string | null
+          billing_address?: Json | null
           created_at?: string | null
           email: string
           full_name?: string | null
           id: string
+          payment_method?: Json | null
           updated_at?: string | null
         }
         Update: {
           auth_user_id?: string
           avatar_url?: string | null
+          billing_address?: Json | null
           created_at?: string | null
           email?: string
           full_name?: string | null
           id?: string
+          payment_method?: Json | null
           updated_at?: string | null
         }
         Relationships: [
