@@ -1,63 +1,81 @@
-'use client'
-import React, { useState, useEffect } from 'react';
-import { XCircle, Search as SearchIcon } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
-import SearchResults from './SearchResults';
-import { Recipe } from '@/types';
+"use client";
+import React, { useState, useEffect } from "react";
+import { XCircle, Search as SearchIcon } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import SearchResults from "./SearchResults";
+import { Recipe } from "@/types";
+import { useApp } from "@/context/AppContext";
 
 const RecipeSearch: React.FC = () => {
-  const [ingredients, setIngredients] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const router = useRouter();
+  const { recipes, setRecipes, ingredients, setIngredients } = useApp();
+  const [inputValue, setInputValue] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [maxCookTime, setMaxCookTime] = useState<number>(60);
   const [minRating, setMinRating] = useState<number>(3);
+
+  // useEffect(() => {
+  //   const savedIngredients = localStorage.getItem("savedIngredients");
+  //   if (savedIngredients) {
+  //     setIngredients(JSON.parse(savedIngredients));
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   let res = localStorage.setItem(
+  //     "savedIngredients",
+  //     JSON.stringify(ingredients)
+  //   );
+  // }, [ingredients]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
   const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputValue.trim() !== '') {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
       addIngredient(inputValue.trim());
     }
   };
 
   const addIngredient = (ingredient: string) => {
     if (!user) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
     setIngredients([...ingredients, ingredient]);
-    setInputValue('');
+    setInputValue("");
   };
 
   const removeIngredient = (index: number) => {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
 
+  const clearAllIngredients = () => {
+    setIngredients([]);
+  };
+
   const searchRecipes = async () => {
     if (!user) {
-      router.push('/');
+      router.push("/");
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/recipe_search', {
-        method: 'POST',
+      const response = await fetch("/api/recipe_search", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ingredients,
@@ -67,12 +85,12 @@ const RecipeSearch: React.FC = () => {
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch recipes');
+        throw new Error("Failed to fetch recipes");
       }
       const data = await response.json();
       setRecipes(data);
     } catch (err) {
-      setError('An error occurred while fetching recipes. Please try again.');
+      setError("An error occurred while fetching recipes. Please try again.");
       setRecipes([]);
     } finally {
       setLoading(false);
@@ -82,15 +100,15 @@ const RecipeSearch: React.FC = () => {
   useEffect(() => {
     if (ingredients.length > 0 && user) {
       searchRecipes();
-    } else {
+    } else if (ingredients.length === 0) {
       setRecipes([]);
     }
-  }, [ingredients, user, dietaryRestrictions, maxCookTime, minRating]);
+  }, [ingredients, user]);
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">Recipe Finder</h1>
-      
+
       <div className="mb-6 w-full flex flex-col items-center">
         <div className="flex w-full justify-center max-w-md">
           <Input
@@ -101,25 +119,40 @@ const RecipeSearch: React.FC = () => {
             onKeyPress={handleInputKeyPress}
             className="w-full mr-2"
           />
-          <Button 
-            onClick={() => inputValue.trim() && addIngredient(inputValue.trim())}
+          <Button
+            onClick={() =>
+              inputValue.trim() && addIngredient(inputValue.trim())
+            }
             className="whitespace-nowrap"
           >
             <SearchIcon className="mr-2 h-4 w-4" /> Add
           </Button>
         </div>
-        
+
         <div className="flex flex-wrap justify-center gap-2 mt-4">
           {ingredients.map((ingredient, index) => (
-            <span key={index} className="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm flex items-center">
+            <span
+              key={index}
+              className="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm flex items-center"
+            >
               {ingredient}
-              <XCircle 
-                className="ml-1 cursor-pointer" 
-                size={16} 
+              <XCircle
+                className="ml-1 cursor-pointer"
+                size={16}
                 onClick={() => removeIngredient(index)}
               />
             </span>
           ))}
+          {ingredients.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllIngredients}
+              className="ml-2"
+            >
+              Clear All
+            </Button>
+          )}
         </div>
       </div>
 
@@ -128,27 +161,40 @@ const RecipeSearch: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Advanced Filters</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Dietary Restrictions</label>
+              <label className="block text-sm font-medium mb-1">
+                Dietary Restrictions
+              </label>
               <div className="flex flex-wrap gap-2">
-                {['vegetarian', 'vegan', 'gluten-free', 'dairy-free'].map((restriction) => (
-                  <label key={restriction} className="flex items-center">
-                    <Checkbox
-                      checked={dietaryRestrictions.includes(restriction)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setDietaryRestrictions([...dietaryRestrictions, restriction]);
-                        } else {
-                          setDietaryRestrictions(dietaryRestrictions.filter(r => r !== restriction));
-                        }
-                      }}
-                    />
-                    <span className="ml-2 capitalize">{restriction}</span>
-                  </label>
-                ))}
+                {["vegetarian", "vegan", "gluten-free", "dairy-free"].map(
+                  (restriction) => (
+                    <label key={restriction} className="flex items-center">
+                      <Checkbox
+                        checked={dietaryRestrictions.includes(restriction)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setDietaryRestrictions([
+                              ...dietaryRestrictions,
+                              restriction,
+                            ]);
+                          } else {
+                            setDietaryRestrictions(
+                              dietaryRestrictions.filter(
+                                (r) => r !== restriction
+                              )
+                            );
+                          }
+                        }}
+                      />
+                      <span className="ml-2 capitalize">{restriction}</span>
+                    </label>
+                  )
+                )}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Max Cook Time: {maxCookTime} minutes</label>
+              <label className="block text-sm font-medium mb-1">
+                Max Cook Time: {maxCookTime} minutes
+              </label>
               <Slider
                 value={[maxCookTime]}
                 onValueChange={(value) => setMaxCookTime(value[0])}
@@ -157,7 +203,9 @@ const RecipeSearch: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Minimum Rating: {minRating}</label>
+              <label className="block text-sm font-medium mb-1">
+                Minimum Rating: {minRating}
+              </label>
               <Slider
                 value={[minRating]}
                 onValueChange={(value) => setMinRating(value[0])}

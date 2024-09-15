@@ -8,6 +8,7 @@ import NutritionCard from "@/components/RecipePage/NutritionCard";
 import IngredientList from "@/components/RecipePage/IngredientList";
 import InstructionSteps from "@/components/RecipePage/InstructionSteps";
 import Link from "next/link";
+import SaveRecipeButton from "@/components/RecipePage/SaveRecipeButton";
 
 export default async function RecipePage({
   params,
@@ -15,19 +16,23 @@ export default async function RecipePage({
   params: { id: string };
 }) {
   const supabase = createClient(cookies());
-  
+
   // Fetch user and subscription status
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   let isActiveMember = false;
-  
+
   if (user) {
     const { data: subscriptionData } = await supabase
-      .from('subscriptions')
-      .select('status')
-      .eq('user_id', user.id)
+      .from("subscriptions")
+      .select("status")
+      .eq("user_id", user.id)
       .single();
-    
-    isActiveMember = subscriptionData?.status === 'active' || subscriptionData?.status === 'trialing';
+
+    isActiveMember =
+      subscriptionData?.status === "active" ||
+      subscriptionData?.status === "trialing";
   }
 
   const { data: recipe, error } = await supabase
@@ -59,7 +64,9 @@ export default async function RecipePage({
           <div className="flex items-center space-x-4 mb-6">
             <div className="flex items-center">
               <Clock className="w-5 h-5 mr-2" />
-              <span>{recipe.prep_time + recipe.cook_time} mins</span>
+              <span>
+                {(recipe.prep_time ?? 0) + (recipe.cook_time ?? 0)} mins
+              </span>
             </div>
             <div className="flex items-center">
               <Users className="w-5 h-5 mr-2" />
@@ -85,10 +92,7 @@ export default async function RecipePage({
 
           <div className="flex space-x-4 mb-8">
             {isActiveMember ? (
-              <Button variant="outline" className="flex items-center">
-                <Bookmark className="w-4 h-4 mr-2" />
-                Save Recipe
-              </Button>
+              <SaveRecipeButton recipeId={recipe.id} userId={user?.id} />
             ) : (
               <div className="bg-gray-100 rounded-lg p-4">
                 <p className="mb-2">Upgrade to Premium to save recipes!</p>
@@ -118,8 +122,13 @@ export default async function RecipePage({
               <NutritionCard nutritionInfo={recipe.nutrition_info} />
             ) : (
               <div className="bg-gray-100 rounded-lg p-4 mb-8">
-                <h3 className="text-xl font-semibold mb-4">Nutrition Information</h3>
-                <p className="mb-4">Unlock detailed nutrition information with a premium membership!</p>
+                <h3 className="text-xl font-semibold mb-4">
+                  Nutrition Information
+                </h3>
+                <p className="mb-4">
+                  Unlock detailed nutrition information with a premium
+                  membership!
+                </p>
                 <Link href="/membership">
                   <Button className="w-full">Upgrade to Premium</Button>
                 </Link>
@@ -138,7 +147,9 @@ export default async function RecipePage({
                 </div>
                 <div className="flex justify-between">
                   <span>Total Time:</span>
-                  <span>{recipe.prep_time + recipe.cook_time} mins</span>
+                  <span>
+                    {(recipe.prep_time ?? 0) + (recipe.cook_time ?? 0)} mins
+                  </span>
                 </div>
               </div>
             </div>

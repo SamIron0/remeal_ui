@@ -1,6 +1,6 @@
-'use client';
+"use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,18 +8,27 @@ import { Input } from "@/components/ui/input";
 
 export default function Login() {
   const [error, setError] = useState<string | null>(null);
+  const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   useEffect(() => {
+    const callback = searchParams.get("callbackUrl");
+    if (callback) {
+      setCallbackUrl(callback);
+    }
+
     const checkSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
-        router.push("/search");
+        router.push(callbackUrl || "/search");
       }
     };
     checkSession();
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,21 +44,20 @@ export default function Login() {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/search");
+      router.push(callbackUrl || "/search");
     }
   };
 
   return (
     <div className="flex flex-col w-full px-8 sm:max-w-md justify-center items-center gap-2">
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col w-full gap-2 text-foreground">
+      <form
+        onSubmit={handleSubmit}
+        className="flex-1 flex flex-col w-full gap-2 text-foreground"
+      >
         <label className="text-md" htmlFor="email">
           Email
         </label>
-        <Input
-          name="email"
-          placeholder="you@example.com"
-          required
-        />
+        <Input name="email" placeholder="you@example.com" required />
 
         <label className="text-md" htmlFor="password">
           Password
@@ -74,7 +82,14 @@ export default function Login() {
         </p>
         <p className="text-sm text-center">
           Don't have an account?{" "}
-          <Link href="/signup" className="text-primary hover:underline">
+          <Link
+            href={`/signup${
+              callbackUrl
+                ? `?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                : ""
+            }`}
+            className="text-primary hover:underline"
+          >
             Sign Up
           </Link>
         </p>

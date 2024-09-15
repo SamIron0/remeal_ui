@@ -4,14 +4,14 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Search from "@/components/Search";
-import TestimonialCarousel from "@/components/TestimonialCarousel";
-import FAQSection from "@/components/FAQ";
-import FeatureComparison from "@/components/FeatureComparison";
-import AnimatedStats from "@/components/AnimatedStats";
-import ParallaxHero from "@/components/ParallaxHero";
-import AnimatedFeature from "@/components/AnimatedFeature";
-import AnimatedStep from "@/components/AnimatedStep";
-import FloatingCTA from "@/components/FloatingCTA";
+import TestimonialCarousel from "@/components/Homepage/TestimonialCarousel";
+import FAQSection from "@/components/Homepage/FAQ";
+import FeatureComparison from "@/components/Homepage/FeatureComparison";
+import AnimatedStats from "@/components/Homepage/AnimatedStats";
+import ParallaxHero from "@/components/Homepage/ParallaxHero";
+import AnimatedFeature from "@/components/Homepage/AnimatedFeature";
+import AnimatedStep from "@/components/Homepage/AnimatedStep";
+import FloatingCTA from "@/components/Homepage/FloatingCTA";
 
 export default function Home() {
   return (

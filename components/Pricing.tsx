@@ -1,12 +1,24 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+
 import type { Tables } from "@/supabase/types";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { getStripe } from "@/utils/stripe/client";
 import { Check } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 type Product = Tables<"products">;
 type Price = Tables<"prices">;
@@ -30,6 +42,8 @@ export default function Pricing({ products }: Props) {
   const { user, subscription } = useApp();
   const router = useRouter();
   const [priceIdLoading, setPriceIdLoading] = useState<string>();
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+
   const currentPath = usePathname();
 
   const handleStripeCheckout = async (price: Price) => {
@@ -37,7 +51,7 @@ export default function Pricing({ products }: Props) {
 
     if (!user) {
       setPriceIdLoading(undefined);
-      return router.push("/signup");
+      router.push("/signup?callbackUrl=/membership");
     }
 
     const response = await fetch("/api/checkout", {
@@ -66,14 +80,14 @@ export default function Pricing({ products }: Props) {
   };
 
   const handleManageSubscription = async () => {
-    const response = await fetch("/api/create-portal-link", {
-      method: "POST",
-    });
-    const { url } = await response.json();
-    router.push(url);
+    // const response = await fetch("/api/create-portal-link", {
+    //   method: "POST",
+    // });
+    // const { url } = await response.json();
+    // router.push(url);
   };
 
-  const handleFreeSignup = () => router.push("/signup");
+  const handleFreeSignup = () => router.push("/signup?callbackUrl=/membership");
 
   if (!products.length) {
     return (
@@ -96,6 +110,25 @@ export default function Pricing({ products }: Props) {
     ],
   };
   const premiumTier = products[0];
+
+  const handleCancelSubscription = async () => {
+    try {
+      const response = await fetch("/api/cancel-subscription", {
+        method: "POST",
+      });
+      const result = await response.json();
+      if (response.ok) {
+        toast.success("Your subscription has been cancelled successfully.");
+        router.push("/account"); // Redirect to account page or refresh current page
+      } else {
+        toast.error("Failed to cancel subscription: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      toast.error("An error occurred while cancelling your subscription.");
+    }
+    setShowCancelDialog(false);
+  };
 
   return (
     <div className="py-12 sm:py-16">
@@ -127,7 +160,7 @@ export default function Pricing({ products }: Props) {
               subscription?.status === "trialing";
 
             let buttonText = isFreeTier
-              ? "Get started for free"
+              ? "Signup up Free"
               : "Upgrade to Premium";
             let buttonAction = isFreeTier
               ? handleFreeSignup
@@ -136,15 +169,17 @@ export default function Pricing({ products }: Props) {
 
             if (hasActiveSubscription) {
               if (isPremiumTier) {
-                buttonText = "Manage Subscription";
+                buttonText = "Premium (Active)";
                 buttonAction = handleManageSubscription;
               } else {
-                buttonText = "Current Plan";
-                buttonDisabled = true;
+                buttonText = "Downgrade to Free";
+                buttonAction = () => setShowCancelDialog(true);
               }
-            } else if (isFreeTier && user) {
-              buttonText = "Current Plan";
+            } else if (user && isFreeTier) {
+              buttonText = "Free Plan (Active)";
               buttonDisabled = true;
+            } else if (!user && !isFreeTier) {
+              buttonText = "Go Premium";
             }
 
             return (
@@ -218,6 +253,25 @@ export default function Pricing({ products }: Props) {
           })}
         </div>
       </div>
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to cancel your subscription?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. You will lose access to premium
+              features at the end of your current billing period.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelSubscription}>
+              Confirm Cancellation
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

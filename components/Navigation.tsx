@@ -49,14 +49,14 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/pricing" className="cursor-pointer">
+                    <Link href="/membership" className="cursor-pointer">
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Pricing</span>
                     </Link>
                   </DropdownMenuItem>
                   {subscription?.status !== "active" && (
                     <DropdownMenuItem asChild>
-                      <Link href="/upgrade" className="cursor-pointer">
+                      <Link href="/membership" className="cursor-pointer">
                         <Button className="w-full" variant="default">
                           Upgrade to Premium
                         </Button>
@@ -74,19 +74,19 @@ export default function Navbar() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link href="/signin">
+                <Link href="/login  ">
                   <Button variant="ghost">
                     <LogIn className="mr-2 h-4 w-4" />
                     Sign in
                   </Button>
                 </Link>
-                <Link href="/pricing">
+                <Link href="/membership">
                   <Button variant="ghost">
                     <CreditCard className="mr-2 h-4 w-4" />
                     Pricing
                   </Button>
                 </Link>
-                <Link href="/upgrade">
+                <Link href="/membership">
                   <Button variant="default">Upgrade to Premium</Button>
                 </Link>
               </div>

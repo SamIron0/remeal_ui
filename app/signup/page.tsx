@@ -1,65 +1,102 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { cookies, headers } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { createClient } from "@/utils/supabase/client";
 
-export default async function Signup() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
-  if (session) {
-    redirect("/search");
-  }
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        router.push("/search");
+      }
+    };
 
-  const signUp = async (formData: FormData) => {
-    "use server";
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    checkSession();
+  }, [router]);
 
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    const { data: user, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/search`,
-      },
-    });
-
-    if (error) {
-      return redirect("/signup?error=" + error.message);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const callback = params.get("callbackUrl");
+    if (callback) {
+      setCallbackUrl(callback);
     }
+  }, []);
 
-    if (!user.user?.id) {
-      return redirect("/signup?error=User ID not found");
+  const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+
+    try {
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${
+              process.env.NEXT_PUBLIC_BASE_URL
+            }/auth/callback?callbackUrl=${callbackUrl || "/search"}`,
+          },
+        });
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
+
+      if (
+        signUpData.user &&
+        Object.keys(signUpData.user.user_metadata).length === 0
+      ) {
+        const { data: signInData, error: signInError } =
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+        if (signInError) {
+          setError(signInError.message);
+        } else {
+          router.push(callbackUrl || "/search");
+        }
+      } else if (signUpData.user) {
+        setSuccess(true);
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
     }
-
-    // Redirect to a success page after successful signup
-    return redirect("/signup?success=true");
   };
-
-  // Check for success message in URL
-
-  const searchParams = headers().get("x-url-search-params");
-  const success = searchParams?.includes("success=true");
-  const error = searchParams
-    ? new URLSearchParams(searchParams).get("error")
-    : null;
 
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
-      <form className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
+      <form
+        onSubmit={signUp}
+        className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
+      >
         <label className="text-md" htmlFor="email">
           Email
         </label>
-        <Input name="email" placeholder="you@example.com" required />
+        <Input
+          name="email"
+          placeholder="you@example.com"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
         <label className="text-md" htmlFor="password">
           Password
@@ -69,16 +106,20 @@ export default async function Signup() {
           name="password"
           placeholder="••••••••"
           required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <Button
-          formAction={signUp}
+          type="submit"
           className="bg-primary rounded-md px-4 py-2 text-foreground mb-2"
         >
           Sign Up
         </Button>
         <p className="text-sm text-center">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link
+            href={`/login${callbackUrl ? `?callbackUrl=${callbackUrl}` : ""}`}
+          >
             Log In
           </Link>
         </p>

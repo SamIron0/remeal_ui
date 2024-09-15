@@ -11,23 +11,24 @@ export interface UserProfile {
   subscription_status: string;
   subscription_end_date: string;
   trial_end_date: string;
-  trial_start_date: string; 
+  trial_start_date: string;
 }
 export interface Recipe {
   id: number;
-  name: string;
-  description: string;
-  recipe_ingredients: {
-    quantity: number;
-    unit: string;
-    ingredients: {
-      name: string;
+  name?: string;
+  description?: string | null;
+  recipe_ingredients?: {
+    quantity?: number;
+    unit?: string;
+    ingredients?: {
+      name?: string;
     };
   }[];
-  nutrition_info: {
-    calories: number;
-    protein: number;
-    fat: number;
-    carbohydrates: number;
+  nutrition_info?: {
+    calories?: number;
+    protein?: number;
+    fat?: number;
+    carbohydrates?: number;
   };
+  image_url?: string;
 }

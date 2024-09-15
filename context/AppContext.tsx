@@ -2,20 +2,31 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/supabase/types";
+import { Recipe } from "@/types";
 
 interface AppContextType {
   user: Tables<"users"> | null;
-  subscription: Tables<"subscriptions"> | null;
+  subscription: any | null;
   loading: boolean;
+  recipes: Recipe[];
+  setRecipes: React.Dispatch<React.SetStateAction<Recipe[]>>;
+  ingredients: string[];
+  setIngredients: React.Dispatch<React.SetStateAction<string[]>>;
+  savedRecipes: number[];
+  setSavedRecipes: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<Tables<"users"> | null>(null);
-  const [subscription, setSubscription] =
-    useState<Tables<"subscriptions"> | null>(null);
+  const [subscription, setSubscription] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [savedRecipes, setSavedRecipes] = useState<number[]>([]);
   const supabase = createClient();
 
   useEffect(() => {
@@ -44,10 +55,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             setSubscription(subscriptionData);
           } else if (subscriptionError) {
             console.error("Error fetching subscription:", subscriptionError);
+            setSubscription(null);
+          } else {
+            // No subscription found
+            setSubscription(null);
           }
+
+          const { data, error } = await supabase
+            .from('saved_recipes')
+            .select('recipe_id')
+            .eq('user_id', userData.auth_user_id);
+
+          if (error) {
+            console.error('Error fetching saved recipes:', error);
+            setSavedRecipes([]);
+          } else {
+            const savedRecipeIds = data.map(item => item.recipe_id);
+            setSavedRecipes(savedRecipeIds);
+          }
+
         } else if (userError) {
           console.error("Error fetching user profile:", userError);
         }
+      } else {
+        setUser(null);
+        setSubscription(null);
       }
       setLoading(false);
     }
@@ -68,19 +100,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, []); // Add supabase.auth as a dependency
 
   return (
-    <AppContext.Provider value={{ user, subscription, loading }}>
+    <AppContext.Provider
+      value={{ user, subscription, loading, recipes, setRecipes, ingredients, setIngredients, savedRecipes, setSavedRecipes }}
+    >
       {children}
     </AppContext.Provider>
   );
-}
+};
 
-export function useApp() {
+export const useApp = () => {
   const context = useContext(AppContext);
   if (context === undefined) {
     throw new Error("useApp must be used within an AppProvider");
   }
   return context;
-}
+};

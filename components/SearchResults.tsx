@@ -48,19 +48,21 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <div className="mb-2">
               <strong>Ingredients:</strong>
               <ul className="list-disc list-inside">
-                {recipe.recipe_ingredients
-                  .slice(0, 3)
-                  .map((ingredient, index) => (
-                    <li key={index}>
-                      {ingredient.quantity} {ingredient.unit}{" "}
-                      {ingredient.ingredients.name}
+                {recipe.recipe_ingredients &&
+                  recipe.recipe_ingredients
+                    .slice(0, 3)
+                    .map((ingredient, index) => (
+                      <li key={index}>
+                        {ingredient.quantity} {ingredient.unit}{" "}
+                        {ingredient.ingredients?.name}
+                      </li>
+                    ))}
+                {recipe.recipe_ingredients &&
+                  recipe.recipe_ingredients.length > 3 && (
+                    <li className="text-sm text-gray-500">
+                      + {recipe.recipe_ingredients.length - 3} more
                     </li>
-                  ))}
-                {recipe.recipe_ingredients.length > 3 && (
-                  <li className="text-sm text-gray-500">
-                    + {recipe.recipe_ingredients.length - 3} more
-                  </li>
-                )}
+                  )}
               </ul>
             </div>
             {recipe.nutrition_info && (

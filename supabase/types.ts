@@ -364,13 +364,13 @@ export type Database = {
       }
       recipes: {
         Row: {
-          cook_time: number
+          cook_time: number | null
           created_at: string | null
           description: string | null
           id: number
           instructions: string
           name: string
-          prep_time: number
+          prep_time: number | null
           servings: number | null
           updated_at: string | null
           user_id: string | null
@@ -379,9 +379,9 @@ export type Database = {
           cook_time?: number | null
           created_at?: string | null
           description?: string | null
-          id?: number
-          instructions: string
-          name: string
+          id: number
+          instructions?: string
+          name?: string
           prep_time?: number | null
           servings?: number | null
           updated_at?: string | null
@@ -391,7 +391,7 @@ export type Database = {
           cook_time?: number | null
           created_at?: string | null
           description?: string | null
-          id?: number
+          id: number
           instructions?: string
           name?: string
           prep_time?: number | null
@@ -402,6 +402,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "recipes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_recipes: {
+        Row: {
+          created_at: string | null
+          id: number
+          recipe_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          recipe_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          recipe_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_recipes_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_recipes_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -501,7 +537,6 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
-          payment_method: Json | null
           updated_at: string | null
         }
         Insert: {
@@ -511,7 +546,6 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
-          payment_method?: Json | null
           updated_at?: string | null
         }
         Update: {
@@ -521,7 +555,6 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
-          payment_method?: Json | null
           updated_at?: string | null
         }
         Relationships: [
