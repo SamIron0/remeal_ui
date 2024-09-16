@@ -10,9 +10,19 @@ import { Slider } from "@/components/ui/slider";
 import SearchResults from "./SearchResults";
 import { Recipe } from "@/types";
 import { useApp } from "@/context/AppContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Settings } from "lucide-react";
 
 const RecipeSearch: React.FC = () => {
   const { user } = useAuth();
+  const { subscription } = useApp();
   const router = useRouter();
   const { recipes, setRecipes, ingredients, setIngredients } = useApp();
   const [inputValue, setInputValue] = useState("");
@@ -22,20 +32,6 @@ const RecipeSearch: React.FC = () => {
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [maxCookTime, setMaxCookTime] = useState<number>(60);
   const [minRating, setMinRating] = useState<number>(3);
-
-  // useEffect(() => {
-  //   const savedIngredients = localStorage.getItem("savedIngredients");
-  //   if (savedIngredients) {
-  //     setIngredients(JSON.parse(savedIngredients));
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   let res = localStorage.setItem(
-  //     "savedIngredients",
-  //     JSON.stringify(ingredients)
-  //   );
-  // }, [ingredients]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -79,9 +75,10 @@ const RecipeSearch: React.FC = () => {
         },
         body: JSON.stringify({
           ingredients,
-          dietaryRestrictions: user.is_premium ? dietaryRestrictions : [],
-          maxCookTime: user.is_premium ? maxCookTime : null,
-          minRating: user.is_premium ? minRating : null,
+          dietaryRestrictions:
+            subscription?.status === "active" ? dietaryRestrictions : [],
+          maxCookTime: subscription?.status === "active" ? maxCookTime : null,
+          minRating: subscription?.status === "active" ? minRating : null,
         }),
       });
       if (!response.ok) {
@@ -98,7 +95,7 @@ const RecipeSearch: React.FC = () => {
   };
 
   useEffect(() => {
-    if (ingredients.length > 0 && user ) {
+    if (ingredients.length > 0 && user) {
       searchRecipes();
     } else if (ingredients.length === 0) {
       setRecipes([]);
@@ -144,78 +141,92 @@ const RecipeSearch: React.FC = () => {
             </span>
           ))}
           {ingredients.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearAllIngredients}
-              className="ml-2"
-            >
-              Clear All
-            </Button>
+            <div className="flex items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearAllIngredients}
+                className="mr-2"
+              >
+                Clear All
+              </Button>
+              {subscription?.status === "active" && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="ml-2">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Filters
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuLabel>Advanced Filters</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <div className="w-full">
+                        <label className="block text-sm font-medium mb-1">
+                          Dietary Restrictions
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {["vegetarian", "vegan", "gluten-free", "dairy-free"].map(
+                            (restriction) => (
+                              <label key={restriction} className="flex items-center">
+                                <Checkbox
+                                  checked={dietaryRestrictions.includes(restriction)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setDietaryRestrictions([
+                                        ...dietaryRestrictions,
+                                        restriction,
+                                      ]);
+                                    } else {
+                                      setDietaryRestrictions(
+                                        dietaryRestrictions.filter(
+                                          (r) => r !== restriction
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                                <span className="ml-2 capitalize">{restriction}</span>
+                              </label>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <div className="w-full">
+                        <label className="block text-sm font-medium mb-1">
+                          Max Cook Time: {maxCookTime} minutes
+                        </label>
+                        <Slider
+                          value={[maxCookTime]}
+                          onValueChange={(value) => setMaxCookTime(value[0])}
+                          max={120}
+                          step={5}
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <div className="w-full">
+                        <label className="block text-sm font-medium mb-1">
+                          Minimum Rating: {minRating}
+                        </label>
+                        <Slider
+                          value={[minRating]}
+                          onValueChange={(value) => setMinRating(value[0])}
+                          max={5}
+                          step={0.5}
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           )}
         </div>
       </div>
-
-      {user?.is_premium && (
-        <div className="mb-4 bg-gray-100 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Advanced Filters</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Dietary Restrictions
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {["vegetarian", "vegan", "gluten-free", "dairy-free"].map(
-                  (restriction) => (
-                    <label key={restriction} className="flex items-center">
-                      <Checkbox
-                        checked={dietaryRestrictions.includes(restriction)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setDietaryRestrictions([
-                              ...dietaryRestrictions,
-                              restriction,
-                            ]);
-                          } else {
-                            setDietaryRestrictions(
-                              dietaryRestrictions.filter(
-                                (r) => r !== restriction
-                              )
-                            );
-                          }
-                        }}
-                      />
-                      <span className="ml-2 capitalize">{restriction}</span>
-                    </label>
-                  )
-                )}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Max Cook Time: {maxCookTime} minutes
-              </label>
-              <Slider
-                value={[maxCookTime]}
-                onValueChange={(value) => setMaxCookTime(value[0])}
-                max={120}
-                step={5}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Minimum Rating: {minRating}
-              </label>
-              <Slider
-                value={[minRating]}
-                onValueChange={(value) => setMinRating(value[0])}
-                max={5}
-                step={0.5}
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       <SearchResults recipes={recipes} loading={loading} error={error} />
     </div>

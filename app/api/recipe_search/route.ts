@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       await request.json();
     const normalizedIngredients = ingredients.map(normalizeIngredient);
 
-    const results = await getRecipes(normalizedIngredients, isPremium);
+    const results = await getRecipes(normalizedIngredients, isPremium, maxCookTime);
 
     return NextResponse.json(results);
   } catch (error: any) {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   }
 }
 
-async function getRecipes(ingredients: string[], isPremium: boolean) {
+async function getRecipes(ingredients: string[], isPremium: boolean, maxCookTime: number | null) {
   const redis = getRedisClient();
   const supabase = createClient(cookies());
   const recipeIds = new Set<string>();
@@ -119,8 +119,13 @@ async function getRecipes(ingredients: string[], isPremium: boolean) {
     return recipe;
   });
 
+  // Filter recipes based on maxCookTime
+  const filteredRecipes = maxCookTime
+    ? modifiedRecipes.filter((recipe) => (recipe.cook_time || 0) <= maxCookTime)
+    : modifiedRecipes;
+
   // Sort recipes by the number of matching ingredients
-  const sortedRecipes = modifiedRecipes.sort((a, b) => {
+  const sortedRecipes = filteredRecipes.sort((a, b) => {
     const aMatches = a.recipe_ingredients.filter((i: any) =>
       normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))
     ).length;

@@ -32,7 +32,7 @@ import { useApp } from "@/context/AppContext";
 
 type UserWithSubscription = Tables<"users"> & {
   subscriptions: Tables<"subscriptions">[] | null;
-};
+}
 
 export default function ProfileForm() {
   const supabase = createClient();

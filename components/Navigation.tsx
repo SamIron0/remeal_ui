@@ -19,7 +19,6 @@ export default function Navbar() {
   const { user, subscription, loading } = useApp();
   const router = useRouter();
   const supabase = createClient();
-
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
