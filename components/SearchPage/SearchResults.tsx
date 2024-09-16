@@ -1,9 +1,9 @@
 import React from "react";
-
 import { Loader2 } from "lucide-react";
 import { Recipe } from "@/types";
 import { useApp } from "@/context/AppContext";
 import RecipeCard from "@/components/SearchPage/RecipeCard";
+import { Button } from "@/components/ui/button";
 
 interface SearchResultsProps {
   recipes: Recipe[];
@@ -16,7 +16,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   loading,
   error,
 }) => {
-  const { user, subscription } = useApp();
+  const { user, subscription, ingredients } = useApp();
   const isPremium = subscription?.status === "active" || subscription?.status === "trialing";
 
   if (loading) {
@@ -36,10 +36,30 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     );
   }
 
+  if (ingredients.length === 0) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-2xl font-semibold mb-4">Ready to cook?</h2>
+        <p className="text-gray-600 mb-6">
+          Start by adding ingredients you have on hand, and we'll find matching recipes for you.
+        </p>
+        <Button onClick={() => document.querySelector('input')?.focus()}>
+          Add Ingredients
+        </Button>
+      </div>
+    );
+  }
+
   if (recipes.length === 0) {
     return (
-      <div className="text-center p-4 bg-gray-100 rounded-lg">
-        No recipes found with these ingredients. Try adding more!
+      <div className="text-center p-8">
+        <h2 className="text-2xl font-semibold mb-4">No recipes found</h2>
+        <p className="text-gray-600 mb-6">
+          We couldn't find any recipes with the current ingredients. Try adding more or adjusting your search.
+        </p>
+        <Button onClick={() => document.querySelector('input')?.focus()}>
+          Add More Ingredients
+        </Button>
       </div>
     );
   }

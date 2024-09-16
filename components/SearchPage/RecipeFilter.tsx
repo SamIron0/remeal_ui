@@ -75,9 +75,8 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <Settings className="mr-2 h-4 w-4" />
-          Filters
+        <Button variant="outline" size="icon">
+          <Settings className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

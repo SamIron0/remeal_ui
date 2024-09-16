@@ -181,7 +181,7 @@ const RecipeSearch: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6 text-center">Recipe Finder</h1>
 
       <div className="mb-6 w-full flex flex-col items-center">
-        <div className="flex w-full justify-center max-w-md">
+        <div className="flex w-full justify-center max-w-md mb-4">
           <Input
             type="text"
             placeholder="Enter an ingredient"
@@ -194,10 +194,14 @@ const RecipeSearch: React.FC = () => {
             onClick={() =>
               inputValue.trim() && addIngredient(inputValue.trim())
             }
-            className="whitespace-nowrap"
+            className="whitespace-nowrap mr-2"
           >
             <SearchIcon className="mr-2 h-4 w-4" /> Add
           </Button>
+          <RecipeFilter
+            options={filterOptions}
+            onChange={applyFilters}
+          />
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mt-4">
@@ -215,20 +219,14 @@ const RecipeSearch: React.FC = () => {
             </span>
           ))}
           {ingredients.length > 0 && (
-            <div className="flex items-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearAllIngredients}
-                className="mr-2"
-              >
-                Clear All
-              </Button>
-              <RecipeFilter
-                options={filterOptions}
-                onChange={applyFilters}
-              />
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllIngredients}
+              className="ml-2"
+            >
+              Clear All
+            </Button>
           )}
         </div>
       </div>
