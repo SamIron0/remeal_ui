@@ -8,7 +8,6 @@ import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 const Footer: React.FC = () => {
   const handleNewsletterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Implement newsletter signup logic here
     console.log("Newsletter signup submitted");
   };
 

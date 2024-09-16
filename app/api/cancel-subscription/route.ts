@@ -27,8 +27,6 @@ export async function POST() {
         { status: 404 }
       );
     }
-    // Set your secret key. Remember to switch to your live secret key in production.
-    // See your keys here: https://dashboard.stripe.com/apikeys
     const stripe = require("stripe")(
       "sk_test_51N5uTxBwxSl9KXhsRPrwnsBiH4pMLyXEfhn1eWQ19XIItU1eMyI45poAaGiCiAc5jKZLvXib4bURXI2sqt9HNTbF00NNlW2mS4"
     );

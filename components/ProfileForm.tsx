@@ -63,7 +63,6 @@ export default function ProfileForm() {
       .from("users")
       .update({
         full_name: profile.full_name,
-        // Add other fields you want to update
       })
       .eq("id", profile.id);
 
@@ -76,14 +75,12 @@ export default function ProfileForm() {
   };
 
   const handleCancelSubscription = async () => {
-    // TODO: Implement subscription cancellation logic
-    // This might involve calling a server-side API to handle the cancellation with Stripe
 
     toast.success("Subscription cancelled successfully");
   };
 
   const handleUpgrade = () => {
-    router.push("/membership"); // Assuming you have an upgrade page
+    router.push("/membership"); 
   };
 
   if (loading) return <div>Loading...</div>;

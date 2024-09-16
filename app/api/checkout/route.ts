@@ -32,7 +32,6 @@ export async function POST(request: Request) {
       throw new Error("Could not get user session.");
     }
 
-    // Retrieve or create the customer in Stripe
     let customer: string;
     try {
       customer = await createOrRetrieveCustomer({
@@ -77,7 +76,6 @@ export async function POST(request: Request) {
       };
     }
 
-    // Create a checkout session in Stripe
     let stripe_session;
     try {
       stripe_session = await stripe.checkout.sessions.create(params);

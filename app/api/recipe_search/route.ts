@@ -41,7 +41,6 @@ async function getRecipes(ingredients: string[], isPremium: boolean, maxCookTime
   const notFoundInRedis = new Set<string>();
   const normalizedIngredients = ingredients.map(normalizeIngredient);
 
-  // Fetch recipe IDs from Redis
   await Promise.all(
     normalizedIngredients.map(async (ingredient) => {
       const exactMatchIds = await redis.get(ingredient);
@@ -57,10 +56,8 @@ async function getRecipes(ingredients: string[], isPremium: boolean, maxCookTime
   let recipesWithIngredients: any[] = [];
   let recipesWithIngredientsFromRedis: any[] = [];
   let recipesWithIngredientsFromSupabase: any[] = [];
-  // Remove duplicates from recipeIds
   const uniqueRecipeIds = Array.from(new Set(recipeIds));
 
-  // Fetch details for recipes found in Redis
   if (uniqueRecipeIds.length > 0) {
     const { data, error } = await supabase
       .from("recipes")
@@ -87,7 +84,6 @@ async function getRecipes(ingredients: string[], isPremium: boolean, maxCookTime
     recipesWithIngredients = recipesWithIngredientsFromRedis;
   }
 
-  // Check Supabase for ingredients not found in Redis using RPC
   if (notFoundInRedis.size > 0) {
     const { data: recipesWithIngredientsFromSupabase, error } =
       await supabase.rpc("search_recipes_by_ingredients", {
@@ -104,27 +100,22 @@ async function getRecipes(ingredients: string[], isPremium: boolean, maxCookTime
       ];
     }
   }
-  // Remove duplicates
   const uniqueRecipes = recipesWithIngredients.filter(
     (recipe, index, self) => index === self.findIndex((t) => t.id === recipe.id)
   );
 
-  // Modify the recipe data based on premium status
   const modifiedRecipes = uniqueRecipes.map((recipe) => {
     if (!isPremium) {
-      // Remove nutrition_info for non-premium users
       const { nutrition_info, ...recipeWithoutNutrition } = recipe;
       return recipeWithoutNutrition;
     }
     return recipe;
   });
 
-  // Filter recipes based on maxCookTime
   const filteredRecipes = maxCookTime
     ? modifiedRecipes.filter((recipe) => (recipe.cook_time || 0) <= maxCookTime)
     : modifiedRecipes;
 
-  // Sort recipes by the number of matching ingredients
   const sortedRecipes = filteredRecipes.sort((a, b) => {
     const aMatches = a.recipe_ingredients.filter((i: any) =>
       normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))

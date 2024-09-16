@@ -20,7 +20,6 @@ export async function getDashboardData() {
     };
   } catch (error) {
     console.error('Error fetching dashboard metrics:', error);
-    // You might want to set a default value for metricsData here
     metricsData = {
       total_recipes: 0,
       total_users: 0,

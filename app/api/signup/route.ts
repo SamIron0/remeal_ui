@@ -8,7 +8,6 @@ export async function POST(request: Request) {
 
   const { email, password } = await request.json();
 
-  // Check if user already exists
   const { data: existingUser, error: userError } = await supabase
     .from("users")
     .select("id")
@@ -16,7 +15,6 @@ export async function POST(request: Request) {
     .single();
 
   if (existingUser) {
-    // User exists, attempt to sign in
     const result = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -32,7 +30,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ user: null });
   }
 
-  // If user doesn't exist, proceed with sign up
   const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
     email,
     password,

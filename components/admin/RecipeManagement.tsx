@@ -39,17 +39,6 @@ export default function RecipeManagement() {
           prep_time: 10,
           servings: 2,
         };
-        // recipeData = {
-        //   name,
-        //   ingredients: ingredients
-        //     .split("\n")
-        //     .map((ingredient) => ingredient.trim()),
-        //   instructions,
-        //   description,
-        //   cook_time: parseInt(cookTime),
-        //   prep_time: parseInt(prepTime),
-        //   servings: parseInt(servings),
-        // };
       }
 
       const response = await fetch("/api/recipe_ingestion", {

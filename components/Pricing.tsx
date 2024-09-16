@@ -73,18 +73,12 @@ export default function Pricing({ products }: Props) {
       }
     } else {
       console.error("Checkout error:", result.error);
-      // Handle error (e.g., show error message to user)
     }
 
     setPriceIdLoading(undefined);
   };
 
   const handleManageSubscription = async () => {
-    // const response = await fetch("/api/create-portal-link", {
-    //   method: "POST",
-    // });
-    // const { url } = await response.json();
-    // router.push(url);
   };
 
   const handleFreeSignup = () => router.push("/signup?callbackUrl=/membership");
@@ -119,7 +113,7 @@ export default function Pricing({ products }: Props) {
       const result = await response.json();
       if (response.ok) {
         toast.success("Your subscription has been cancelled successfully.");
-        router.push("/account"); // Redirect to account page or refresh current page
+        router.push("/account"); 
       } else {
         toast.error("Failed to cancel subscription: " + result.error);
       }

@@ -17,7 +17,6 @@ export default async function RecipePage({
 }) {
   const supabase = createClient(cookies());
 
-  // Fetch user and subscription status
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -25,7 +25,6 @@ export async function POST(request: Request) {
     } = await request.json();
 
 
-    // Call the recipe ingestion function to update indexes
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
