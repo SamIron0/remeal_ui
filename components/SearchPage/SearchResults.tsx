@@ -1,11 +1,9 @@
 import React from "react";
 
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import { Recipe } from "@/types";
 import { useApp } from "@/context/AppContext";
-import { Button } from "@/components/ui/button";
-import RecipeCard from "@/components/RecipeCard";
+import RecipeCard from "@/components/SearchPage/RecipeCard";
 
 interface SearchResultsProps {
   recipes: Recipe[];

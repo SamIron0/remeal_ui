@@ -1,9 +1,4 @@
-
-import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import Search from "@/components/Search";
+import Search from "@/components/SearchPage/Search";
 import TestimonialCarousel from "@/components/Homepage/TestimonialCarousel";
 import FAQSection from "@/components/Homepage/FAQ";
 import FeatureComparison from "@/components/Homepage/FeatureComparison";

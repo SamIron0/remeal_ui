@@ -30,5 +30,7 @@ export interface Recipe {
     fat?: number;
     carbohydrates?: number;
   };
+  cook_time?: number;
+  rating?: number;
   image_url?: string;
 }
