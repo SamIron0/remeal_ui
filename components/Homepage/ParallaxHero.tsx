@@ -1,21 +1,24 @@
-'use client';
+"use client";
+import { useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 export default function ParallaxHero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, -150]);
+  const [email, setEmail] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push(`/signup?email=${encodeURIComponent(email)}`);
+  };
 
   return (
     <section className="w-full h-screen relative overflow-hidden bg-primary text-white">
-      <motion.div style={{ y }} className="absolute inset-0 z-0">
-        <img
-          src="/hero-background.jpg"
-          alt="Kitchen background"
-          className="w-full h-full object-cover"
-        />
-      </motion.div>
       <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4">
         <motion.h1
@@ -34,30 +37,25 @@ export default function ParallaxHero() {
         >
           Discover recipes based on the ingredients in your kitchen.
         </motion.p>
-        <motion.div
+        <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="space-x-4"
+          className="flex w-full max-w-md gap-2"
+          onSubmit={handleSubmit}
         >
-          <Link href="/signup">
-            <Button
-              size="lg"
-              className="bg-white text-primary hover:bg-gray-100 hover:text-primary-dark"
-            >
-              Get Started
-            </Button>
-          </Link>
-          <Link href="#how-it-works">
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-white border-white hover:bg-white/10"
-            >
-              Learn More
-            </Button>
-          </Link>
-        </motion.div>
+          <Input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-white text-primary"
+            required
+          />
+          <Button type="submit" size="lg" className="bg-white text-primary hover:bg-gray-100 hover:text-primary-dark">
+            Get Started
+          </Button>
+        </motion.form>
       </div>
     </section>
   );

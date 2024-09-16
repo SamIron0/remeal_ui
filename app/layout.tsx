@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { Database } from "@/supabase/types";
 import Navigation from "@/components/Navigation";
 import { AppProvider } from '@/context/AppContext';
+import Footer from '@/components/Footer';
 
 const defaultUrl = "https://remeal.food";
 
@@ -88,6 +89,7 @@ export default async function RootLayout({
             {children}
             <Toaster />
           </main>
+          <Footer />
         </AppProvider>
       </body>
     </html>

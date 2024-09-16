@@ -6,145 +6,184 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import AuthBackground from '@/components/AuthBackground';
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    const checkSession = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        router.push("/search");
-      }
-    };
-
-    checkSession();
-  }, [router]);
-
-  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const callback = params.get("callbackUrl");
+    const emailParam = params.get("email");
     if (callback) {
       setCallbackUrl(callback);
     }
+    if (emailParam) {
+      setEmail(emailParam);
+    }
   }, []);
+
+  const validateForm = () => {
+    if (!email || !password || !confirmPassword || !fullName) {
+      setError("All fields are required");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return false;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return false;
+    }
+    if (!agreeTerms) {
+      setError("You must agree to the Terms of Service and Privacy Policy");
+      return false;
+    }
+    return true;
+  };
 
   const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
+    setLoading(true);
     setError(null);
-    setSuccess(false);
 
     try {
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${
-              process.env.NEXT_PUBLIC_BASE_URL
-            }/auth/callback?callbackUrl=${callbackUrl || "/search"}`,
-          },
-        });
-      if (signUpError) {
-        setError(signUpError.message);
-        return;
-      }
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?callbackUrl=${callbackUrl || "/search"}`,
+        },
+      });
 
-      if (
-        signUpData.user &&
-        Object.keys(signUpData.user.user_metadata).length === 0
-      ) {
-        const { data: signInData, error: signInError } =
-          await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
+      if (signUpError) throw signUpError;
 
-        if (signInError) {
-          setError(signInError.message);
-        } else {
-          router.push(callbackUrl || "/search");
-        }
-      } else if (signUpData.user) {
-        setSuccess(true);
+      if (signUpData.user) {
+        toast.success("Sign up successful! Please check your email to verify your account.");
+        router.push("/login");
       }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
+    } catch (error: any) {
+      setError(error.message || "An error occurred during sign up");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
-      <form
-        onSubmit={signUp}
-        className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
-      >
-        <label className="text-md" htmlFor="email">
-          Email
-        </label>
-        <Input
-          name="email"
-          placeholder="you@example.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+    <div className="flex min-h-screen bg-gray-100 w-full">
+      <div className="flex flex-col justify-center flex-1 px-4 py-20 sm:px-6 lg:flex-none lg:px-24 xl:px-32">
+        <div className="w-full max-w-sm mx-auto lg:w-96">
+          <div>
+            <h2 className="mt-6 text-3xl font-semibold   text-gray-900">Create your account</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Or{' '}
+              <Link href="/login" className="font-medium hover:underline text-primary hover:text-primary-dark">
+                sign in to your existing account
+              </Link>
+            </p>
+          </div>
 
-        <label className="text-md" htmlFor="password">
-          Password
-        </label>
-        <Input
-          type="password"
-          name="password"
-          placeholder="••••••••"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button
-          type="submit"
-          className="bg-primary rounded-md px-4 py-2 text-foreground mb-2"
-        >
-          Sign Up
-        </Button>
-        <p className="text-sm text-center">
-          Already have an account?{" "}
-          <Link
-            href={`/login${callbackUrl ? `?callbackUrl=${callbackUrl}` : ""}`}
-          >
-            Log In
-          </Link>
-        </p>
-      </form>
-      {error && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-          role="alert"
-        >
-          <strong className="font-bold">Error:</strong>
-          <span className="block sm:inline"> {error}</span>
+          <div className="mt-8">
+            <form onSubmit={signUp} className="space-y-6">
+              <div>
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="email">Email address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <div className="relative mt-1">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="flex items-center">
+                <Checkbox id="terms" checked={agreeTerms} onCheckedChange={(checked) => setAgreeTerms(checked as boolean)} />
+                <Label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
+                  I agree to the <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link> and{" "}
+                  <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                </Label>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Sign Up
+              </Button>
+            </form>
+            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+          </div>
         </div>
-      )}
-      {success && (
-        <div
-          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
-          role="alert"
-        >
-          <strong className="font-bold">Success!</strong>
-          <span className="block sm:inline">
-            {" "}
-            Please check your email for a verification link.
-          </span>
-        </div>
-      )}
+      </div>
+      <div className="relative flex-1 hidden w-0 lg:block">
+        <AuthBackground />
+      </div>
     </div>
   );
 }

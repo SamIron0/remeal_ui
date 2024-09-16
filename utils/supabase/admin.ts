@@ -8,11 +8,7 @@ import { cookies } from "next/headers";
 type Product = Tables<"products">;
 type Price = Tables<"prices">;
 
-// Change to control trial period length
 const TRIAL_PERIOD_DAYS = 0;
-
-// Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
-// as it has admin privileges and overwrites RLS policies!
 
 const upsertProductRecord = async (product: Stripe.Product) => {
   const supabaseAdmin = createClient(cookies());

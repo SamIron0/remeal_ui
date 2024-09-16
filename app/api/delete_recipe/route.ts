@@ -26,7 +26,6 @@ async function removeRecipeFromIndex(recipeId: number) {
   const supabase = createClient();
 
   try {
-    // Get the recipe ingredients from the junction table
     const { data: recipeIngredients, error: ingredientsError } = await supabase
       .from("recipe_ingredients")
       .select("ingredient_id")
@@ -34,7 +33,6 @@ async function removeRecipeFromIndex(recipeId: number) {
 
     if (ingredientsError) throw ingredientsError;
 
-    // Remove recipe from Supabase ingredient index
     for (const { ingredient_id } of recipeIngredients) {
      
       const { error } = await supabase.rpc("remove_ingredient_from_index", {
