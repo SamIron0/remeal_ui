@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Recipe } from "@/types";
 import { useApp } from "@/context/AppContext";
@@ -18,6 +18,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 }) => {
   const { user, subscription, ingredients } = useApp();
   const isPremium = subscription?.status === "active" || subscription?.status === "trialing";
+  const [displayCount, setDisplayCount] = useState(10);
 
   if (loading) {
     return (
@@ -38,7 +39,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (ingredients.length === 0) {
     return (
-      <div className="text-center p-8">
+      <div className="text-center py-8 px-24">
         <h2 className="text-2xl font-semibold mb-4">Ready to cook?</h2>
         <p className="text-gray-600 mb-6">
           Start by adding ingredients you have on hand, and we'll find matching recipes for you.
@@ -64,11 +65,23 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     );
   }
 
+  const displayedRecipes = recipes.slice(0, displayCount);
+  const hasMore = recipes.length > displayCount;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {recipes.map((recipe) => (
-        <RecipeCard key={recipe.id} recipe={recipe} isPremium={isPremium} />
-      ))}
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {displayedRecipes.map((recipe) => (
+          <RecipeCard key={recipe.id} recipe={recipe} isPremium={isPremium} />
+        ))}
+      </div>
+      {hasMore && (
+        <div className="mt-6 text-center">
+          <Button onClick={() => setDisplayCount(prevCount => prevCount + 10)}>
+            Show More
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

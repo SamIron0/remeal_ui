@@ -60,7 +60,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 w-full">
-      <div className="flex flex-col justify-center flex-1 px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+      <div className="flex flex-col justify-center flex-1 px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-48">
         <div className="w-full max-w-sm mx-auto lg:w-96">
           <div>
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Log in to your account</h2>

@@ -8,10 +8,17 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import AuthBackground from '@/components/AuthBackground';
+import AuthBackground from "@/components/AuthBackground";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -59,6 +66,7 @@ export default function Signup() {
   };
 
   const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("callbackurl", callbackUrl);
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -66,20 +74,37 @@ export default function Signup() {
     setError(null);
 
     try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: fullName },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?callbackUrl=${encodeURIComponent(callbackUrl || "/search")}`,
-        },
-      });
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName },
+            emailRedirectTo: `${
+              process.env.NEXT_PUBLIC_BASE_URL
+            }/auth/callback${
+              callbackUrl
+                ? `?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                : ""
+            }`,
+          },
+        });
 
       if (signUpError) throw signUpError;
 
       if (signUpData.user) {
-        toast.success("Sign up successful! Please check your email to verify your account.");
-        router.push(`/login${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}${email ? `${callbackUrl ? '&' : '?'}email=${encodeURIComponent(email)}` : ''}`);
+        toast.success(
+          "Sign up successful! Please check your email to verify your account."
+        );
+        router.push(
+          `/login${
+            callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""
+          }${
+            email
+              ? `${callbackUrl ? "&" : "?"}email=${encodeURIComponent(email)}`
+              : ""
+          }`
+        );
       }
     } catch (error: any) {
       setError(error.message || "An error occurred during sign up");
@@ -90,13 +115,28 @@ export default function Signup() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 w-full">
-      <div className="flex flex-col justify-center flex-1 px-4 py-20 sm:px-6 lg:flex-none lg:px-24 xl:px-32">
+      <div className="flex flex-col justify-center flex-1 px-4 py-20 sm:px-6 lg:flex-none lg:px-24 xl:px-48">
         <div className="w-full max-w-sm mx-auto lg:w-96">
           <div>
-            <h2 className="mt-6 text-3xl font-semibold   text-gray-900">Create your account</h2>
+            <h2 className="mt-6 text-3xl font-semibold   text-gray-900">
+              Create your account
+            </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Or{' '}
-              <Link href={`/login${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}${email ? `${callbackUrl ? '&' : '?'}email=${encodeURIComponent(email)}` : ''}`} className="font-medium hover:underline text-primary hover:text-primary-dark">
+              Or{" "}
+              <Link
+                href={`/login${
+                  callbackUrl
+                    ? `?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                    : ""
+                }${
+                  email
+                    ? `${callbackUrl ? "&" : "?"}email=${encodeURIComponent(
+                        email
+                      )}`
+                    : ""
+                }`}
+                className="font-medium hover:underline text-primary hover:text-primary-dark"
+              >
                 sign in to your existing account
               </Link>
             </p>
@@ -146,7 +186,11 @@ export default function Signup() {
                     className="absolute inset-y-0 right-0 flex items-center pr-3"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -165,10 +209,28 @@ export default function Signup() {
               </div>
 
               <div className="flex items-center">
-                <Checkbox id="terms" checked={agreeTerms} onCheckedChange={(checked) => setAgreeTerms(checked as boolean)} />
-                <Label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-                  I agree to the <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link> and{" "}
-                  <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                <Checkbox
+                  id="terms"
+                  checked={agreeTerms}
+                  onCheckedChange={(checked) =>
+                    setAgreeTerms(checked as boolean)
+                  }
+                />
+                <Label
+                  htmlFor="terms"
+                  className="ml-2 block text-sm text-gray-900"
+                >
+                  I agree to the{" "}
+                  <Link href="/terms" className="text-primary hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>
                 </Label>
               </div>
 
