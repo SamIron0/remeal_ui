@@ -24,19 +24,9 @@ const recipeImages = [
 export default function AuthBackground() {
   return (
     <div className="relative w-full h-full bg-black text-white overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <Image
-          src="/images/food-pattern.jpg"
-          layout="fill"
-          objectFit="cover"
-          alt="Food pattern"
-        />
-      </div>
+    
 
-      {/* Content wrapper */}
       <div className="relative z-10 p-8 h-full flex flex-col justify-between">
-        {/* Welcome text */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

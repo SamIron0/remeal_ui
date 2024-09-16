@@ -66,7 +66,7 @@ export default function Login() {
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Log in to your account</h2>
             <p className="mt-2 text-sm text-gray-600">
               Or{' '}
-              <Link href="/signup" className="font-medium hover:underline text-primary hover:text-primary-dark">
+              <Link href={`/signup${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}${email ? `${callbackUrl ? '&' : '?'}email=${encodeURIComponent(email)}` : ''}`} className="font-medium hover:underline text-primary hover:text-primary-dark">
                 create a new account
               </Link>
             </p>

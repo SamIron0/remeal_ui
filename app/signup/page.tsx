@@ -71,7 +71,7 @@ export default function Signup() {
         password,
         options: {
           data: { full_name: fullName },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?callbackUrl=${callbackUrl || "/search"}`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?callbackUrl=${encodeURIComponent(callbackUrl || "/search")}`,
         },
       });
 
@@ -79,7 +79,7 @@ export default function Signup() {
 
       if (signUpData.user) {
         toast.success("Sign up successful! Please check your email to verify your account.");
-        router.push("/login");
+        router.push(`/login${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}${email ? `${callbackUrl ? '&' : '?'}email=${encodeURIComponent(email)}` : ''}`);
       }
     } catch (error: any) {
       setError(error.message || "An error occurred during sign up");
@@ -96,7 +96,7 @@ export default function Signup() {
             <h2 className="mt-6 text-3xl font-semibold   text-gray-900">Create your account</h2>
             <p className="mt-2 text-sm text-gray-600">
               Or{' '}
-              <Link href="/login" className="font-medium hover:underline text-primary hover:text-primary-dark">
+              <Link href={`/login${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}${email ? `${callbackUrl ? '&' : '?'}email=${encodeURIComponent(email)}` : ''}`} className="font-medium hover:underline text-primary hover:text-primary-dark">
                 sign in to your existing account
               </Link>
             </p>
