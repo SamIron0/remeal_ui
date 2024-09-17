@@ -108,7 +108,7 @@ export default async function RecipePage({
 
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Description</h2>
-            <p className="text-gray-700">{recipe.description}</p>
+            <p className="text-gray-700 max-w-2xl">{recipe.description}</p>
           </div>
 
           <IngredientList ingredients={recipe.recipe_ingredients} />

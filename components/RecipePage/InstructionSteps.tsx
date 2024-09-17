@@ -6,7 +6,7 @@ export default function InstructionSteps({
   const steps = JSON.parse(instructions);
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 max-w-2xl ">
       <h2 className="text-2xl font-semibold mb-4">Instructions</h2>
       <ol className="space-y-4">
         {steps.map((step: string, index: number) => (
