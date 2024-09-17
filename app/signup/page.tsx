@@ -34,15 +34,21 @@ export default function Signup() {
   const supabase = createClient();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const callback = params.get("callbackUrl");
-    const emailParam = params.get("email");
-    if (callback) {
-      setCallbackUrl(callback);
-    }
-    if (emailParam) {
-      setEmail(emailParam);
-    }
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.push("/");
+      }
+      const params = new URLSearchParams(window.location.search);
+      const callback = params.get("callbackUrl");
+      const emailParam = params.get("email");
+      if (callback) {
+        setCallbackUrl(callback);
+      }
+      if (emailParam) {
+        setEmail(emailParam);
+      }
+    })();
   }, []);
 
   const validateForm = () => {

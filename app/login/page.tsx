@@ -6,12 +6,19 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import AuthBackground from '@/components/AuthBackground';
+import AuthBackground from "@/components/AuthBackground";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -25,6 +32,14 @@ export default function Login() {
   const supabase = createClient();
 
   useEffect(() => {
+    (async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        router.push("/");
+      }
+    })();
     const params = new URLSearchParams(window.location.search);
     const callback = params.get("callbackUrl");
     const emailParam = params.get("email");
@@ -59,14 +74,29 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 w-full">
-      <div className="flex flex-col justify-center flex-1 px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-48">
+    <div className="flex h-screen bg-gray-100 w-full">
+      <div className="flex flex-col justify-center flex-1 px-4  sm:px-6 lg:flex-none lg:px-20 xl:px-48">
         <div className="w-full max-w-sm mx-auto lg:w-96">
           <div>
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Log in to your account</h2>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+              Log in to your account
+            </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Or{' '}
-              <Link href={`/signup${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}${email ? `${callbackUrl ? '&' : '?'}email=${encodeURIComponent(email)}` : ''}`} className="font-medium hover:underline text-primary hover:text-primary-dark">
+              Or{" "}
+              <Link
+                href={`/signup${
+                  callbackUrl
+                    ? `?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                    : ""
+                }${
+                  email
+                    ? `${callbackUrl ? "&" : "?"}email=${encodeURIComponent(
+                        email
+                      )}`
+                    : ""
+                }`}
+                className="font-medium hover:underline text-primary hover:text-primary-dark"
+              >
                 create a new account
               </Link>
             </p>
@@ -103,15 +133,21 @@ export default function Login() {
                     className="absolute inset-y-0 right-0 flex items-center pr-3"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
                   </button>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
-              
                 <div className="text-sm">
-                  <Link href="/reset_password" className="font-medium text-primary hover:text-primary-dark">
+                  <Link
+                    href="/reset_password"
+                    className="font-medium text-primary hover:text-primary-dark"
+                  >
                     Forgot your password?
                   </Link>
                 </div>

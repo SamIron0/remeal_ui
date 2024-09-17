@@ -57,7 +57,6 @@ export default async function RootLayout({
       },
     }
   );
-  const session = (await supabase.auth.getSession()).data.session;
 
   return (
     <html lang="en" className={GeistSans.className}>

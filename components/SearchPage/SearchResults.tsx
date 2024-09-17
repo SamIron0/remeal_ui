@@ -39,7 +39,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (ingredients.length === 0) {
     return (
-      <div className="text-center py-8 px-24">
+      <div className="text-center px-8 py-24">
         <h2 className="text-2xl font-semibold mb-4">Ready to cook?</h2>
         <p className="text-gray-600 mb-6">
           Start by adding ingredients you have on hand, and we'll find matching recipes for you.

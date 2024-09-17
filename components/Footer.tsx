@@ -60,11 +60,7 @@ const Footer: React.FC = () => {
                   Privacy Policy
                 </Link>
               </li>
-              <li>
-                <Link href="/cookies" className="hover:text-primary">
-                  Cookie Policy
-                </Link>
-              </li>
+            
             </ul>
           </div>
         </div>

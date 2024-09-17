@@ -1,7 +1,5 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
-
 import type { Tables } from "@/supabase/types";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -81,7 +79,7 @@ export default function Pricing({ products }: Props) {
   const handleManageSubscription = async () => {
   };
 
-  const handleFreeSignup = () => router.push("/signup?callbackUrl=/membership");
+  const handleFreeSignup = () => router.push("/signup");
 
   if (!products.length) {
     return (
@@ -179,7 +177,9 @@ export default function Pricing({ products }: Props) {
             return (
               <div
                 key={product.id}
-                className="divide-y divide-gray-200 rounded-lg border border-gray-200 shadow-sm"
+                className={`divide-y divide-gray-200 rounded-lg border ${
+                  isPremiumTier ? 'border-primary/90 border-2' : 'border-gray-200'
+                } shadow-sm`}
               >
                 <div className="p-6">
                   <h3 className="text-lg font-medium leading-6 text-gray-900">

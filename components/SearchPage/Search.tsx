@@ -149,7 +149,6 @@ const RecipeSearch: React.FC = () => {
   }, [ingredients]);
 
   const applyFilters = useCallback((newOptions: FilterOptions) => {
-    console.log("Applying filters:", newOptions); 
     setFilterOptions(newOptions);
     const filtered = recipes.filter((recipe) => {
       if (
