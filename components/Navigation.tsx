@@ -17,8 +17,8 @@ import { User, CreditCard, LogOut } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
-export default function Navbar() {
-  const { user, subscription   } = useApp();
+export default function Navbar(userSession: any) {
+  const { user, subscription } = useApp();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
@@ -64,7 +64,7 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
-            {user && (
+            {userSession && (
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -74,20 +74,20 @@ export default function Navbar() {
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage
-                          src={user.avatar_url || ""}
-                          alt={user.full_name || ""}
+                          src={user?.avatar_url || ""}
+                          alt={user?.full_name || ""}
                         />
                         <AvatarFallback>
-                          {user.full_name?.charAt(0) || "U"}
+                          {user?.full_name?.charAt(0) || "U"}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <DropdownMenuItem className="flex-col items-start">
-                      <div className="font-medium">{user.full_name}</div>
+                      <div className="font-medium">{user?.full_name}</div>
                       <div className="text-sm text-muted-foreground">
-                        {user.email}
+                        {user?.email}
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -121,7 +121,7 @@ export default function Navbar() {
                 </DropdownMenu>
               </>
             )}
-            {!user && (
+            {!userSession && (
               <>
                 <Link href="/login">
                   <Button variant="ghost" className="text-primary">

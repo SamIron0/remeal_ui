@@ -57,7 +57,7 @@ export default async function RootLayout({
       },
     }
   );
-
+  const userSession = await supabase.auth.getUser();
   return (
     <html lang="en" className={GeistSans.className}>
       <head>
@@ -83,7 +83,7 @@ export default async function RootLayout({
       <body className="hide-scrollbar bg-background text-foreground">
         <AppProvider>
           <SpeedInsights />
-          <Navigation />
+            <Navigation userSession={userSession} />
           <main className="space-y-12 flex flex-col items-center">
             {children}
             <Toaster />
