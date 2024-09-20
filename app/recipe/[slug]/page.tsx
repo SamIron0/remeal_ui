@@ -55,7 +55,6 @@ export default async function RecipePage({
     .single();
 
   if (error || !recipe) {
-    console.log(params.slug);
     notFound();
   }
 

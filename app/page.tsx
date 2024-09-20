@@ -64,17 +64,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Recipe Search Demo */}
-      <section className="w-full py-20 bg-gray-100">
-        <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12 text-primary">
-            Try It Now
-          </h2>
-          <Search />
-        </div>
-      </section>
-
       {/* Testimonials */}
       <section className="w-full py-20 bg-white">
         <div className="container px-4 md:px-6">

@@ -17,6 +17,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import FeatureComparison from "@/components/Homepage/FeatureComparison";
+import TestimonialCarousel from "@/components/Homepage/TestimonialCarousel";
+import FAQSection from "@/components/Homepage/FAQ";
 
 type Product = Tables<"products">;
 type Price = Tables<"prices">;
@@ -248,6 +251,26 @@ export default function Pricing({ products }: Props) {
           })}
         </div>
       </div>
+
+      {/* New sections */}
+      <div className="mt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Testimonials */}
+        <section className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            What Our Users Say
+          </h2>
+          <TestimonialCarousel />
+        </section>
+
+        {/* FAQ */}
+        <section className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Frequently Asked Questions
+          </h2>
+          <FAQSection />
+        </section>
+      </div>
+
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -17,7 +17,7 @@ import { User, CreditCard, LogOut } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
-export default function Navbar(userSession: any) {
+export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const { user, subscription } = useApp();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = createClient();
@@ -28,8 +28,8 @@ export default function Navbar(userSession: any) {
   const menuItems = [
     { name: "Home", href: "/" },
     { name: "How It Works", href: "/#how-it-works" },
-    { name: "Recipes", href: "/recipes" },
-    { name: "Pricing", href: "/pricing" },
+    { name: "Search", href: "/search" },
+    { name: "Pricing", href: "/membership" },
   ];
 
   const handleSignOut = async () => {
@@ -37,6 +37,7 @@ export default function Navbar(userSession: any) {
     if (error) {
       console.error("Error signing out:", error);
     } else {
+      isLoggedIn = false;
       router.push("/search");
     }
   };
@@ -64,7 +65,7 @@ export default function Navbar(userSession: any) {
                 {item.name}
               </Link>
             ))}
-            {userSession && (
+            {isLoggedIn || user ? (
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -120,8 +121,7 @@ export default function Navbar(userSession: any) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
-            )}
-            {!userSession && (
+            ) : (
               <>
                 <Link href="/login">
                   <Button variant="ghost" className="text-primary">
@@ -167,7 +167,7 @@ export default function Navbar(userSession: any) {
                 {item.name}
               </Link>
             ))}
-            {!user && (
+            {!isLoggedIn && (
               <>
                 <Link href="/login" onClick={toggleMenu}>
                   <Button

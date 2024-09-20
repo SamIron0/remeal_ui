@@ -9,7 +9,6 @@ const features = [
   { name: 'Save Favorite Recipes', free: false, premium: true },
   { name: 'Advanced Filters', free: false, premium: true },
   { name: 'Personalized Recommendations', free: false, premium: true },
-  { name: 'Meal Planning', free: false, premium: true },
   { name: 'Nutritional Information', free: false, premium: true },
 ];
 
