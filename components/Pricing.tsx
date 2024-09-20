@@ -76,8 +76,7 @@ export default function Pricing({ products }: Props) {
     setPriceIdLoading(undefined);
   };
 
-  const handleManageSubscription = async () => {
-  };
+  const handleManageSubscription = async () => {};
 
   const handleFreeSignup = () => router.push("/signup");
 
@@ -111,7 +110,7 @@ export default function Pricing({ products }: Props) {
       const result = await response.json();
       if (response.ok) {
         toast.success("Your subscription has been cancelled successfully.");
-        router.push("/account"); 
+        router.push("/account");
       } else {
         toast.error("Failed to cancel subscription: " + result.error);
       }
@@ -178,7 +177,9 @@ export default function Pricing({ products }: Props) {
               <div
                 key={product.id}
                 className={`divide-y divide-gray-200 rounded-lg border ${
-                  isPremiumTier ? 'border-primary/90 border-2' : 'border-gray-200'
+                  isPremiumTier
+                    ? "border-primary/90 border-2"
+                    : "border-gray-200"
                 } shadow-sm`}
               >
                 <div className="p-6">

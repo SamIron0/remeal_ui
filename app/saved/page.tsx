@@ -58,7 +58,7 @@ export default function SavedRecipes() {
               <div className="p-4">
                 <h2 className="text-xl font-semibold mb-2">{recipe.name}</h2>
                 <p className="text-gray-600 mb-4">{recipe.description}</p>
-                <Link href={`/recipe/${recipe.id}`}>
+                <Link href={`/recipe/${recipe.name}`}>
                   <Button>View Recipe</Button>
                 </Link>
               </div>

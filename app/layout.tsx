@@ -14,16 +14,18 @@ const defaultUrl = "https://remeal.food";
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "Remeal - Cook Smart, Waste Less",
-    template: "%s | Remeal"
+    default: "Remeal - Cook Smart, Waste Less | Recipe Finder App",
+    template: "%s | Remeal - Cook Smart, Waste Less"
   },
-  description:
-    "Discover recipes based on ingredients you have. Remeal helps you cook delicious meals with what's in your kitchen.",
+  description: "Discover delicious recipes based on ingredients you have. Remeal helps you cook smart, reduce food waste, and save money with personalized meal suggestions.",
+  keywords: ["recipe finder", "food waste reduction", "meal planning", "ingredient-based recipes", "smart cooking"],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: defaultUrl,
     siteName: "Remeal",
+    title: "Remeal - Cook Smart, Waste Less | Recipe Finder App",
+    description: "Discover delicious recipes based on ingredients you have. Reduce food waste and save money with Remeal's smart cooking suggestions.",
     images: [
       {
         url: `${defaultUrl}/og-image.jpg`,
@@ -36,7 +38,9 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@remeal_app",
-    creator: "@remeal_app"
+    creator: "@remeal_app",
+    title: "Remeal - Cook Smart, Waste Less | Recipe Finder App",
+    description: "Discover recipes, reduce food waste, and save money with Remeal's smart cooking suggestions.",
   }
 };
 

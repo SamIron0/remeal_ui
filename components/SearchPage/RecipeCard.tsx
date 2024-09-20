@@ -11,7 +11,7 @@ interface RecipeCardProps {
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isPremium }) => {
   return (
-    <Link href={`/recipe/${recipe.id}`}>
+    <Link href={`/recipe/${recipe.name}`}>
       <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
         <h3 className="text-lg font-semibold mb-2">{recipe.name}</h3>
         <p className="text-sm text-gray-600 mb-2">{recipe.description}</p>

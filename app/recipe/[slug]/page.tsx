@@ -9,11 +9,13 @@ import IngredientList from "@/components/RecipePage/IngredientList";
 import InstructionSteps from "@/components/RecipePage/InstructionSteps";
 import Link from "next/link";
 import SaveRecipeButton from "@/components/RecipePage/SaveRecipeButton";
+import SchemaMarkup from "@/components/SchemaMarkup";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default async function RecipePage({
   params,
 }: {
-  params: { id: string };
+  params: { slug: string };
 }) {
   const supabase = createClient(cookies());
 
@@ -33,6 +35,7 @@ export default async function RecipePage({
       subscriptionData?.status === "active" ||
       subscriptionData?.status === "trialing";
   }
+  const decodedSlug = decodeURIComponent(params.slug);
 
   const { data: recipe, error } = await supabase
     .from("recipes")
@@ -48,15 +51,49 @@ export default async function RecipePage({
       )
     `
     )
-    .eq("id", params.id)
+    .eq("name", decodedSlug)
     .single();
 
   if (error || !recipe) {
+    console.log(params.slug);
     notFound();
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Search", href: "/search" },
+          { label: recipe.name, href: `/recipe/${recipe.name}` },
+        ]}
+      />
+      <SchemaMarkup
+        type="Recipe"
+        data={{
+          name: recipe.name,
+          image: recipe.recipe_images[0]?.file_path,
+          description: recipe.description,
+          recipeIngredient: recipe.recipe_ingredients.map(
+            (ing) =>
+              `${ing.quantity} ${ing.unit} ${ing.ingredients?.name ?? ""}`
+          ),
+          recipeInstructions: recipe.instructions,
+          cookTime: `PT${recipe.cook_time}M`,
+          prepTime: `PT${recipe.prep_time ?? 0}M`,
+          totalTime: `PT${(recipe.cook_time ?? 0) + (recipe.prep_time ?? 0)}M`,
+          recipeYield: `${recipe.servings} servings`,
+          nutrition: recipe.nutrition_info
+            ? {
+                "@type": "NutritionInformation",
+                calories: `${recipe.nutrition_info.calories} calories`,
+                fatContent: `${recipe.nutrition_info.fat}g`,
+                carbohydrateContent: `${recipe.nutrition_info.carbohydrates}g`,
+                proteinContent: `${recipe.nutrition_info.protein}g`,
+              }
+            : undefined,
+        }}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
           <h1 className="text-4xl font-bold mb-4">{recipe.name}</h1>
@@ -81,10 +118,11 @@ export default async function RecipePage({
             <div className="relative h-96 mb-8 rounded-lg overflow-hidden">
               <Image
                 src={recipe.recipe_images[0].file_path}
-                alt={recipe.name}
+                alt={`${recipe.name} - A delicious recipe by Remeal`}
                 layout="fill"
                 objectFit="cover"
                 className="transition-transform duration-300 hover:scale-105"
+                priority
               />
             </div>
           )}
