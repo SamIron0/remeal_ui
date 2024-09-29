@@ -4,9 +4,8 @@ Remeal UI is the frontend application for Remeal, an intelligent recipe companio
 
 ## Features
 
-- Smart Recipe Search
 - Ingredient Matching
-- Meal Planning
+- Recipe Filtering
 - Nutritional Information
 - User Authentication
 - Premium Subscription Management
@@ -67,7 +66,7 @@ npm run dev
 
 ## Styling
 
-The project uses Tailwind CSS for styling. Ctustom components are built using the shadcn/ui library.
+The project uses Tailwind CSS for styling. Custom components are built using the shadcn/ui library.
 
 ## API Integration
 
@@ -75,7 +74,7 @@ The UI interacts with backend services for recipe matching, user management, and
 
 ## Deployment
 
-The project is configured for deployment on Vercel. Push to the main branch to trigger a deployment.
+The project is configured for deployment on Vercel.
 
 ## License
 
