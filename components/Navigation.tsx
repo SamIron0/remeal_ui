@@ -31,7 +31,6 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
     { name: "Search", href: "/search" },
     { name: "Pricing", href: "/membership" },
   ];
-
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {

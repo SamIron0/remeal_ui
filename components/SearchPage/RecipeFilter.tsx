@@ -19,7 +19,6 @@ import Link from "next/link";
 interface FilterOptions {
   dietaryRestrictions: string[];
   maxCookTime: number | null;
-  minRating: number | null;
 }
 
 interface FilterProps {
@@ -30,7 +29,8 @@ interface FilterProps {
 const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
   const [localOptions, setLocalOptions] = useState<FilterOptions>(options);
   const { subscription } = useApp();
-  const isPremium = subscription?.status === "active" || subscription?.status === "trialing";
+  const isPremium =
+    subscription?.status === "active" || subscription?.status === "trialing";
 
   useEffect(() => {
     const savedOptions = localStorage.getItem("filterOptions");
@@ -87,7 +87,9 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <label className="text-sm font-medium">Dietary Restrictions</label>
+                <label className="text-sm font-medium">
+                  Dietary Restrictions
+                </label>
                 {["vegetarian", "vegan", "gluten-free", "dairy-free"].map(
                   (restriction) => (
                     <label
@@ -120,19 +122,6 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
                   onValueChange={handleMaxCookTimeChange}
                   max={120}
                   step={5}
-                />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">
-                  Min Rating: {localOptions.minRating}
-                </label>
-                <Slider
-                  value={
-                    localOptions.minRating !== null ? [localOptions.minRating] : [0]
-                  }
-                  onValueChange={handleMinRatingChange}
-                  max={5}
-                  step={0.5}
                 />
               </div>
             </div>

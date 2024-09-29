@@ -23,7 +23,6 @@ import RecipeFilter from "./RecipeFilter";
 interface FilterOptions {
   dietaryRestrictions: string[];
   maxCookTime: number | null;
-  minRating: number | null;
 }
 
 const RecipeSearch: React.FC = () => {
@@ -70,15 +69,6 @@ const RecipeSearch: React.FC = () => {
         : "null"
     );
   }, [filterOptions.maxCookTime]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "minRating",
-      filterOptions.minRating !== null
-        ? filterOptions.minRating.toString()
-        : "null"
-    );
-  }, [filterOptions.minRating]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -148,28 +138,29 @@ const RecipeSearch: React.FC = () => {
     }
   }, [ingredients]);
 
-  const applyFilters = useCallback((newOptions: FilterOptions) => {
-    setFilterOptions(newOptions);
-    const filtered = recipes.filter((recipe) => {
-      if (
-        newOptions.maxCookTime &&
-        (recipe.cook_time || 0) > newOptions.maxCookTime
-      ) {
-        return false;
-      }
-      if (newOptions.minRating && (recipe.rating || 0) < newOptions.minRating) {
-        return false;
-      }
-      if (newOptions.dietaryRestrictions.length > 0) {
-        const recipeDiets: string[] = [];
-        return newOptions.dietaryRestrictions.every((diet) =>
-          recipeDiets.includes(diet)
-        );
-      }
-      return true;
-    });
-    setFilteredRecipes(filtered);
-  }, [recipes]);
+  const applyFilters = useCallback(
+    (newOptions: FilterOptions) => {
+      setFilterOptions(newOptions);
+      const filtered = recipes.filter((recipe) => {
+        if (
+          newOptions.maxCookTime &&
+          (recipe.cook_time || 0) > newOptions.maxCookTime
+        ) {
+          return false;
+        }
+
+        if (newOptions.dietaryRestrictions.length > 0) {
+          const recipeDiets: string[] = [];
+          return newOptions.dietaryRestrictions.every((diet) =>
+            recipeDiets.includes(diet)
+          );
+        }
+        return true;
+      });
+      setFilteredRecipes(filtered);
+    },
+    [recipes]
+  );
 
   useEffect(() => {
     applyFilters(filterOptions);
@@ -197,10 +188,7 @@ const RecipeSearch: React.FC = () => {
           >
             <SearchIcon className="mr-2 h-4 w-4" /> Add
           </Button>
-          <RecipeFilter
-            options={filterOptions}
-            onChange={applyFilters}
-          />
+          <RecipeFilter options={filterOptions} onChange={applyFilters} />
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mt-4">

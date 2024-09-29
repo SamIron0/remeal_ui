@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Remeal UI
+
+Remeal UI is the frontend application for Remeal, an intelligent recipe companion that helps users cook smart and waste less food.
+
+## Features
+
+- Smart Recipe Search
+- Ingredient Matching
+- Meal Planning
+- Nutritional Information
+- User Authentication
+- Premium Subscription Management
+- Saved Recipes
+- Admin Dashboard
+
+## Tech Stack
+
+- Next.js 14
+- React
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Stripe (for payments)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (version 18 or later)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up environment variables:
+   Create a `.env.local` file in the root directory and add the necessary environment variables (refer to `.env.example` if available).
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- `/app`: Next.js app router pages and API routes
+- `/components`: Reusable React components
+- `/utils`: Utility functions and helpers
+- `/context`: React context providers
+- `/types`: TypeScript type definitions
+- `/public`: Static assets
 
-## Learn More
+## Key Components
 
-To learn more about Next.js, take a look at the following resources:
+- Search Page: Allows users to find recipes based on ingredients
+- Recipe Page: Displays detailed recipe information
+- Pricing Page: Shows subscription options for premium features
+- Admin Dashboard: Manages recipes and views site metrics
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Styling
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The project uses Tailwind CSS for styling. Ctustom components are built using the shadcn/ui library.
 
-## Deploy on Vercel
+## API Integration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The UI interacts with backend services for recipe matching, user management, and subscription handling.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Deployment
+
+The project is configured for deployment on Vercel. Push to the main branch to trigger a deployment.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
