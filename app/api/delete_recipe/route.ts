@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/client";
-import getRedisClient from "@/utils/redis";
 
 export async function DELETE(request: Request) {
   try {
@@ -34,7 +33,6 @@ async function removeRecipeFromIndex(recipeId: number) {
     if (ingredientsError) throw ingredientsError;
 
     for (const { ingredient_id } of recipeIngredients) {
-     
       const { error } = await supabase.rpc("remove_ingredient_from_index", {
         p_ingredient: ingredient_id.toString(),
         p_recipe_id: recipeId,
@@ -48,8 +46,6 @@ async function removeRecipeFromIndex(recipeId: number) {
         throw error;
       }
     }
-
-   
   } catch (error) {
     console.error("Error in removeRecipeFromIndex:", error);
     throw error;

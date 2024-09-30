@@ -81,10 +81,7 @@ const RecipeSearch: React.FC = () => {
   };
 
   const addIngredient = (ingredient: string) => {
-    if (!user) {
-      router.push(`/login?callbackUrl=${encodeURIComponent("/search")}`);
-      return;
-    }
+  
     setIngredients([...ingredients, ingredient]);
     setInputValue("");
   };
@@ -98,10 +95,7 @@ const RecipeSearch: React.FC = () => {
   };
 
   const searchRecipes = async () => {
-    if (!user) {
-      router.push(`/login?callbackUrl=${encodeURIComponent("/search")}`);
-      return;
-    }
+   
     setLoading(true);
     setError(null);
     try {
@@ -130,7 +124,7 @@ const RecipeSearch: React.FC = () => {
   };
 
   useEffect(() => {
-    if (ingredients.length > 0 && user) {
+    if (ingredients.length > 0) {
       searchRecipes();
     } else if (ingredients.length === 0) {
       setRecipes([]);
