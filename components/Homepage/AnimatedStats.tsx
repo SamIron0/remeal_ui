@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 
 const stats = [
-  { label: 'Recipes', value: 10000, suffix: '+' },
-  { label: 'Active Users', value: 50000, suffix: '+' },
-  { label: 'Ingredients', value: 5000, suffix: '+' },
+  { label: 'Recipes', value: 100, suffix: '+' },
+  { label: 'Active Users', value: 50, suffix: '+' },
+  { label: 'Ingredients', value: 500, suffix: '+' },
 ];
 
 const AnimatedStats: React.FC = () => {
