@@ -32,20 +32,6 @@ async function removeRecipeFromIndex(recipeId: number) {
 
     if (ingredientsError) throw ingredientsError;
 
-    for (const { ingredient_id } of recipeIngredients) {
-      const { error } = await supabase.rpc("remove_ingredient_from_index", {
-        p_ingredient: ingredient_id.toString(),
-        p_recipe_id: recipeId,
-      });
-
-      if (error) {
-        console.error(
-          `Error removing ingredient ${ingredient_id} from index:`,
-          error
-        );
-        throw error;
-      }
-    }
   } catch (error) {
     console.error("Error in removeRecipeFromIndex:", error);
     throw error;

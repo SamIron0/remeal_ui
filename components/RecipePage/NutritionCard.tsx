@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function NutritionCard({ nutritionInfo }: { nutritionInfo: any }) {
   if (!nutritionInfo) {
@@ -9,6 +9,7 @@ export default function NutritionCard({ nutritionInfo }: { nutritionInfo: any })
     <Card>
       <CardHeader>
         <CardTitle>Nutrition Information</CardTitle>
+        <p className="text-sm text-gray-500">Per serving</p>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">

@@ -158,12 +158,10 @@ export default async function RecipePage({
               <NutritionCard nutritionInfo={recipe.nutrition_info} />
             ) : (
               <div className="bg-gray-100 rounded-lg p-4 mb-8">
-                <h3 className="text-xl font-semibold mb-4">
-                  Nutrition Information
-                </h3>
+                <h3 className="text-xl font-semibold ">Nutrition Information</h3>
+                <p className="text-sm text-gray-600 mb-4">Per serving</p>
                 <p className="mb-4">
-                  Unlock detailed nutrition information with a premium
-                  membership!
+                  Unlock detailed nutrition information with a premium membership!
                 </p>
                 <Link href="/membership">
                   <Button className="w-full">Upgrade to Premium</Button>
