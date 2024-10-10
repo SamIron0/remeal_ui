@@ -40,12 +40,7 @@ const Footer: React.FC = () => {
                   Pricing
                 </Link>
               </li>
-              <li>
-                <Link href="/about" className="hover:text-primary">
-                  About Us
-                </Link>
-              </li>
-            </ul>
+             </ul>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
