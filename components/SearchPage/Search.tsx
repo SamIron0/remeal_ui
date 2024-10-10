@@ -81,8 +81,12 @@ const RecipeSearch: React.FC = () => {
   };
 
   const addIngredient = (ingredient: string) => {
+    const newIngredients = ingredient
+      .split(',')
+      .map(item => item.trim())
+      .filter(item => item !== '');
   
-    setIngredients([...ingredients, ingredient]);
+    setIngredients([...ingredients, ...newIngredients]);
     setInputValue("");
   };
 
@@ -124,7 +128,7 @@ const RecipeSearch: React.FC = () => {
   };
 
   useEffect(() => {
-    if (ingredients.length > 0) {
+    if (ingredients.length > 0 ) {
       searchRecipes();
     } else if (ingredients.length === 0) {
       setRecipes([]);
