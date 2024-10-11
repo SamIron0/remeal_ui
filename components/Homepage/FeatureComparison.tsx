@@ -2,17 +2,18 @@
 import React from 'react';
 import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
+import { useRouter } from 'next/navigation';
 const features = [
   { name: 'Recipe Search', free: true, premium: true },
   { name: 'Basic Ingredient Matching', free: true, premium: true },
+  { name: 'Nutritional Information', free: true, premium: true},
   { name: 'Save Favorite Recipes', free: false, premium: true },
   { name: 'Advanced Filters', free: false, premium: true },
   { name: 'Personalized Recommendations', free: false, premium: true },
-  { name: 'Nutritional Information', free: false, premium: true },
 ];
 
 const FeatureComparison: React.FC = () => {
+  const router = useRouter();
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
@@ -38,7 +39,7 @@ const FeatureComparison: React.FC = () => {
         </tbody>
       </table>
       <div className="mt-8 text-center">
-        <Button size="lg" className="bg-primary text-white hover:bg-primary-dark">
+        <Button onClick={() => router.push('/membership')} size="lg" className="bg-primary text-white hover:bg-primary-dark">
           Upgrade to Premium
         </Button>
       </div>
