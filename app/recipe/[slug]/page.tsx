@@ -127,16 +127,7 @@ export default async function RecipePage({
           )}
 
           <div className="flex space-x-4 mb-8">
-            {isActiveMember ? (
-              <SaveRecipeButton recipeId={recipe.id} userId={user?.id} />
-            ) : (
-              <div className="bg-gray-100 rounded-lg p-4">
-                <p className="mb-2">Upgrade to Premium to save recipes!</p>
-                <Link href="/membership">
-                  <Button className="w-full">Upgrade to Premium</Button>
-                </Link>
-              </div>
-            )}
+            <SaveRecipeButton recipeId={recipe.id} userId={user?.id} />
             <Button variant="outline" className="flex items-center">
               <Share2 className="w-4 h-4 mr-2" />
               Share

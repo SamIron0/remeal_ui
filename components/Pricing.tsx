@@ -17,9 +17,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import FeatureComparison from "@/components/Homepage/FeatureComparison";
-import TestimonialCarousel from "@/components/Homepage/TestimonialCarousel";
-import FAQSection from "@/components/Homepage/FAQ";
+import TestimonialCarousel from "./Home/TestimonialCarousel";
+import FAQSection from "./Home/FAQ";
 
 type Product = Tables<"products">;
 type Price = Tables<"prices">;
