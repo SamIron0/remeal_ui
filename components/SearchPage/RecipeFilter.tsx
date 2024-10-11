@@ -17,7 +17,6 @@ import { useApp } from "@/context/AppContext";
 import Link from "next/link";
 
 interface FilterOptions {
-  dietaryRestrictions: string[];
   maxCookTime: number | null;
 }
 
@@ -40,30 +39,10 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
     }
   }, []);
 
-  const handleDietaryRestrictionChange = (restriction: string) => {
-    const updatedRestrictions = localOptions.dietaryRestrictions.includes(
-      restriction
-    )
-      ? localOptions.dietaryRestrictions.filter((r) => r !== restriction)
-      : [...localOptions.dietaryRestrictions, restriction];
-
-    setLocalOptions((prevOptions) => ({
-      ...prevOptions,
-      dietaryRestrictions: updatedRestrictions,
-    }));
-  };
-
   const handleMaxCookTimeChange = (value: number[]) => {
     setLocalOptions((prevOptions) => ({
       ...prevOptions,
       maxCookTime: value[0],
-    }));
-  };
-
-  const handleMinRatingChange = (value: number[]) => {
-    setLocalOptions((prevOptions) => ({
-      ...prevOptions,
-      minRating: value[0],
     }));
   };
 
@@ -86,29 +65,6 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
               <DialogTitle>Advanced Filters</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">
-                  Dietary Restrictions
-                </label>
-                {["vegetarian", "vegan", "gluten-free", "dairy-free"].map(
-                  (restriction) => (
-                    <label
-                      key={restriction}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        checked={localOptions.dietaryRestrictions.includes(
-                          restriction
-                        )}
-                        onCheckedChange={() =>
-                          handleDietaryRestrictionChange(restriction)
-                        }
-                      />
-                      <span className="capitalize">{restriction}</span>
-                    </label>
-                  )
-                )}
-              </div>
               <div className="grid gap-2">
                 <label className="text-sm font-medium">
                   Max Cook Time: {localOptions.maxCookTime} minutes

@@ -1,34 +1,18 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { XCircle, Search as SearchIcon } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import SearchResults from "./SearchResults";
 import { Recipe } from "@/types";
 import { useApp } from "@/context/AppContext";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Settings } from "lucide-react";
 import RecipeFilter from "./RecipeFilter";
 
 interface FilterOptions {
-  dietaryRestrictions: string[];
   maxCookTime: number | null;
 }
 
 const RecipeSearch: React.FC = () => {
-  const { user } = useAuth();
-  const { subscription } = useApp();
-  const router = useRouter();
   const { recipes, setRecipes, ingredients, setIngredients } = useApp();
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,26 +24,15 @@ const RecipeSearch: React.FC = () => {
       return savedOptions
         ? JSON.parse(savedOptions)
         : {
-            dietaryRestrictions: [],
             maxCookTime: 120,
-            minRating: 0,
           };
     }
     return {
-      dietaryRestrictions: [],
       maxCookTime: 120,
-      minRating: 0,
     };
   });
 
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "dietaryRestrictions",
-      JSON.stringify(filterOptions.dietaryRestrictions)
-    );
-  }, [filterOptions.dietaryRestrictions]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -82,24 +55,30 @@ const RecipeSearch: React.FC = () => {
 
   const addIngredient = (ingredient: string) => {
     const newIngredients = ingredient
-      .split(',')
-      .map(item => item.trim())
-      .filter(item => item !== '');
-  
-    setIngredients([...ingredients, ...newIngredients]);
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item !== "");
+
+    const newIngredientsList = [...ingredients, ...newIngredients];
+    setIngredients(newIngredientsList);
+
+    searchRecipes(newIngredientsList);
     setInputValue("");
   };
 
   const removeIngredient = (index: number) => {
-    setIngredients(ingredients.filter((_, i) => i !== index));
+    const newIngredients = ingredients.filter((_, i) => i !== index);
+    setIngredients(newIngredients);
+    if (newIngredients.length > 0) {
+      searchRecipes(newIngredients);
+    }
   };
 
   const clearAllIngredients = () => {
     setIngredients([]);
   };
 
-  const searchRecipes = async () => {
-   
+  const searchRecipes = async (ingredients: string[]) => {
     setLoading(true);
     setError(null);
     try {
@@ -126,16 +105,6 @@ const RecipeSearch: React.FC = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (ingredients.length > 0 ) {
-      searchRecipes();
-    } else if (ingredients.length === 0) {
-      setRecipes([]);
-      setFilteredRecipes([]);
-    }
-  }, [ingredients]);
-
   const applyFilters = useCallback(
     (newOptions: FilterOptions) => {
       setFilterOptions(newOptions);
@@ -147,12 +116,6 @@ const RecipeSearch: React.FC = () => {
           return false;
         }
 
-        if (newOptions.dietaryRestrictions.length > 0) {
-          const recipeDiets: string[] = [];
-          return newOptions.dietaryRestrictions.every((diet) =>
-            recipeDiets.includes(diet)
-          );
-        }
         return true;
       });
       setFilteredRecipes(filtered);
