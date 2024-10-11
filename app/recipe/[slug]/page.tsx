@@ -154,20 +154,8 @@ export default async function RecipePage({
 
         <div className="lg:col-span-1">
           <div className="sticky top-8">
-            {isActiveMember ? (
-              <NutritionCard nutritionInfo={recipe.nutrition_info} />
-            ) : (
-              <div className="bg-gray-100 rounded-lg p-4 mb-8">
-                <h3 className="text-xl font-semibold ">Nutrition Information</h3>
-                <p className="text-sm text-gray-600 mb-4">Per serving</p>
-                <p className="mb-4">
-                  Unlock detailed nutrition information with a premium membership!
-                </p>
-                <Link href="/membership">
-                  <Button className="w-full">Upgrade to Premium</Button>
-                </Link>
-              </div>
-            )}
+            <NutritionCard nutritionInfo={recipe.nutrition_info} />
+
             <div className="mt-8">
               <h3 className="text-xl font-semibold mb-4">Recipe Details</h3>
               <div className="bg-gray-100 rounded-lg p-4">

@@ -24,17 +24,20 @@ export default function Home() {
             {[
               {
                 title: "Smart Recipe Matching",
-                description: "Our advanced algorithm finds the perfect recipes based on your available ingredients.",
+                description:
+                  "Our advanced algorithm finds the perfect recipes based on your available ingredients.",
                 icon: "🧠",
               },
               {
                 title: "Reduce Food Waste",
-                description: "Use up ingredients before they spoil, saving money and reducing environmental impact.",
+                description:
+                  "Use up ingredients before they spoil, saving money and reducing environmental impact.",
                 icon: "🌱",
               },
               {
                 title: "Personalized Recommendations",
-                description: "Get recipe suggestions tailored to your dietary preferences and cooking habits.",
+                description:
+                  "Get recipe suggestions tailored to your dietary preferences and cooking habits.",
                 icon: "👤",
               },
             ].map((feature, index) => (
@@ -51,25 +54,29 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { step: 1, title: "Enter Your Ingredients", description: "List the ingredients you have on hand." },
-              { step: 2, title: "Get Matched Recipes", description: "Our system finds recipes that match your ingredients." },
-              { step: 3, title: "Start Cooking", description: "Follow the recipe and enjoy your delicious meal!" },
+              {
+                step: 1,
+                title: "Enter Your Ingredients",
+                description: "List the ingredients you have on hand.",
+              },
+              {
+                step: 2,
+                title: "Get Matched Recipes",
+                description:
+                  "Our system finds recipes that match your ingredients.",
+              },
+              {
+                step: 3,
+                title: "Start Cooking",
+                description: "Follow the recipe and enjoy your delicious meal!",
+              },
             ].map((step, index) => (
               <AnimatedStep key={index} step={step} index={index} />
             ))}
           </div>
         </div>
       </section>
-      {/* Testimonials */}
-      <section className="w-full py-20 bg-white">
-        <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12 text-primary">
-            What Our Users Say
-          </h2>
-          <TestimonialCarousel />
-        </div>
-      </section>
-
+            
       {/* Feature Comparison */}
       <section className="w-full py-20 bg-gray-100">
         <div className="container px-4 md:px-6">
@@ -90,7 +97,8 @@ export default function Home() {
             Ready to Transform Your Cooking Experience?
           </h2>
           <p className="mx-auto max-w-[700px] text-xl text-gray-200 mb-8">
-            Join Remeal today and discover a world of culinary possibilities right in your kitchen.
+            Join Remeal today and discover a world of culinary possibilities
+            right in your kitchen.
           </p>
           <FloatingCTA />
         </div>

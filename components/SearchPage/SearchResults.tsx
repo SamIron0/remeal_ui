@@ -16,8 +16,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   loading,
   error,
 }) => {
-  const { user, subscription, ingredients } = useApp();
-  const isPremium = subscription?.status === "active" || subscription?.status === "trialing";
+  const { ingredients } = useApp();
   const [displayCount, setDisplayCount] = useState(10);
 
   if (loading) {
@@ -42,9 +41,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       <div className="text-center px-8 py-24">
         <h2 className="text-2xl font-semibold mb-4">Ready to cook?</h2>
         <p className="text-gray-600 mb-6">
-          Start by adding ingredients you have on hand, and we'll find matching recipes for you.
+          Start by adding ingredients you have on hand, and we'll find matching
+          recipes for you.
         </p>
-        <Button onClick={() => document.querySelector('input')?.focus()}>
+        <Button onClick={() => document.querySelector("input")?.focus()}>
           Add Ingredients
         </Button>
       </div>
@@ -56,9 +56,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       <div className="text-center p-8">
         <h2 className="text-2xl font-semibold mb-4">No recipes found</h2>
         <p className="text-gray-600 mb-6">
-          We couldn't find any recipes with the current ingredients. Try adding more or adjusting your search.
+          We couldn't find any recipes with the current ingredients. Try adding
+          more or adjusting your search.
         </p>
-        <Button onClick={() => document.querySelector('input')?.focus()}>
+        <Button onClick={() => document.querySelector("input")?.focus()}>
           Add More Ingredients
         </Button>
       </div>
@@ -72,12 +73,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {displayedRecipes.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} isPremium={isPremium} />
+          <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
       </div>
       {hasMore && (
         <div className="mt-6 text-center">
-          <Button onClick={() => setDisplayCount(prevCount => prevCount + 10)}>
+          <Button
+            onClick={() => setDisplayCount((prevCount) => prevCount + 10)}
+          >
             Show More
           </Button>
         </div>

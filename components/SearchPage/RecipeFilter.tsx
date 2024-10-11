@@ -27,9 +27,6 @@ interface FilterProps {
 
 const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
   const [localOptions, setLocalOptions] = useState<FilterOptions>(options);
-  const { subscription } = useApp();
-  const isPremium =
-    subscription?.status === "active" || subscription?.status === "trialing";
 
   useEffect(() => {
     const savedOptions = localStorage.getItem("filterOptions");
@@ -59,49 +56,33 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        {isPremium ? (
-          <>
-            <DialogHeader>
-              <DialogTitle>Advanced Filters</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">
-                  Max Cook Time: {localOptions.maxCookTime} minutes
-                </label>
-                <Slider
-                  value={
-                    localOptions.maxCookTime !== null
-                      ? [localOptions.maxCookTime]
-                      : [120]
-                  }
-                  onValueChange={handleMaxCookTimeChange}
-                  max={120}
-                  step={5}
-                />
-              </div>
+        <>
+          <DialogHeader>
+            <DialogTitle>Advanced Filters</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                Max Cook Time: {localOptions.maxCookTime} minutes
+              </label>
+              <Slider
+                value={
+                  localOptions.maxCookTime !== null
+                    ? [localOptions.maxCookTime]
+                    : [120]
+                }
+                onValueChange={handleMaxCookTimeChange}
+                max={120}
+                step={5}
+              />
             </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button onClick={applyFilters}>Apply Filters</Button>
-              </DialogClose>
-            </DialogFooter>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle>Upgrade to Premium</DialogTitle>
-            </DialogHeader>
-            <div className="py-6">
-              <p className="text-center mb-4">
-                Unlock advanced filters and more features with our Premium plan!
-              </p>
-              <Link href="/membership">
-                <Button className="w-full">Upgrade Now</Button>
-              </Link>
-            </div>
-          </>
-        )}
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button onClick={applyFilters}>Apply Filters</Button>
+            </DialogClose>
+          </DialogFooter>
+        </>
       </DialogContent>
     </Dialog>
   );

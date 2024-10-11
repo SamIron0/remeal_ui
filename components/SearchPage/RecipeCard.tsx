@@ -6,17 +6,16 @@ import NutritionInfo from "@/components/NutritionInfo";
 
 interface RecipeCardProps {
   recipe: Recipe;
-  isPremium: boolean;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isPremium }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   return (
     <Link href={`/recipe/${recipe.name}`}>
       <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
         <h3 className="text-lg font-semibold mb-2">{recipe.name}</h3>
         <p className="text-sm text-gray-600 mb-2">{recipe.description}</p>
         <IngredientsList ingredients={recipe.recipe_ingredients} />
-        <NutritionInfo nutritionInfo={recipe.nutrition_info} isPremium={isPremium} />
+        <NutritionInfo nutritionInfo={recipe.nutrition_info} />
       </div>
     </Link>
   );
