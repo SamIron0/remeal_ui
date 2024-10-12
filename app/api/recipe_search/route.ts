@@ -1,36 +1,17 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { normalizeIngredient } from "@/utils/helpers";
+import { updateRedis, getRedis } from "@/utils/redis";
+import { Recipe } from "@/types";
+
+interface RecipeWithMatchedIngredients extends Recipe {
+  matchedIngredients: string[];
+}
 
 export async function POST(request: Request) {
   try {
-    const supabase = createClient(cookies());
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-    let isPremium = false;
-    if (user) {
-      const { data: userSubscription } = await supabase
-        .from("subscriptions")
-        .select("status")
-        .eq("user_id", user.id)
-        .single();
-
-      isPremium = userSubscription?.status === "active";
-    }
-
-    const { ingredients, dietaryRestrictions, maxCookTime, minRating } =
-      await request.json();
-    const normalizedIngredients = ingredients.map(normalizeIngredient);
-
-    const results = await getRecipes(
-      normalizedIngredients,
-      isPremium,
-      maxCookTime
-    );
-
+    const { ingredients } = await request.json();
+    const results = await getRecipes(ingredients);
     return NextResponse.json(results);
   } catch (error: any) {
     console.error("Error in recipe search:", error);
@@ -38,65 +19,69 @@ export async function POST(request: Request) {
   }
 }
 
-async function getRecipes(
-  ingredients: string[],
-  isPremium: boolean,
-  maxCookTime: number | null
-) {
+async function getRecipes(ingredients: string[]) {
   const supabase = createClient(cookies());
-  const normalizedIngredients = ingredients.map(normalizeIngredient);
+  const BATCH_SIZE = 10; // Adjust based on your database performance
 
-  const { data: recipesWithIngredients, error } = await supabase.rpc("search_recipes_by_ingredients", {
-    p_ingredients: normalizedIngredients,
-    similarity_threshold: 0.3,
-  });
+  const processIngredientBatch = async (batch: string[]) => {
+    const results = await Promise.all(
+      batch.map(async (ingredient) => {
+        const cachedResult = await getRedis(ingredient);
+        if (cachedResult) {
+          return cachedResult;
+        }
 
-  if (error) {
-    console.error("Error fetching from Supabase:", error);
-    throw error;
+        const { data, error } = await supabase.rpc(
+          "search_recipes_by_ingredient",
+          {
+            p_ingredient: ingredient,
+            similarity_threshold: 0.3,
+          }
+        );
+
+        if (error) {
+          console.error(`Error fetching recipes for ${ingredient}:`, error);
+          return [];
+        }
+
+        const processedData = data.map((recipe: any) => ({
+          ...recipe,
+          matchedIngredients: [ingredient],
+        }));
+
+        updateRedis(ingredient, processedData);
+        return processedData;
+      })
+    );
+
+    return results.flat();
+  };
+  const recipeMap = new Map<number, RecipeWithMatchedIngredients>();
+
+  for (let i = 0; i < ingredients.length; i += BATCH_SIZE) {
+    const batch = ingredients.slice(i, i + BATCH_SIZE);
+    const batchResults = await processIngredientBatch(batch);
+
+    for (const recipe of batchResults as RecipeWithMatchedIngredients[]) {
+      if (recipeMap.has(recipe.id)) {
+        recipeMap
+          .get(recipe.id)!
+          .matchedIngredients.push(...recipe.matchedIngredients);
+      } else {
+        recipeMap.set(recipe.id, recipe);
+      }
+    }
+
+    if (i === 0 && recipeMap.size === 0) {
+      return [];
+    }
   }
 
-  const uniqueRecipes = recipesWithIngredients.filter(
-    (recipe, index, self) => index === self.findIndex((t) => t.id === recipe.id)
+  const finalRecipes = Array.from(recipeMap.values());
+
+  finalRecipes.sort(
+    (a, b) => b.matchedIngredients.length - a.matchedIngredients.length
   );
 
-  const modifiedRecipes = uniqueRecipes.map((recipe) => {
-    if (!isPremium) {
-      const { nutrition_info, ...recipeWithoutNutrition } = recipe;
-      return recipeWithoutNutrition;
-    }
-    return recipe;
-  });
-
-  const filteredRecipes = maxCookTime
-    ? modifiedRecipes.filter((recipe) => (recipe.cook_time || 0) <= maxCookTime)
-    : modifiedRecipes;
-
-  const sortedRecipes = filteredRecipes.sort((a, b) => {
-    const aMatches = Array.isArray(a.recipe_ingredients) 
-      ? a.recipe_ingredients.filter((i: any) =>
-          normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))
-        ).length
-      : 0;
-    const bMatches = Array.isArray(b.recipe_ingredients) 
-      ? b.recipe_ingredients.filter((i: any) =>
-          normalizedIngredients.includes(normalizeIngredient(i.ingredients.name))
-        ).length
-      : 0;
-    return bMatches - aMatches;
-  });
-
-  return sortedRecipes;
-}
-
-function addIdsToSet(set: Set<string>, ids: string | string[] | number | {}) {
-  if (typeof ids === "string") {
-    ids.split(",").forEach((id) => set.add(id));
-  } else if (Array.isArray(ids)) {
-    ids.forEach((id) => set.add(id.toString()));
-  } else if (typeof ids === "number") {
-    set.add(ids.toString());
-  } else {
-    console.warn(`Unexpected type for ids: ${typeof ids}`);
-  }
+  return finalRecipes;
 }

@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -8,31 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       categories: {
@@ -69,21 +43,18 @@ export type Database = {
         Row: {
           id: number
           ingredient: string
-          ingredient_tokens: unknown | null
           ingredient_tsv: unknown | null
           recipe_ids: number[]
         }
         Insert: {
           id?: number
           ingredient: string
-          ingredient_tokens?: unknown | null
           ingredient_tsv?: unknown | null
           recipe_ids: number[]
         }
         Update: {
           id?: number
           ingredient?: string
-          ingredient_tokens?: unknown | null
           ingredient_tsv?: unknown | null
           recipe_ids?: number[]
         }
@@ -227,15 +198,21 @@ export type Database = {
       }
       recipe_categories: {
         Row: {
-          category_id: number
+          categories: string[] | null
+          category_id: number | null
+          id: number
           recipe_id: number
         }
         Insert: {
-          category_id: number
+          categories?: string[] | null
+          category_id?: number | null
+          id?: never
           recipe_id: number
         }
         Update: {
-          category_id?: number
+          categories?: string[] | null
+          category_id?: number | null
+          id?: never
           recipe_id?: number
         }
         Relationships: [
@@ -298,18 +275,21 @@ export type Database = {
       }
       recipe_ingredients: {
         Row: {
+          converted_quantity: number | null
           ingredient_id: number
           quantity: number | null
           recipe_id: number
           unit: string | null
         }
         Insert: {
+          converted_quantity?: number | null
           ingredient_id: number
           quantity?: number | null
           recipe_id: number
           unit?: string | null
         }
         Update: {
+          converted_quantity?: number | null
           ingredient_id?: number
           quantity?: number | null
           recipe_id?: number
@@ -359,6 +339,29 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["tag_id"]
+          },
+        ]
+      }
+      recipe_vectors: {
+        Row: {
+          embedding: string | null
+          recipe_id: number
+        }
+        Insert: {
+          embedding?: string | null
+          recipe_id: number
+        }
+        Update: {
+          embedding?: string | null
+          recipe_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_vectors_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: true
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -641,6 +644,7 @@ export type Database = {
           p_ingredient: string
           p_quantity: number
           p_unit: string
+          p_converted_quantity: number
           p_calories: number
           p_protein: number
           p_fat: number
@@ -652,25 +656,9 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
-      remove_ingredient_from_index: {
+      search_recipes_by_ingredient: {
         Args: {
           p_ingredient: string
-          p_recipe_id: number
-        }
-        Returns: undefined
-      }
-      search_ingredients: {
-        Args: {
-          search_term: string
-        }
-        Returns: {
-          ingredient: string
-          recipe_ids: number[]
-        }[]
-      }
-      search_recipes_by_ingredients: {
-        Args: {
-          p_ingredients: string[]
           similarity_threshold?: number
         }
         Returns: {
@@ -687,7 +675,7 @@ export type Database = {
           nutrition_info: Json
           recipe_images: Json
           recipe_ingredients: Json
-          match_count: number
+          avg_similarity: number
         }[]
       }
       set_limit: {

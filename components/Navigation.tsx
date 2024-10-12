@@ -2,26 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useApp } from "@/context/AppContext";
-import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { User, CreditCard, LogOut } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
+import { useApp } from "@/context/AppContext";
 
 export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
-
+  const { subscription } = useApp();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const menuItems = [
@@ -99,7 +90,13 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
               </>
             ) : (
               <>
-              
+                {!subscription && (
+                  <Link href="/membership">
+                    <Button className="w-full bg-primary text-white hover:bg-primary-dark">
+                      Upgrade to Premium
+                    </Button>
+                  </Link>
+                )}
                 <Button
                   onClick={handleSignOut}
                   className="w-full bg-primary text-white hover:bg-primary-dark"

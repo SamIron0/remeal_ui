@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/supabase/types";
 import { Recipe } from "@/types";
-import { useRouter } from "next/navigation";
 interface AppContextType {
   user: Tables<"users"> | null;
   subscription: any | null;
@@ -28,7 +27,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [savedRecipes, setSavedRecipes] = useState<number[]>([]);
   const supabase = createClient();
-  const router = useRouter();
   useEffect(() => {
     const loadUserAndSubscription = async () => {
       try {

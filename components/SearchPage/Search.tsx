@@ -128,7 +128,7 @@ const RecipeSearch: React.FC = () => {
   }, [filterOptions, applyFilters]);
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">Recipe Finder</h1>
 
       <div className="mb-6 w-full flex flex-col items-center">
