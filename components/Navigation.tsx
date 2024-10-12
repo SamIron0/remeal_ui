@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -12,16 +12,18 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
-  const { subscription } = useApp();
+  const { user, subscription } = useApp();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  const menuItems = [
-    { name: "Home", href: "/" },
-    { name: "How It Works", href: "/#how-it-works" },
-    { name: "Search", href: "/search" },
-    { name: "Pricing", href: "/membership" },
-    ...(isLoggedIn ? [{ name: "Profile", href: "/profile" }] : []),
-  ];
+  const [menuItems, setMenuItems] = useState<{ name: string; href: string }[]>([]);
+  useEffect(() => {
+    setMenuItems([
+      { name: "Home", href: "/" },
+      { name: "How It Works", href: "/#how-it-works" },
+      { name: "Search", href: "/search" },
+      { name: "Pricing", href: "/membership" },
+      ...(user ? [{ name: "Profile", href: "/profile" }] : []),
+    ]);
+  }, [user]);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -72,7 +74,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {item.name}
               </Link>
             ))}
-            {!isLoggedIn ? (
+            {user == null ? (
               <>
                 <Link href="/login" onClick={toggleMenu}>
                   <Button
