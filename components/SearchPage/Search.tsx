@@ -110,8 +110,7 @@ const RecipeSearch: React.FC = () => {
       setFilterOptions(newOptions);
       const filtered = recipes.filter((recipe) => {
         if (
-          newOptions.maxCookTime &&
-          (recipe.cook_time || 0) > newOptions.maxCookTime
+          (recipe.cook_time || 0) > (newOptions.maxCookTime || 0) 
         ) {
           return false;
         }
