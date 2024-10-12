@@ -27,7 +27,9 @@ export default function Signup() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         router.push("/");
       }
@@ -113,8 +115,7 @@ export default function Signup() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 w-full">
-      <div className="flex flex-col justify-center flex-1 px-4 py-20 sm:px-6 lg:flex-none lg:px-24 xl:px-48">
-        <div className="w-full max-w-sm mx-auto lg:w-96">
+      <div className="flex w-full max-w-lg flex-col justify-center mx-auto py-8 mb-24 px-4 sm:px-6 ">
           <div>
             <h2 className="mt-6 text-3xl font-semibold   text-gray-900">
               Create your account
@@ -239,10 +240,6 @@ export default function Signup() {
             </form>
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           </div>
-        </div>
-      </div>
-      <div className="relative flex-1 hidden w-0 lg:block">
-        <AuthBackground />
       </div>
     </div>
   );

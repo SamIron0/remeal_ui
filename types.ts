@@ -33,4 +33,6 @@ export interface Recipe {
   cook_time?: number;
   rating?: number;
   image_url?: string;
+  matchedIngredients?: string[];
 }
+

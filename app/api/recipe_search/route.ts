@@ -4,10 +4,6 @@ import { cookies } from "next/headers";
 import { updateRedis, getRedis } from "@/utils/redis";
 import { Recipe } from "@/types";
 
-interface RecipeWithMatchedIngredients extends Recipe {
-  matchedIngredients: string[];
-}
-
 export async function POST(request: Request) {
   try {
     const { ingredients } = await request.json();
@@ -56,17 +52,17 @@ async function getRecipes(ingredients: string[]) {
 
     return results.flat();
   };
-  const recipeMap = new Map<number, RecipeWithMatchedIngredients>();
+  const recipeMap = new Map<number, Recipe>();
 
   for (let i = 0; i < ingredients.length; i += BATCH_SIZE) {
     const batch = ingredients.slice(i, i + BATCH_SIZE);
     const batchResults = await processIngredientBatch(batch);
 
-    for (const recipe of batchResults as RecipeWithMatchedIngredients[]) {
+    for (const recipe of batchResults as Recipe[]) {
       if (recipeMap.has(recipe.id)) {
         recipeMap
           .get(recipe.id)!
-          .matchedIngredients.push(...recipe.matchedIngredients);
+          .matchedIngredients?.push(...(recipe.matchedIngredients || []));
       } else {
         recipeMap.set(recipe.id, recipe);
       }
@@ -80,7 +76,7 @@ async function getRecipes(ingredients: string[]) {
   const finalRecipes = Array.from(recipeMap.values());
 
   finalRecipes.sort(
-    (a, b) => b.matchedIngredients.length - a.matchedIngredients.length
+    (a, b) => (b.matchedIngredients?.length || 0) - (a.matchedIngredients?.length || 0)
   );
 
   return finalRecipes;

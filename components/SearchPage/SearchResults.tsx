@@ -6,7 +6,7 @@ import RecipeCard from "@/components/SearchPage/RecipeCard";
 import { Button } from "@/components/ui/button";
 
 interface SearchResultsProps {
-  recipes: Recipe[];
+  recipes: Recipe[]
   loading: boolean;
   error: string | null;
 }

@@ -3,16 +3,22 @@ import Link from "next/link";
 import { Recipe } from "@/types";
 import { Button } from "@/components/ui/button";
 import NutritionInfo from "@/components/NutritionInfo";
+import { Badge } from "@/components/ui/badge";
 
 interface RecipeCardProps {
   recipe: Recipe;
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+  const matchedIngredientsCount = recipe.matchedIngredients?.length || 0;
+
   return (
     <Link href={`/recipe/${recipe.name}`}>
       <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
         <h3 className="text-lg font-semibold mb-2">{recipe.name}</h3>
+        <Badge variant="secondary" className="mb-2">
+          {matchedIngredientsCount} matched ingredient{matchedIngredientsCount !== 1 ? 's' : ''}
+        </Badge>
         <p className="text-sm text-gray-600 mb-2">{recipe.description}</p>
         <IngredientsList ingredients={recipe.recipe_ingredients} />
         <NutritionInfo nutritionInfo={recipe.nutrition_info} />
@@ -21,7 +27,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   );
 };
 
-const IngredientsList: React.FC<{ ingredients: Recipe['recipe_ingredients'] }> = ({ ingredients }) => (
+const IngredientsList: React.FC<{
+  ingredients: Recipe["recipe_ingredients"];
+}> = ({ ingredients }) => (
   <div className="mb-2">
     <strong>Ingredients:</strong>
     <ul className="list-disc list-inside">

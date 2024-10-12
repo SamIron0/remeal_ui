@@ -127,8 +127,8 @@ const RecipeSearch: React.FC = () => {
   }, [filterOptions, applyFilters]);
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center">Recipe Finder</h1>
+    <div className="max-w-6xl mx-auto pb-24">
+      <h1 className="text-3xl font-bold py-6 text-center">Recipe Finder</h1>
 
       <div className="mb-6 w-full flex flex-col items-center">
         <div className="flex w-full justify-center max-w-md mb-4">
@@ -138,7 +138,7 @@ const RecipeSearch: React.FC = () => {
             value={inputValue}
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}
-            className="w-full mr-2"
+            className="w-full mr-2 text-[16px]"
           />
           <Button
             onClick={() =>

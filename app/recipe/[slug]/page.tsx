@@ -2,12 +2,10 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Clock, Users, ChefHat, Bookmark, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Clock, Users, ChefHat } from "lucide-react";
 import NutritionCard from "@/components/RecipePage/NutritionCard";
 import IngredientList from "@/components/RecipePage/IngredientList";
 import InstructionSteps from "@/components/RecipePage/InstructionSteps";
-import Link from "next/link";
 import SaveRecipeButton from "@/components/RecipePage/SaveRecipeButton";
 import SchemaMarkup from "@/components/SchemaMarkup";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -22,7 +20,7 @@ export default async function RecipePage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  let isActiveMember = false;
+  let isActiveMember =false;
 
   if (user) {
     const { data: subscriptionData } = await supabase
@@ -128,10 +126,7 @@ export default async function RecipePage({
 
           <div className="flex space-x-4 mb-8">
             <SaveRecipeButton recipeId={recipe.id} userId={user?.id} />
-            <Button variant="outline" className="flex items-center">
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
-            </Button>
+         
           </div>
 
           <div className="mb-8">
@@ -139,7 +134,7 @@ export default async function RecipePage({
             <p className="text-gray-700 max-w-2xl">{recipe.description}</p>
           </div>
 
-          <IngredientList ingredients={recipe.recipe_ingredients} />
+          <IngredientList recipeIngredients={recipe.recipe_ingredients} />
           <InstructionSteps instructions={recipe.instructions} />
         </div>
 
