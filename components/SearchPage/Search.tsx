@@ -125,13 +125,12 @@ const RecipeSearch: React.FC = () => {
   useEffect(() => {
     applyFilters(filterOptions);
   }, [filterOptions, applyFilters]);
-
   return (
-    <div className="max-w-6xl mx-auto pb-24">
+    <div className="max-w-6xl mx-auto pb-12">
       <h1 className="text-3xl font-bold py-6 text-center">Recipe Finder</h1>
 
-      <div className="mb-6 w-full flex flex-col items-center">
-        <div className="flex w-full justify-center max-w-md mb-4">
+      <div className="mb-6 w-full flex flex-col items-center max-w-lg mx-auto">
+        <div className="flex w-full justify-center min-w-md mb-4">
           <Input
             type="text"
             placeholder="Enter an ingredient"

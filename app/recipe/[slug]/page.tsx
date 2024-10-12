@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Clock, Users, ChefHat } from "lucide-react";
+import { Clock, Users } from "lucide-react";
 import NutritionCard from "@/components/RecipePage/NutritionCard";
 import IngredientList from "@/components/RecipePage/IngredientList";
 import InstructionSteps from "@/components/RecipePage/InstructionSteps";
@@ -105,10 +105,6 @@ export default async function RecipePage({
               <Users className="w-5 h-5 mr-2" />
               <span>{recipe.servings} servings</span>
             </div>
-            <div className="flex items-center">
-              <ChefHat className="w-5 h-5 mr-2" />
-              <span>{"Easy"}</span>
-            </div>
           </div>
 
           {recipe.recipe_images[0] && (
@@ -134,7 +130,7 @@ export default async function RecipePage({
             <p className="text-gray-700 max-w-2xl">{recipe.description}</p>
           </div>
 
-          <IngredientList recipeIngredients={recipe.recipe_ingredients} />
+          <IngredientList ingredients={recipe.recipe_ingredients} />
           <InstructionSteps instructions={recipe.instructions} />
         </div>
 

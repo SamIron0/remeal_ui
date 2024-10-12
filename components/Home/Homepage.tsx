@@ -56,7 +56,8 @@ export default function Homepage() {
               {
                 step: 1,
                 title: "Enter Your Ingredients",
-                description: "List the ingredients you have on hand.",
+                description:
+                  "List the ingredients you have on hand individually or comma seperated.",
               },
               {
                 step: 2,

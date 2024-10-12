@@ -5,7 +5,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 const faqs = [
   {
     question: 'How does Remeal work?',
-    answer: 'Remeal uses an advanced algorithm to match the ingredients you have with our database of recipes. Simply input the ingredients you have on hand, and we\'ll suggest delicious meals you can make!'
+    answer: 'Remeal uses an algorithm to match the ingredients you have with our database of recipes. Simply input the ingredients you have on hand, and we\'ll suggest delicious meals you can make!'
   },
   {
     question: 'Is Remeal free to use?',
@@ -13,15 +13,15 @@ const faqs = [
   },
   {
     question: 'Can I add my own recipes to Remeal?',
-    answer: 'Currently, recipe submission is not available for users. However, we\'re constantly updating our database with new recipes from professional chefs and food bloggers.'
+    answer: 'Currently, recipe submission is not available for users. However, we\'re constantly updating our database with new recipes.'
   },
   {
     question: 'How often are new recipes added?',
-    answer: 'We add new recipes to our database weekly, ensuring you always have fresh meal ideas!'
+    answer: 'We add new recipes to our database weekly!'
   },
   {
     question: 'What features are included in the premium version?',
-    answer: 'Premium features include advanced filters, personalized recommendations, meal planning, detailed nutritional information, and the ability to save favorite recipes.'
+    answer: 'Premium features include advanced filters, personalized recommendations, detailed nutritional information, and the ability to save favorite recipes.'
   },
 ];
 

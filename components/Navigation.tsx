@@ -14,12 +14,14 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const router = useRouter();
   const { user, subscription } = useApp();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const [menuItems, setMenuItems] = useState<{ name: string; href: string }[]>([]);
+  const [menuItems, setMenuItems] = useState<{ name: string; href: string }[]>(
+    []
+  );
   useEffect(() => {
     setMenuItems([
-      { name: "Home", href: "/" },
-      { name: "How It Works", href: "/#how-it-works" },
-      { name: "Search", href: "/search" },
+      { name: "Recipe Search", href: "/search" },
+      { name: "Home page", href: "/" },
+      { name: "How it works", href: "/#how-it-works" },
       { name: "Pricing", href: "/membership" },
       ...(user ? [{ name: "Profile", href: "/profile" }] : []),
     ]);

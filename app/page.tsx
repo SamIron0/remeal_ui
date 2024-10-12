@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 export default async function Home() {
   const supabase = createClient(cookies());
   const user = await supabase.auth.getUser();
-  if (user) {
+  if (user && user.data.user) {
     redirect("/search");
   }
   return <Homepage />;

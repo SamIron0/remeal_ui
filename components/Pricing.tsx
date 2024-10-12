@@ -4,7 +4,7 @@ import type { Tables } from "@/supabase/types";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { getStripe } from "@/utils/stripe/client";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import {
   AlertDialog,
@@ -32,11 +32,10 @@ interface Props {
 const features = [
   { name: "Recipe Search", free: true, premium: true },
   { name: "Basic Ingredient Matching", free: true, premium: true },
+  { name: "Nutritional Information", free: true, premium: true },
   { name: "Save Favorite Recipes", free: false, premium: true },
   { name: "Advanced Filters", free: false, premium: true },
   { name: "Personalized Recommendations", free: false, premium: true },
-  { name: "Meal Planning", free: false, premium: true },
-  { name: "Nutritional Information", free: false, premium: true },
 ];
 export default function Pricing({ products }: Props) {
   const { user, subscription } = useApp();
@@ -220,16 +219,24 @@ export default function Pricing({ products }: Props) {
                   <ul role="list" className="mt-6 space-y-4">
                     {features.map((feature) => (
                       <li key={feature.name} className="flex space-x-3">
-                        <Check
-                          className={`h-5 w-5 flex-shrink-0 ${
-                            index === 0
-                              ? feature.free
-                                ? "text-green-500"
-                                : "text-gray-300"
-                              : "text-green-500"
-                          }`}
-                          aria-hidden="true"
-                        />
+                        {index === 0 ? (
+                          feature.free ? (
+                            <Check
+                              className="h-5 w-5 flex-shrink-0 text-green-500"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <X
+                              className="h-5 w-5 flex-shrink-0 text-red-200"
+                              aria-hidden="true"
+                            />
+                          )
+                        ) : (
+                          <Check
+                            className="h-5 w-5 flex-shrink-0 text-green-500"
+                            aria-hidden="true"
+                          />
+                        )}
                         <span
                           className={`text-sm ${
                             index === 0
