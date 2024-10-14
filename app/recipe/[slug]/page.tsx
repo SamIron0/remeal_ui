@@ -9,6 +9,7 @@ import InstructionSteps from "@/components/RecipePage/InstructionSteps";
 import SaveRecipeButton from "@/components/RecipePage/SaveRecipeButton";
 import SchemaMarkup from "@/components/SchemaMarkup";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import SEOMetaTags from "@/components/SEOMetaTags";
 
 export default async function RecipePage({
   params,
@@ -57,7 +58,7 @@ export default async function RecipePage({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-12">
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -90,6 +91,12 @@ export default async function RecipePage({
               }
             : undefined,
         }}
+      />
+      <SEOMetaTags
+        title={`${recipe.name} | Remeal Recipe`}
+        description={recipe.description ?? ""}
+        canonicalUrl={`https://remeal.xyz/recipe/${recipe.name}`}
+        ogImage={recipe.recipe_images[0]?.file_path}
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">

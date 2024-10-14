@@ -14,7 +14,7 @@ async function generateSitemap() {
   try {
     const { data: pages, error } = await supabase
       .from("page_metadata")
-      .select("url")
+      .select("url, changefreq, priority")
       .order("url");
 
     if (error) throw error;
@@ -28,6 +28,8 @@ async function generateSitemap() {
   <url>
     <loc>${baseUrl}${page.url}</loc>
     <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq || 'weekly'}</changefreq>
+    <priority>${page.priority || '0.5'}</priority>
   </url>`
     )
     .join("")}

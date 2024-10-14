@@ -14,9 +14,10 @@ interface FilterOptions {
 
 interface SearchProps {
   initialIngredients?: string[];
+  initialRecipes?: Recipe[];
 }
 
-const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [] }) => {
+const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialRecipes = [] }) => {
   const { recipes, setRecipes, ingredients, setIngredients } = useApp();
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,9 +49,11 @@ const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [] }) => {
 
     if (initialIngredients.length > 0) {
       setIngredients(initialIngredients);
-      searchRecipes(initialIngredients);
     }
-  }, [filterOptions.maxCookTime, initialIngredients]);
+    if (initialRecipes.length > 0) {
+      setRecipes(initialRecipes);
+    }
+  }, [initialIngredients, initialRecipes, setIngredients, setRecipes]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);

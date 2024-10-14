@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, Search, Home, Info, CreditCard, User } from "lucide-react";
+import { Search, Home, Info, CreditCard, User } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { useApp } from "@/context/AppContext";
 import { motion } from "framer-motion";
+import Logo from "@/public/text-logo";
+import TextLogo from "@/public/text-logo";
 
 export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,9 +47,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-semibold text-primary">
-                Remeal
-              </span>
+              <TextLogo className="w-24 sm:w-24 h-10" />
             </Link>
           </div>
           <div className="flex items-center">

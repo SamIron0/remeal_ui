@@ -130,7 +130,9 @@ export type Database = {
           description: string | null
           id: number
           ingredients: string[] | null
+          keywords: string[] | null
           metadata: Json | null
+          recipe_ids: number[] | null
           title: string
           url: string
         }
@@ -138,7 +140,9 @@ export type Database = {
           description?: string | null
           id?: number
           ingredients?: string[] | null
+          keywords?: string[] | null
           metadata?: Json | null
+          recipe_ids?: number[] | null
           title: string
           url: string
         }
@@ -146,7 +150,9 @@ export type Database = {
           description?: string | null
           id?: number
           ingredients?: string[] | null
+          keywords?: string[] | null
           metadata?: Json | null
+          recipe_ids?: number[] | null
           title?: string
           url?: string
         }
