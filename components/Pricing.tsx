@@ -123,7 +123,7 @@ export default function Pricing({ products }: Props) {
   };
 
   return (
-    <div className="py-12 sm:py-16">
+    <div className="pt-24 sm:pt -32 w-full space-y-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -205,8 +205,8 @@ export default function Pricing({ products }: Props) {
                     disabled={buttonDisabled}
                     className={`mt-8 block w-full rounded-md py-2 text-center text-sm font-semibold text-white ${
                       isFreeTier
-                        ? "bg-gray-800 hover:bg-gray-900"
-                        : "bg-primary hover:bg-primary-dark"
+                        ? "bg-primary/90  hover:bg-primary/95 "
+                        : "bg-primary-gradient   hover:text-white/90 hover:shadow-accent "
                     } ${buttonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     {buttonText}
@@ -258,24 +258,7 @@ export default function Pricing({ products }: Props) {
         </div>
       </div>
 
-      {/* New sections */}
-      <div className="mt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Testimonials */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            What Our Users Say
-          </h2>
-          <TestimonialCarousel />
-        </section>
-
-        {/* FAQ */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            Frequently Asked Questions
-          </h2>
-          <FAQSection />
-        </section>
-      </div>
+      <FAQSection />
 
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <AlertDialogContent>

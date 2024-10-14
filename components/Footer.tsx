@@ -4,12 +4,12 @@ import Link from "next/link";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-100 text-gray-600 border-t border-gray-200 pt-12 pb-8">
+    <footer className="bg-background text-gray-600 border-t border-gray-200 pt-12 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4">Remeal</h3>
-            <p className="text-sm">
+            <p className="text-sm ">
               Cook smart, waste less with Remeal - your intelligent recipe
               companion.
             </p>

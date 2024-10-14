@@ -65,7 +65,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-gray-100 w-full">
+    <div className="flex h-[calc(100vh-64px)] bg-background w-full">
       <div className="flex w-full max-w-lg flex-col justify-center mx-auto px-4 sm:px-6 ">
         <div>
           <h2 className="text-3xl font-extrabold text-gray-900">

@@ -125,6 +125,33 @@ export type Database = {
           },
         ]
       }
+      page_metadata: {
+        Row: {
+          description: string | null
+          id: number
+          ingredients: string[] | null
+          metadata: Json | null
+          title: string
+          url: string
+        }
+        Insert: {
+          description?: string | null
+          id?: number
+          ingredients?: string[] | null
+          metadata?: Json | null
+          title: string
+          url: string
+        }
+        Update: {
+          description?: string | null
+          id?: number
+          ingredients?: string[] | null
+          metadata?: Json | null
+          title?: string
+          url?: string
+        }
+        Relationships: []
+      }
       prices: {
         Row: {
           active: boolean | null

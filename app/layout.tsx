@@ -98,11 +98,11 @@ export default async function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <GoogleAnalytics gaId="G-8VB6GS4GD1" />
-      <body className="hide-scrollbar text-foreground">
+      <body className="hide-scrollbar text-foreground bg-background antialiased">
         <AppProvider>
           <SpeedInsights />
           <Navigation isLoggedIn={!!user} />
-          <main className="space-y-12 flex flex-col items-center">
+          <main className="space-y-12 flex flex-col  items-center">
             {children}
             <Toaster />
           </main>

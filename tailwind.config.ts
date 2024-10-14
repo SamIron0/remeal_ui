@@ -41,8 +41,8 @@ const config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "hsl(194, 100%, 17%)",
+          foreground: "hsl(0, 0%, 98%)",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -60,10 +60,30 @@ const config = {
           "5": "hsl(var(--chart-5))",
         },
       },
+      backgroundImage: {
+        "primary-gradient":
+          "linear-gradient(92.88deg, rgb(0, 57, 76) 0%, rgb(0, 65, 85) 50%, rgb(0, 72, 95) 100%)",
+        "page-gradient":
+          "radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0, 57, 76, 0.3), transparent)",
+        "hero-gradient":
+          "radial-gradient(ellipse 50% 80% at 20% 40%,rgba(0, 57, 76, 0.1),transparent), radial-gradient(ellipse 50% 80% at 80% 50%,rgba(0, 38, 51, 0.15),transparent)",
+        "hero-glow":
+          "conic-gradient(from 230.29deg at 51.63% 52.16%, rgb(0, 57, 76) 0deg, rgb(0, 38, 51) 67.5deg, rgb(0, 19, 25) 198.75deg, rgb(0, 57, 76) 251.25deg, rgb(0, 38, 51) 301.88deg, rgb(0, 19, 25) 360deg)",
+        "glow-lines":
+          "linear-gradient(var(--direction),#003952 0.43%,#002633 14.11%,rgba(0, 57, 76, 0) 62.95%)",
+        "radial-faded":
+          "radial-gradient(circle at bottom center,var(--color),transparent 70%)",
+        "glass-gradient":
+          "linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 100%)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        primary: "rgb(0, 57, 76, 0.5) 0px 1px 40px",
+        accent: "rgb(0, 19, 25, 0.5) 0px 1px 20px",
       },
       keyframes: {
         "accordion-down": {
@@ -86,6 +106,7 @@ const config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+       
       },
     },
   },

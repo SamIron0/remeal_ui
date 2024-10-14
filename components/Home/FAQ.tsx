@@ -33,12 +33,12 @@ const FAQSection: React.FC = () => {
   };
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
+    <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
       <div className="container px-4 md:px-6">
         <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">Frequently Asked Questions</h2>
-        <div className="space-y-4">
+        <div className="max-w-3xl mx-auto space-y-4">
           {faqs.map((faq, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md">
+            <div key={index} className="bg-white border rounded-lg shadow-sm">
               <button
                 className="flex justify-between items-center w-full p-4 text-left"
                 onClick={() => toggleFAQ(index)}

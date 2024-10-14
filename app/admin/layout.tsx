@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { Home, Book, Users, Settings } from "lucide-react";
+import { Home, Book} from "lucide-react";
 
 export default function AdminLayout({
   children,

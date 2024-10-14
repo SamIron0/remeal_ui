@@ -12,7 +12,11 @@ interface FilterOptions {
   maxCookTime: number | null;
 }
 
-const RecipeSearch: React.FC = () => {
+interface SearchProps {
+  initialIngredients?: string[];
+}
+
+const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [] }) => {
   const { recipes, setRecipes, ingredients, setIngredients } = useApp();
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,7 +45,12 @@ const RecipeSearch: React.FC = () => {
         ? filterOptions.maxCookTime.toString()
         : "null"
     );
-  }, [filterOptions.maxCookTime]);
+
+    if (initialIngredients.length > 0) {
+      setIngredients(initialIngredients);
+      searchRecipes(initialIngredients);
+    }
+  }, [filterOptions.maxCookTime, initialIngredients]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -126,11 +135,11 @@ const RecipeSearch: React.FC = () => {
     applyFilters(filterOptions);
   }, [filterOptions, applyFilters]);
   return (
-    <div className="max-w-6xl mx-auto pb-12">
+    <div className="max-w-6xl mx-auto py-16">
       <h1 className="text-3xl font-bold py-6 text-center">Recipe Finder</h1>
 
       <div className="mb-6 w-full flex flex-col items-center max-w-lg mx-auto">
-        <div className="flex w-full justify-center min-w-md mb-4">
+        <div className="flex w-full justify-center mb-4">
           <Input
             type="text"
             placeholder="Enter an ingredient"

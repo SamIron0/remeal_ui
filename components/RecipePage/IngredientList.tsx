@@ -7,7 +7,7 @@ export default function IngredientList({ ingredients }: { ingredients: any[] }) 
       <ul className="space-y-2">
         {ingredients.map((ingredient, index) => (
           <li key={index} className="flex items-center">
-            <Checkbox/>
+            <Checkbox className="mr-2"/>
             <span>
               {ingredient.quantity} {ingredient.unit} {ingredient.ingredients.name}
             </span>

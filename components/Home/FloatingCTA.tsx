@@ -18,7 +18,7 @@ export default function FloatingCTA() {
       <Link href="/signup">
         <Button
           size="lg"
-          className="bg-white text-primary hover:bg-gray-100 hover:text-primary-dark"
+          className="bg-primary-gradient hover:text-white/90 hover:shadow-primary "
         >
           Get Started
         </Button>

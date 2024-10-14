@@ -9,7 +9,7 @@ import FloatingCTA from "./FloatingCTA";
 
 export default function Homepage() {
   return (
-    <div className="flex flex-col w-full items-center">
+    <div className="flex bg-black opacity-95 flex-col w-full items-center bg-page-gradient">
       <ParallaxHero />
 
       <AnimatedStats />
@@ -46,7 +46,7 @@ export default function Homepage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="w-full py-20 bg-primary text-white">
+      <section id="how-it-works" className="w-full bg-transparent py-20 text-white">
         <div className="container px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">
             How Remeal Works
@@ -77,7 +77,7 @@ export default function Homepage() {
         </div>
       </section>
 
-      <section className="w-full py-20 bg-gray-100">
+      <section className="w-full py-20 bg-background">
         <div className="container px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12 text-primary">
             Choose Your Plan
@@ -88,12 +88,12 @@ export default function Homepage() {
 
       <FAQSection />
 
-      <section className="w-full py-20 bg-primary text-white">
+      <section className="w-full py-20 bg-transparent text-white">
         <div className="container px-4 md:px-6 text-center">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-6">
             Ready to Transform Your Cooking Experience?
           </h2>
-          <p className="mx-auto max-w-[700px] text-xl text-gray-200 mb-8">
+          <p className="mx-auto max-w-[700px] text-xl text-muted-foreground mb-8">
             Join Remeal today and discover a world of culinary possibilities
             right in your kitchen.
           </p>
