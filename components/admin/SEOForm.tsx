@@ -1,49 +1,52 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { createClient } from '@/utils/supabase/client';
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { createClient } from "@/utils/supabase/client";
 
 export default function SEOForm() {
-  const [ingredients, setIngredients] = useState('');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [keywords, setKeywords] = useState('');
+  const [url, setUrl] = useState("");
+  const [ingredients, setIngredients] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [keywords, setKeywords] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
-      const ingredientsList = ingredients.split(',').map(i => i.trim());
-      const url = `/search/${ingredientsList.join('-')}`;
-
-      const { data, error } = await supabase
-        .from('page_metadata')
-        .upsert({
+      const { data, error } = await supabase.from("page_metadata").upsert(
+        {
           url,
           title,
           description,
-          keywords: keywords.split(',').map(k => k.trim()),
-          ingredients: ingredientsList
-        }, { onConflict: 'url' });
+          keywords: keywords.split(",").map((k) => k.trim()),
+          ingredients: ingredients.split(",").map((i) => i.trim()),
+        },
+        { onConflict: "url" }
+      );
 
-      if (error) throw error;
-
-      setMessage('SEO metadata saved successfully!');
-      // Clear form
-      setIngredients('');
-      setTitle('');
-      setDescription('');
-      setKeywords('');
+      if (error) {
+        console.error("Error saving SEO metadata:", error);
+        setMessage("Error saving SEO metadata. Please try again.");
+      } else {
+        setMessage("SEO metadata saved successfully!");
+        // Clear form
+        setUrl("");
+        setIngredients("");
+        setTitle("");
+        setDescription("");
+        setKeywords("");
+      }
     } catch (error) {
-      console.error('Error saving SEO metadata:', error);
-      setMessage('Error saving SEO metadata. Please try again.');
+      console.error("Error saving SEO metadata:", error);
+      setMessage("Error saving SEO metadata. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -52,7 +55,21 @@ export default function SEOForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="ingredients" className="block mb-2">Ingredients (comma-separated)</label>
+        <label htmlFor="url" className="block mb-2">
+          URL
+        </label>
+        <Input
+          id="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="e.g., https://example.com"
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="ingredients" className="block mb-2">
+          Ingredients (comma-separated)
+        </label>
         <Input
           id="ingredients"
           value={ingredients}
@@ -62,7 +79,9 @@ export default function SEOForm() {
         />
       </div>
       <div>
-        <label htmlFor="title" className="block mb-2">Page Title</label>
+        <label htmlFor="title" className="block mb-2">
+          Page Title
+        </label>
         <Input
           id="title"
           value={title}
@@ -72,7 +91,9 @@ export default function SEOForm() {
         />
       </div>
       <div>
-        <label htmlFor="description" className="block mb-2">Meta Description</label>
+        <label htmlFor="description" className="block mb-2">
+          Meta Description
+        </label>
         <Textarea
           id="description"
           value={description}
@@ -82,7 +103,9 @@ export default function SEOForm() {
         />
       </div>
       <div>
-        <label htmlFor="keywords" className="block mb-2">Keywords (comma-separated)</label>
+        <label htmlFor="keywords" className="block mb-2">
+          Keywords (comma-separated)
+        </label>
         <Input
           id="keywords"
           value={keywords}
@@ -92,10 +115,17 @@ export default function SEOForm() {
         />
       </div>
       <Button type="submit" disabled={loading}>
-        {loading ? 'Saving...' : 'Save SEO Metadata'}
+        {loading ? "Saving..." : "Save SEO Metadata"}
       </Button>
-      {message && <p className={message.includes('Error') ? 'text-red-500' : 'text-green-500'}>{message}</p>}
+      {message && (
+        <p
+          className={
+            message.includes("Error") ? "text-red-500" : "text-green-500"
+          }
+        >
+          {message}
+        </p>
+      )}
     </form>
   );
 }
-
