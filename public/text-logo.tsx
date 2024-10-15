@@ -26,7 +26,7 @@ export default function TextLogo({ className }: { className?: string }) {
           gradientUnits="userSpaceOnUse"
         >
           <stop offset="0.243" />
-          <stop offset="0.775" stop-color="#424242" />
+          <stop offset="0.775" stopColor="#424242" />
         </linearGradient>
       </defs>
     </svg>

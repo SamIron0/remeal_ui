@@ -40,7 +40,7 @@ export default function Signup() {
         setEmail(emailParam);
       }
     })();
-  }, []);
+  });
 
   const validateForm = () => {
     if (!email || !password || !confirmPassword) {

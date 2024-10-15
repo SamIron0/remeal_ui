@@ -22,7 +22,6 @@ const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialR
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(() => {
     if (typeof window !== "undefined") {
       const savedOptions = localStorage.getItem("filterOptions");
@@ -53,7 +52,7 @@ const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialR
     if (initialRecipes.length > 0) {
       setRecipes(initialRecipes);
     }
-  }, [initialIngredients, initialRecipes, setIngredients, setRecipes]);
+  }, [initialIngredients, initialRecipes, setIngredients, setRecipes, filterOptions]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -145,7 +144,7 @@ const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialR
         <div className="flex w-full justify-center mb-4">
           <Input
             type="text"
-            placeholder="Enter an ingredient"
+            placeholder="Enter your ingredients(comma-separated)"
             value={inputValue}
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}

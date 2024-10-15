@@ -47,7 +47,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <TextLogo className="w-24 sm:w-24 h-10" />
+              <TextLogo className="w-20 sm:w-20 h-10" />
             </Link>
           </div>
           <div className="flex items-center">
@@ -101,7 +101,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {isMenuOpen && (
-        <div className="mx-auto sm:px-6 lg:px-8">
+        <div className="mx-auto sm:px-4 ">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {menuItems.map((item) => (
               <Link

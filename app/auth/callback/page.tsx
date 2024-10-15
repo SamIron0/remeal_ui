@@ -30,7 +30,7 @@ export default function AuthCallbackPage() {
     };
 
     handleAuthCallback();
-  }, [router]);
+  }, [router, supabase]);
 
   return (
     <div className="flex justify-center items-center h-screen">

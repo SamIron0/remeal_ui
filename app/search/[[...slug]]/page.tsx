@@ -15,7 +15,7 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const slug = params.slug ? params.slug.join(" ") : "";
-  let url = process.env.NEXT_PUBLIC_URL + "/search/" + slug;
+  let url = slug;
   const decodedSlug = decodeURIComponent(slug).replace(/-/g, " ");
 
   const supabase = createClient(cookies());
@@ -25,13 +25,16 @@ export async function generateMetadata(
     .eq("url", url)
     .single();
 
+  let initialRecipes: Recipe[] = [];
+
   if (pageMetadata) {
     return {
       title: pageMetadata.title,
       description: pageMetadata.description,
       keywords: pageMetadata.keywords,
       other: {
-        initialIngredients: pageMetadata.ingredients || []  ,
+        initialIngredients: pageMetadata.ingredients || [],
+        initialRecipeIds: pageMetadata.recipe_ids || [],
       },
     };
   }
@@ -39,35 +42,49 @@ export async function generateMetadata(
   // Fallback to default metadata if no pre-computed data is found
   return {
     title: "Recipe Search",
-    description: "Find delicious recipes based on ingredients you have in your kitchen.",
+    description:
+      "Find delicious recipes based on ingredients you have in your kitchen.",
     keywords: [],
     other: {
       initialIngredients: [],
+      initialRecipeIds: [],
     },
   };
 }
 
 export default async function SearchPage({ params, searchParams }: Props) {
-  const supabase = createClient(cookies());
   const slug = params.slug ? params.slug.join(" ") : "";
-  let url = process.env.NEXT_PUBLIC_URL + "/search/" + slug;
+  const url = process.env.NEXT_PUBLIC_URL + "/search/" + slug;
+  const supabase = createClient(cookies());
+  const metadata = await generateMetadata(
+    { params, searchParams },
+    {} as ResolvingMetadata
+  );
+  const initialRecipeIds = metadata.other?.initialRecipeIds as number[];
+  const initialIngredients = metadata.other?.initialIngredients as string[];
 
-  const { data: pageMetadata } = await supabase
-    .from("page_metadata")
-    .select("*")
-    .eq("url", url)
-    .single();
+  const { data: initialRecipes } = await supabase
+    .from("recipes")
+    .select(`
+      *,
+      nutrition_info(*),
+      recipe_ingredients(
+        quantity,
+        unit,
+        ingredients(name)
+      )
+    `)
+    .in("id", initialRecipeIds);
 
-  let initialRecipes: Recipe[] = [];
-  if (pageMetadata && pageMetadata.recipe_ids) {
-    const { data: recipes } = await supabase
-      .from("recipes")
-      .select("*")
-      .in("id", pageMetadata.recipe_ids);
-    initialRecipes = recipes || []
-  }
-
-  const metadata = await generateMetadata({ params, searchParams }, {} as ResolvingMetadata);
+  // Tag each recipe with matched ingredients
+  const taggedInitialRecipes = initialRecipes?.map(recipe => ({
+    ...recipe,
+    matchedIngredients: initialIngredients.filter(ingredient =>
+      recipe.recipe_ingredients?.some(ri =>
+        ri.ingredients?.name?.toLowerCase().includes(ingredient.toLowerCase())
+      )
+    )
+  }));
 
   return (
     <>
@@ -78,7 +95,10 @@ export default async function SearchPage({ params, searchParams }: Props) {
         keywords={metadata.keywords as string[]}
       />
       <div className="px-4 md:px-6 mx-auto py-8">
-        <Search initialIngredients={pageMetadata?.ingredients || []} initialRecipes={initialRecipes} />
+        <Search
+          initialIngredients={initialIngredients}
+          initialRecipes={taggedInitialRecipes as Recipe[]}
+        />
       </div>
     </>
   );

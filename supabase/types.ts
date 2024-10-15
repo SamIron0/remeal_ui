@@ -127,31 +127,37 @@ export type Database = {
       }
       page_metadata: {
         Row: {
+          changefreq: number | null
           description: string | null
           id: number
           ingredients: string[] | null
           keywords: string[] | null
           metadata: Json | null
+          priority: number | null
           recipe_ids: number[] | null
           title: string
           url: string
         }
         Insert: {
+          changefreq?: number | null
           description?: string | null
           id?: number
           ingredients?: string[] | null
           keywords?: string[] | null
           metadata?: Json | null
+          priority?: number | null
           recipe_ids?: number[] | null
           title: string
           url: string
         }
         Update: {
+          changefreq?: number | null
           description?: string | null
           id?: number
           ingredients?: string[] | null
           keywords?: string[] | null
           metadata?: Json | null
+          priority?: number | null
           recipe_ids?: number[] | null
           title?: string
           url?: string

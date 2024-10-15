@@ -22,7 +22,7 @@ const TestimonialCarousel: React.FC = () => {
   return (
     <div className="relative bg-white p-6 rounded-lg shadow-md">
       <div className="text-center">
-        <p className="text-lg italic mb-4">"{testimonials[currentIndex].quote}"</p>
+        <p className="text-lg italic mb-4">&quot;{testimonials[currentIndex].quote}&quot;</p>
         <p className="font-bold">- {testimonials[currentIndex].name}</p>
       </div>
       <button
