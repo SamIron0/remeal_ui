@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
 
-export default function ResetButton() {
+export default function ResetMetadataButton() {
   const [isResetting, setIsResetting] = useState(false);
 
   const handleReset = async () => {
@@ -19,7 +19,7 @@ export default function ResetButton() {
   };
   return (
     <Button onClick={handleReset} disabled={isResetting}>
-      {isResetting ? "Resetting..." : "Reset Page Metadata"}
+      {isResetting ? "Resetting..." : "Reset Search Page Metadata"}
     </Button>
   );
 }

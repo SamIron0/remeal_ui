@@ -34,7 +34,7 @@ export default function ResetButton() {
 
   return (
     <Button onClick={handleReset} disabled={isResetting}>
-      {isResetting ? "Resetting..." : "Reset Redis Cache and Update Metadata"}
+      {isResetting ? "Resetting..." : "Reset Redis Cache"}
     </Button>
   );
 }

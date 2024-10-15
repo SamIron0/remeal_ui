@@ -50,7 +50,7 @@ export default function ProfileForm() {
     }
   }, [user, subscription]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setProfile((prev) => (prev ? { ...prev, [name]: value } : null));
   };

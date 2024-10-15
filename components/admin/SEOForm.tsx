@@ -5,25 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/utils/supabase/client";
 
 export default function SEOForm() {
-  const [url, setUrl] = useState("");
-  const [ingredients, setIngredients] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [keywords, setKeywords] = useState("");
-  const [changefreq, setChangefreq] = useState("monthly");
-  const [priority, setPriority] = useState("1");
+  const [jsonInput, setJsonInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const supabase = createClient();
 
-  const changefreqMap: { [key: string]: number } = {
-    always: 1,
-    hourly: 2,
-    daily: 3,
-    weekly: 4,
-    monthly: 5,
-    yearly: 6,
-    never: 7
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setJsonInput(e.target.value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,14 +20,25 @@ export default function SEOForm() {
     setMessage("");
 
     try {
-      // First, search for recipes using the ingredients
+      // Parse the JSON input
+      const formData = JSON.parse(jsonInput);
+
+      // Validate the required fields
+      const requiredFields = ['url', 'ingredients', 'title', 'description', 'keywords'];
+      for (const field of requiredFields) {
+        if (!formData[field]) {
+          throw new Error(`Missing required field: ${field}`);
+        }
+      }
+
+      // Fetch recipes based on ingredients
       const response = await fetch("/api/recipe_search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ingredients: ingredients.split(",").map((i) => i.trim()),
+          ingredients: formData.ingredients.split(",").map((i: string) => i.trim()),
         }),
       });
 
@@ -50,35 +49,28 @@ export default function SEOForm() {
       const recipes = await response.json();
       const recipeIds = recipes.map((recipe: any) => recipe.id);
 
-      // Now insert the SEO metadata along with the recipe IDs
-      const { data, error } = await supabase.from("page_metadata").insert({
-        url,
-        title,
-        description,
-        keywords: keywords.split(",").map((k) => k.trim()),
-        ingredients: ingredients.split(",").map((i) => i.trim()),
+      // Prepare data for insertion with default values
+      const dataToInsert = {
+        ...formData,
+        ingredients: formData.ingredients.split(",").map((i: string) => i.trim()),
+        keywords: formData.keywords.split(",").map((k: string) => k.trim()),
         recipe_ids: recipeIds,
-        changefreq: changefreqMap[changefreq],
-        priority: parseFloat(priority),
-      });
+        changefreq: "4",
+        priority: 0.8,
+      };
+
+      // Insert data into Supabase
+      const { data, error } = await supabase.from("page_metadata").insert(dataToInsert);
 
       if (error) {
-        console.error("Error saving SEO metadata:", error);
-        setMessage("Error saving SEO metadata. Please try again.");
+        throw new Error("Error saving SEO metadata: " + error.message);
       } else {
         setMessage("SEO metadata saved successfully!");
-        // Clear form
-        setUrl("");
-        setIngredients("");
-        setTitle("");
-        setDescription("");
-        setKeywords("");
-        setChangefreq("weekly");
-        setPriority("0.5");
+        setJsonInput("");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving SEO metadata:", error);
-      setMessage("Error saving SEO metadata. Please try again.");
+      setMessage("Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -87,99 +79,23 @@ export default function SEOForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="url" className="block mb-2">
-          URL
-        </label>
-        <Input
-          id="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="recipes-with-tomato"
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="ingredients" className="block mb-2">
-          Ingredients (comma-separated)
-        </label>
-        <Input
-          id="ingredients"
-          value={ingredients}
-          onChange={(e) => setIngredients(e.target.value)}
-          placeholder="e.g., tomato, cheese, basil"
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="title" className="block mb-2">
-          Page Title
-        </label>
-        <Input
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="SEO-optimized title"
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="description" className="block mb-2">
-          Meta Description
+        <label htmlFor="jsonInput" className="block mb-2">
+          SEO Metadata JSON
         </label>
         <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Brief description for search results"
+          id="jsonInput"
+          value={jsonInput}
+          onChange={handleInputChange}
+          placeholder={`Enter JSON data, e.g.:
+{
+  "url": "recipes-with-tomato",
+  "ingredients": "tomato, cheese, basil",
+  "title": "Delicious Tomato Recipes",
+  "description": "Discover tasty recipes using tomatoes",
+  "keywords": "tomato, recipes, healthy"
+}`}
           required
-        />
-      </div>
-      <div>
-        <label htmlFor="keywords" className="block mb-2">
-          Keywords (comma-separated)
-        </label>
-        <Input
-          id="keywords"
-          value={keywords}
-          onChange={(e) => setKeywords(e.target.value)}
-          placeholder="e.g., recipe, healthy, quick"
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="changefreq" className="block mb-2">
-          Change Frequency
-        </label>
-        <select
-          id="changefreq"
-          value={changefreq}
-          onChange={(e) => setChangefreq(e.target.value)}
-          className="w-full p-2 border rounded"
-          required
-        >
-          <option value="always">Always</option>
-          <option value="hourly">Hourly</option>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="yearly">Yearly</option>
-          <option value="never">Never</option>
-        </select>
-      </div>
-      <div>
-        <label htmlFor="priority" className="block mb-2">
-          Priority
-        </label>
-        <Input
-          id="priority"
-          type="number"
-          min="0"
-          max="1"
-          step="0.1"
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          placeholder="0.5"
-          required
+          rows={10}
         />
       </div>
       <Button type="submit" disabled={loading}>

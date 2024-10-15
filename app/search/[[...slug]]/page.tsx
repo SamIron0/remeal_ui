@@ -16,7 +16,6 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const slug = params.slug ? params.slug.join(" ") : "";
   let url = slug;
-  const decodedSlug = decodeURIComponent(slug).replace(/-/g, " ");
 
   const supabase = createClient(cookies());
   const { data: pageMetadata } = await supabase

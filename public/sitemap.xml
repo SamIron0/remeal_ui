@@ -5,6 +5,54 @@
     <loc>https://remeal.xyz/search/recipes-with-avocado</loc>
     <lastmod>2024-10-15</lastmod>
     <changefreq>4</changefreq>
-    <priority>1</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-can-i-make-with-these-ingredients</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-can-i-make-with-what-i-have</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-to-do-with-ground-beef</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-to-make-with-chicken</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-to-make-with-chicken-thighs</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-to-make-with-cream-cheese</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-to-make-with-eggs</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://remeal.xyz/search/what-to-make-with-ground-beef</loc>
+    <lastmod>2024-10-15</lastmod>
+    <changefreq>4</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

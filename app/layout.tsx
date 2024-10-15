@@ -10,16 +10,16 @@ import { AppProvider } from "@/context/AppContext";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
-const defaultUrl = "https://remeal.food";
+const defaultUrl = "https://remeal.xyz";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "Remeal - Cook Smart, Waste Less | Recipe Finder App",
-    template: "%s | Remeal - Cook Smart, Waste Less",
+    default: "Remeal | Recipe Finder App",
+    template: "%s | Remeal",
   },
   description:
-    "Discover delicious recipes based on ingredients you have in your kitchen. Remeal helps you cook smart, reduce food waste, and save money with personalized meal suggestions.",
+    "Find recipes you can easily make based on ingredients you already have in your kitchen. Get nutritional information and personalized recommendations.",
   keywords: [
     "recipe finder",
     "food waste reduction",
