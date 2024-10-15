@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { XLogo } from "./icons/Xlogo";
 
 const Footer: React.FC = () => {
   return (
@@ -39,6 +40,9 @@ const Footer: React.FC = () => {
           <p className="text-sm">
             &copy; {new Date().getFullYear()} Remeal. All rights reserved.
           </p>
+          <a href="https://x.com/csi0x" target="_blank" rel="noopener noreferrer" className="mt-4 md:mt-0">
+            <XLogo className="w-6 h-6 text-gray-600 hover:text-primary" />
+          </a>
         </div>
       </div>
     </footer>

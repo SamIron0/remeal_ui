@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Recipe } from "@/types";
 import { Button } from "@/components/ui/button";
-import NutritionInfo from "@/components/NutritionInfo";
+import NutritionInfo from "@/components/SearchPage/NutritionInfo";
 import { Badge } from "@/components/ui/badge";
 
 interface RecipeCardProps {
