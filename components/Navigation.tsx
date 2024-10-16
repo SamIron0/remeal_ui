@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Search, Home, Info, CreditCard, User } from "lucide-react";
+import { Search, Home, Info, CreditCard, User, Bookmark } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
@@ -27,7 +27,10 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
       { name: "Home page", href: "/", icon: <Home className="w-4 h-4 mr-2" /> },
       { name: "How it works", href: "/#how-it-works", icon: <Info className="w-4 h-4 mr-2" /> },
       { name: "Pricing", href: "/membership", icon: <CreditCard className="w-4 h-4 mr-2" /> },
-      ...(user ? [{ name: "Profile", href: "/profile", icon: <User className="w-4 h-4 mr-2" /> }] : []),
+      ...(user ? [
+        { name: "Saved Recipes", href: "/saved", icon: <Bookmark className="w-4 h-4 mr-2" /> },
+        { name: "Profile", href: "/profile", icon: <User className="w-4 h-4 mr-2" /> }
+      ] : []),
     ]);
   }, [user]);
 
@@ -53,7 +56,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
           <div className="flex items-center">
             <motion.button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-primary hover:bg-gray-200 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-primary hover:bg-secondary focus:outline-none"
               initial={false}
               animate={isMenuOpen ? "open" : "closed"}
             >     
@@ -101,13 +104,13 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {isMenuOpen && (
-        <div className="mx-auto sm:px-4 ">
+        <div className="mx-auto">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {menuItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="flex hover:bg-gray-200 items-center justify-between text-gray-600 hover:text-primary px-3 py-2 rounded-md text-base font-medium"
+                className="flex hover:bg-secondary items-center justify-between text-gray-600 hover:text-primary px-3 py-2 rounded-md text-base font-medium"
                 onClick={toggleMenu}
               >
                 <div className="flex items-center w-full justify-between">
@@ -121,7 +124,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <Link href="/login" onClick={toggleMenu}>
                   <Button
                     variant="outline"
-                    className="w-full hover:bg-gray-200 hover:text-primary items-center text-left text-primary"
+                    className="w-full hover:bg-secondary hover:text-primary items-center text-left text-primary"
                   >
                     Log In
                   </Button>

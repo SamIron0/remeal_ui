@@ -47,7 +47,7 @@ export default function SavedRecipes() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)] mt-16">
       <h1 className="text-3xl font-bold mb-6">Your Saved Recipes</h1>
       {recipes.length === 0 ? (
         <p>You haven&apos;t saved any recipes yet.</p>

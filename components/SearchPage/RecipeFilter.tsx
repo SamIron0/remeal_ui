@@ -50,7 +50,7 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild className="border-none h-8 w-8 hover:bg-transparent hover:text-black shadow-none rounded-full">
         <Button className="px-2" variant="outline" size="icon">
           <Settings className="h-4 w-4" />
         </Button>

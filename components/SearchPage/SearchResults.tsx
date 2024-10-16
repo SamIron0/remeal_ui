@@ -39,11 +39,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     return (
       <div className="text-center px-8 py-24">
         <h2 className="text-2xl font-semibold mb-4">Ready to cook?</h2>
-        <p className="text-gray-600 mb-6">
-          Start by adding ingredients you have on hand, and we&apos;ll find matching
+        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+          Start by adding ingredients you have on hand,<br /> and we&apos;ll find matching
           recipes for you.
         </p>
-        <Button onClick={() => document.querySelector("input")?.focus()}>
+        <Button variant="secondary" onClick={() => document.querySelector("input")?.focus()}>
           Add Ingredients
         </Button>
       </div>

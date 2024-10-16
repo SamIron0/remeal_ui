@@ -21,19 +21,7 @@ export default async function RecipePage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  let isActiveMember =false;
-
-  if (user) {
-    const { data: subscriptionData } = await supabase
-      .from("subscriptions")
-      .select("status")
-      .eq("user_id", user.id)
-      .single();
-
-    isActiveMember =
-      subscriptionData?.status === "active" ||
-      subscriptionData?.status === "trialing";
-  }
+  
   const decodedSlug = decodeURIComponent(params.slug);
 
   const { data: recipe, error } = await supabase

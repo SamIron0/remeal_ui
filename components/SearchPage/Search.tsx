@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { XCircle, Search as SearchIcon } from "lucide-react";
+import { XCircle, Search as SearchIcon, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SearchResults from "./SearchResults";
@@ -17,7 +17,10 @@ interface SearchProps {
   initialRecipes?: Recipe[];
 }
 
-const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialRecipes = [] }) => {
+const RecipeSearch: React.FC<SearchProps> = ({
+  initialIngredients = [],
+  initialRecipes = [],
+}) => {
   const { recipes, setRecipes, ingredients, setIngredients } = useApp();
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,7 +55,13 @@ const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialR
     if (initialRecipes.length > 0) {
       setRecipes(initialRecipes);
     }
-  }, [initialIngredients, initialRecipes, setIngredients, setRecipes, filterOptions]);
+  }, [
+    initialIngredients,
+    initialRecipes,
+    setIngredients,
+    setRecipes,
+    filterOptions,
+  ]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -120,9 +129,7 @@ const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialR
     (newOptions: FilterOptions) => {
       setFilterOptions(newOptions);
       const filtered = recipes.filter((recipe) => {
-        if (
-          (recipe.cook_time || 0) > (newOptions.maxCookTime || 0) 
-        ) {
+        if ((recipe.cook_time || 0) > (newOptions.maxCookTime || 0)) {
           return false;
         }
 
@@ -138,34 +145,45 @@ const RecipeSearch: React.FC<SearchProps> = ({ initialIngredients = [], initialR
   }, [filterOptions, applyFilters]);
   return (
     <div className="max-w-6xl mx-auto py-16">
-      <h1 className="text-3xl font-bold py-6 text-center">Recipe Finder</h1>
+      <h1 className="text-4xl md:text-5xl font-semibold py-6 text-center">
+        Enter Your Ingredients
+      </h1>
 
-      <div className="mb-6 w-full flex flex-col items-center max-w-lg mx-auto">
-        <div className="flex w-full justify-center mb-4">
-          <Input
-            type="text"
-            placeholder="Enter your ingredients(comma-separated)"
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyPress={handleInputKeyPress}
-            className="w-full mr-2 text-[16px]"
-          />
-          <Button
-            onClick={() =>
-              inputValue.trim() && addIngredient(inputValue.trim())
-            }
-            className="whitespace-nowrap mr-2"
-          >
-            <SearchIcon className="mr-2 h-4 w-4" /> Add
-          </Button>
-          <RecipeFilter options={filterOptions} onChange={applyFilters} />
+      <div className="mb-6 w-full flex flex-col items-center">
+        <div className="w-[460px] sm:w-[500px] md:w-[550px] lg:w-[600px] xl:w-[650px] relative">
+          <div className="relative">
+            <SearchIcon
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <Input
+              type="text"
+              placeholder="chicken, rice, tomatoes"
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyPress={handleInputKeyPress}
+              className="w-full pl-10 pr-24 text-[16px] h-12 rounded-[9987px] focus-visible:ring-0 focus-visible:ring-offset-0  focus-visible:border-2"
+            />
+          </div>
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center">
+            <RecipeFilter options={filterOptions} onChange={applyFilters} />
+
+            <Button
+              onClick={() =>
+                inputValue.trim() && addIngredient(inputValue.trim())
+              }
+              className="ml-2 rounded-full h-8 bg-primary-gradient"
+            >
+              Add
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mt-4">
           {ingredients.map((ingredient, index) => (
             <span
               key={index}
-              className="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm flex items-center"
+              className="bg-secondary text-primary px-2 py-1 rounded-full text-sm flex items-center"
             >
               {ingredient}
               <XCircle
