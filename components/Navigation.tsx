@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Search, Home, Info, CreditCard, User, Bookmark } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -20,6 +20,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [menuItems, setMenuItems] = useState<{ name: string; href: string; icon: React.ReactNode }[]>(
     []
   );
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMenuItems([
@@ -34,6 +35,19 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
     ]);
   }, [user]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -45,7 +59,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   };
 
   return (
-    <nav className="fixed z-10 top-0 left-0 w-full bg-background shadow-sm backdrop-blur-[12px] transition-all duration-300">
+    <nav ref={navRef} className="fixed z-10 top-0 left-0 w-full bg-background shadow-sm backdrop-blur-[12px] transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">

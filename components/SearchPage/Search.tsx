@@ -25,6 +25,7 @@ const RecipeSearch: React.FC<SearchProps> = ({
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [displayCount, setDisplayCount] = useState(12);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(() => {
     if (typeof window !== "undefined") {
       const savedOptions = localStorage.getItem("filterOptions");
@@ -144,13 +145,13 @@ const RecipeSearch: React.FC<SearchProps> = ({
     applyFilters(filterOptions);
   }, [filterOptions, applyFilters]);
   return (
-    <div className="max-w-6xl mx-auto py-16">
+    <div className=" max-w-6xl mx-auto py-16">
       <h1 className="text-4xl md:text-5xl font-semibold py-6 text-center">
         Enter Your Ingredients
       </h1>
 
       <div className="mb-6 w-full flex flex-col items-center">
-        <div className="w-[460px] sm:w-[500px] md:w-[550px] lg:w-[600px] xl:w-[650px] relative">
+        <div className="w-full sm:w-[500px] md:w-[550px] lg:w-[600px] xl:w-[650px] relative">
           <div className="relative">
             <SearchIcon
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -162,7 +163,7 @@ const RecipeSearch: React.FC<SearchProps> = ({
               value={inputValue}
               onChange={handleInputChange}
               onKeyPress={handleInputKeyPress}
-              className="w-full pl-10 pr-24 text-[16px] h-12 rounded-[9987px] focus-visible:ring-0 focus-visible:ring-offset-0  focus-visible:border-2"
+              className="w-full pl-10 text-[16px] pr-24 h-12 rounded-[9987px] focus-visible:ring-0 focus-visible:ring-offset-0  focus-visible:border-2"
             />
           </div>
           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center">
@@ -207,9 +208,11 @@ const RecipeSearch: React.FC<SearchProps> = ({
       </div>
 
       <SearchResults
+        setDisplayCount={setDisplayCount}
         recipes={filteredRecipes}
         loading={loading}
         error={error}
+        displayCount={displayCount}
       />
     </div>
   );

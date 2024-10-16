@@ -1,23 +1,54 @@
-import React, { useState } from "react";
-import { Loader2 } from "lucide-react";
+import React, { useState, useRef, useCallback } from "react";
+import { Loader2, ChevronUp } from "lucide-react";
 import { Recipe } from "@/types";
 import { useApp } from "@/context/AppContext";
 import RecipeCard from "@/components/SearchPage/RecipeCard";
 import { Button } from "@/components/ui/button";
+import BackToTopButton from "../BackToTopButton";
 
 interface SearchResultsProps {
   recipes: Recipe[]
   loading: boolean;
   error: string | null;
+  displayCount: number;
+  setDisplayCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   recipes,
   loading,
   error,
+  displayCount,
+  setDisplayCount,
 }) => {
   const { ingredients } = useApp();
-  const [displayCount, setDisplayCount] = useState(10);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  const lastRecipeElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && displayCount < recipes.length) {
+        setDisplayCount(prevCount => prevCount + 12);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, displayCount, recipes.length, setDisplayCount]);
+
+  React.useEffect(() => {
+    const toggleBackToTop = () => {
+      setShowBackToTop(window.pageYOffset > 300);
+    };
+
+    window.addEventListener('scroll', toggleBackToTop);
+    return () => window.removeEventListener('scroll', toggleBackToTop);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -69,7 +100,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   const hasMore = recipes.length > displayCount;
 
   return (
-    <div>
+    <div className="">
+      {recipes.length > 0 && (
+        <p className="text-sm text-gray-600 mb-4">
+          Showing {Math.min(displayCount, recipes.length)} of {recipes.length} results
+        </p>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedRecipes.map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
@@ -78,11 +114,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       {hasMore && (
         <div className="mt-6 text-center">
           <Button
-            onClick={() => setDisplayCount((prevCount) => prevCount + 10)}
+            onClick={() => setDisplayCount(prevCount => prevCount + 12)}
           >
             Show More
           </Button>
         </div>
+      )}
+      {showBackToTop && (
+        <BackToTopButton />
       )}
     </div>
   );

@@ -86,19 +86,19 @@ export default async function SearchPage({ params, searchParams }: Props) {
   }));
 
   return (
-    <>
+    <div className="">
       <SEOMetaTags
         title={metadata.title as string}
         description={metadata.description as string}
         canonicalUrl={url}
         keywords={metadata.keywords as string[]}
       />
-      <div className="px-4 md:px-6 mx-auto py-8">
+      <div className=" px-4 md:px-6 mx-auto py-8">
         <Search
           initialIngredients={initialIngredients}
           initialRecipes={taggedInitialRecipes as Recipe[]}
         />
       </div>
-    </>
+    </div>
   );
 }

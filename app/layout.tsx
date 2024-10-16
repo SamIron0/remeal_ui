@@ -9,6 +9,7 @@ import Navigation from "@/components/Navigation";
 import { AppProvider } from "@/context/AppContext";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { cn } from "@/lib/utils";
 
 const defaultUrl = "https://remeal.xyz";
 
@@ -76,7 +77,7 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <html lang="en" className={GeistSans.className}>
+    <html lang="en" className={cn(GeistSans.className, "hide-scrollbar")}>
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -87,11 +88,11 @@ export default async function RootLayout({
         <meta name="theme-color" content="#f7f7f7" />
       </head>
       <GoogleAnalytics gaId="G-8VB6GS4GD1" />
-      <body className="hide-scrollbar text-foreground bg-background antialiased">
+      <body className=" text-foreground bg-background antialiased">
         <AppProvider>
           <SpeedInsights />
           <Navigation isLoggedIn={!!user} />
-          <main className="space-y-12 flex flex-col  items-center">
+          <main className="space-y-12 flex flex-col items-center">
             {children}
             <Toaster />
           </main>
