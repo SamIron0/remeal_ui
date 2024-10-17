@@ -1,14 +1,14 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 
 const stats = [
-  { label: 'Recipes', value: 100, suffix: '+' },
-  { label: 'Active Users', value: 50, suffix: '+' },
-  { label: 'Ingredients', value: 500, suffix: '+' },
+  { label: "Recipes", value: 1000, suffix: "+" },
+  { label: "Active Users", value: 20, suffix: "+" },
+  { label: "Ingredients", value: 2000, suffix: "+" },
 ];
 
 const AnimatedStats: React.FC = () => {
-  const [counts, setCounts] = useState(stats.map(() => 0));
+  const [counts, setCounts] = useState<number[]>(stats.map(() => 0));
 
   useEffect(() => {
     const duration = 2000; // Animation duration in milliseconds
@@ -24,7 +24,7 @@ const AnimatedStats: React.FC = () => {
         const progress = frame / totalFrames;
         const currentCount = Math.round(countTo * progress);
 
-        setCounts(prevCounts => {
+        setCounts((prevCounts: number[]) => {
           const newCounts = [...prevCounts];
           newCounts[index] = currentCount;
           return newCounts;
@@ -36,7 +36,7 @@ const AnimatedStats: React.FC = () => {
       }, frameDuration);
     });
 
-    return () => counters.forEach(counter => clearInterval(counter));
+    return () => counters.forEach((counter) => clearInterval(counter));
   }, []);
 
   return (
@@ -46,7 +46,8 @@ const AnimatedStats: React.FC = () => {
           {stats.map((stat, index) => (
             <div key={index} className="space-y-2">
               <h3 className="text-4xl font-bold">
-                {counts[index].toLocaleString()}{stat.suffix}
+                {counts[index].toLocaleString()}
+                {stat.suffix}
               </h3>
               <p className="text-xl">{stat.label}</p>
             </div>

@@ -39,7 +39,7 @@ export default function ParallaxHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex w-full max-w-md gap-2"
+          className="flex w-full max-w-md gap-2 items-center"
           onSubmit={handleSubmit}
         >
           <Input
@@ -47,14 +47,13 @@ export default function ParallaxHero() {
             type="email"
             placeholder="Enter your email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             className="flex-grow text-[16px] text-primary"
             required
           />
           <Button
             type="submit"
-            size="lg"
-            className="bg-primary-gradient hover:text-gray-400 hover:shadow-accent "
+            className="bg-primary-gradient px-3 py-5 hover:shadow-accent "
           >
             Get Started
           </Button>
