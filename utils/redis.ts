@@ -5,7 +5,7 @@ export const redis = new Redis({
   token: process.env.REDIS_TOKEN,
 });
 
-export async function updateRedis(key: string, value: any) {
+export async function updateRedis(key: string, value: string[]) {
   await redis.set(key, JSON.stringify(value));
 }
 

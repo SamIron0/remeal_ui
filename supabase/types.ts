@@ -125,45 +125,6 @@ export type Database = {
           },
         ]
       }
-      page_metadata: {
-        Row: {
-          changefreq: number | null
-          description: string | null
-          id: number
-          ingredients: string[] | null
-          keywords: string[] | null
-          metadata: Json | null
-          priority: number | null
-          recipe_ids: number[] | null
-          title: string
-          url: string
-        }
-        Insert: {
-          changefreq?: number | null
-          description?: string | null
-          id?: number
-          ingredients?: string[] | null
-          keywords?: string[] | null
-          metadata?: Json | null
-          priority?: number | null
-          recipe_ids?: number[] | null
-          title: string
-          url: string
-        }
-        Update: {
-          changefreq?: number | null
-          description?: string | null
-          id?: number
-          ingredients?: string[] | null
-          keywords?: string[] | null
-          metadata?: Json | null
-          priority?: number | null
-          recipe_ids?: number[] | null
-          title?: string
-          url?: string
-        }
-        Relationships: []
-      }
       prices: {
         Row: {
           active: boolean | null
@@ -351,6 +312,53 @@ export type Database = {
           },
         ]
       }
+      recipe_page_metadata: {
+        Row: {
+          changefreq: number | null
+          created_at: string | null
+          description: string | null
+          ingredients: string[] | null
+          keywords: string[] | null
+          priority: number | null
+          recipe_id: number
+          title: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          changefreq?: number | null
+          created_at?: string | null
+          description?: string | null
+          ingredients?: string[] | null
+          keywords?: string[] | null
+          priority?: number | null
+          recipe_id: number
+          title: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          changefreq?: number | null
+          created_at?: string | null
+          description?: string | null
+          ingredients?: string[] | null
+          keywords?: string[] | null
+          priority?: number | null
+          recipe_id?: number
+          title?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_page_metadata_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: true
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipe_tags: {
         Row: {
           recipe_id: number
@@ -441,15 +449,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "recipes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       saved_recipes: {
         Row: {
@@ -478,14 +478,43 @@ export type Database = {
             referencedRelation: "recipes"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "saved_recipes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
+      }
+      search_page_metadata: {
+        Row: {
+          changefreq: number | null
+          description: string | null
+          id: number
+          ingredients: string[] | null
+          keywords: string[] | null
+          priority: number | null
+          recipe_ids: number[] | null
+          title: string
+          url: string
+        }
+        Insert: {
+          changefreq?: number | null
+          description?: string | null
+          id?: number
+          ingredients?: string[] | null
+          keywords?: string[] | null
+          priority?: number | null
+          recipe_ids?: number[] | null
+          title: string
+          url: string
+        }
+        Update: {
+          changefreq?: number | null
+          description?: string | null
+          id?: number
+          ingredients?: string[] | null
+          keywords?: string[] | null
+          priority?: number | null
+          recipe_ids?: number[] | null
+          title?: string
+          url?: string
+        }
+        Relationships: []
       }
       subscriptions: {
         Row: {
@@ -605,15 +634,7 @@ export type Database = {
           payment_method?: Json | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "users_auth_user_id_fkey"
-            columns: ["auth_user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
@@ -834,4 +855,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

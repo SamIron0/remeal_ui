@@ -11,7 +11,7 @@ async function generateSitemap() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
     const { data: pages, error } = await supabase
-      .from("page_metadata")
+      .from("search_page_metadata")
       .select("url, changefreq, priority")
       .order("url");
 

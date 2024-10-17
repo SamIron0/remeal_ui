@@ -21,9 +21,11 @@ export default function AuthCallbackPage() {
 
       try {
         await supabase.auth.exchangeCodeForSession(code);
+        toast.success("Confirmed, you can log in now");
       } catch (error) {
         console.error("Error during authentication:", error);
         toast.error("Authentication failed");
+
       }
 
       router.push(callbackUrl);

@@ -60,7 +60,7 @@ export default function SEOForm() {
       };
 
       // Insert data into Supabase
-      const { data, error } = await supabase.from("page_metadata").insert(dataToInsert);
+      const { data, error } = await supabase.from("search_page_metadata").insert(dataToInsert);
 
       if (error) {
         throw new Error("Error saving SEO metadata: " + error.message);

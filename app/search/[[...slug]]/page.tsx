@@ -19,7 +19,7 @@ export async function generateMetadata(
 
   const supabase = createClient(cookies());
   const { data: pageMetadata } = await supabase
-    .from("page_metadata")
+    .from("search_page_metadata")
     .select("*")
     .eq("url", url)
     .single();
