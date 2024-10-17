@@ -4,30 +4,67 @@ const path = require("path");
 
 const sitemapPath = path.join(process.cwd(), "public", "sitemap.xml");
 const baseUrl = "https://remeal.xyz";
+
 async function generateSitemap() {
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
-    const { data: pages, error } = await supabase
+
+    // Fetch search page metadata
+    const { data: searchPages, error: searchError } = await supabase
       .from("search_page_metadata")
       .select("url, changefreq, priority")
       .order("url");
 
-    if (error){
-      console.error("Error fetching pages:", error);
+    if (searchError) {
+      console.error("Error fetching search pages:", searchError);
       return;
     }
+
+    // Fetch recipe page metadata
+    const { data: recipePages, error: recipeError } = await supabase
+      .from("recipe_page_metadata")
+      .select("recipe_id, changefreq, priority")
+      .order("recipe_id");
+
+    if (recipeError) {
+      console.error("Error fetching recipe pages:", recipeError);
+      return;
+    }
+    const recipeIds = recipePages.map(page => page.recipe_id);
+    const { data: recipes, error: recipesError } = await supabase
+      .from("recipes")
+      .select("id, name,slug")
+      .in("id", recipeIds);
+
+    if (recipesError) {
+      console.error("Error fetching recipe names:", recipesError);
+      return;
+    }
+
+
     const today = new Date().toISOString().split("T")[0];
 
     const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${pages
+  ${searchPages
     .map(
       (page) => `
   <url>
     <loc>${baseUrl}/search/${page.url}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq || "weekly"}</changefreq>
+    <priority>${page.priority || "0.5"}</priority>
+  </url>`
+    )
+    .join("")}
+  ${recipePages
+    .map(
+      (page) => `
+  <url>
+    <loc>${baseUrl}/recipe/${recipes.find(r => r.id === page.recipe_id)?.slug || ''}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${page.changefreq || "weekly"}</changefreq>
     <priority>${page.priority || "0.5"}</priority>

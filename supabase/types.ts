@@ -317,37 +317,31 @@ export type Database = {
           changefreq: number | null
           created_at: string | null
           description: string | null
-          ingredients: string[] | null
           keywords: string[] | null
           priority: number | null
           recipe_id: number
           title: string
           updated_at: string | null
-          url: string
         }
         Insert: {
           changefreq?: number | null
           created_at?: string | null
           description?: string | null
-          ingredients?: string[] | null
           keywords?: string[] | null
           priority?: number | null
           recipe_id: number
           title: string
           updated_at?: string | null
-          url: string
         }
         Update: {
           changefreq?: number | null
           created_at?: string | null
           description?: string | null
-          ingredients?: string[] | null
           keywords?: string[] | null
           priority?: number | null
           recipe_id?: number
           title?: string
           updated_at?: string | null
-          url?: string
         }
         Relationships: [
           {
@@ -422,6 +416,7 @@ export type Database = {
           name: string
           prep_time: number | null
           servings: number | null
+          slug: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -434,6 +429,7 @@ export type Database = {
           name: string
           prep_time?: number | null
           servings?: number | null
+          slug?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -446,6 +442,7 @@ export type Database = {
           name?: string
           prep_time?: number | null
           servings?: number | null
+          slug?: string | null
           updated_at?: string | null
           user_id?: string | null
         }

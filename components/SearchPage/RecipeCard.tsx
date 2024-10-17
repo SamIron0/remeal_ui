@@ -1,9 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { Recipe } from "@/types";
-import { Button } from "@/components/ui/button";
 import NutritionInfo from "@/components/SearchPage/NutritionInfo";
 import { Badge } from "@/components/ui/badge";
+import { slugify } from "@/utils/helpers";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -11,9 +11,10 @@ interface RecipeCardProps {
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const matchedIngredientsCount = recipe.matchedIngredients?.length || 0;
+  const seoFriendlyUrl = slugify(recipe.name || '');
 
   return (
-    <Link href={`/recipe/${recipe.name}`}>
+    <Link href={`/recipe/${seoFriendlyUrl}`}>
       <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
         <h3 className="text-lg font-semibold mb-2">{recipe.name}</h3>
         <Badge variant="secondary" className="mb-2">

@@ -38,7 +38,7 @@ export default async function RecipePage({
       )
     `
     )
-    .eq("name", decodedSlug)
+    .eq("slug", decodedSlug)
     .single();
 
   if (error || !recipe) {

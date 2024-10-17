@@ -46,7 +46,10 @@ export default function Homepage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="w-full bg-transparent py-20 text-white">
+      <section
+        id="how-it-works"
+        className="w-full bg-transparent py-20 text-white"
+      >
         <div className="container px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">
             How Remeal Works

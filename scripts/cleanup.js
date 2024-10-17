@@ -11,27 +11,44 @@ async function cleanupDatabase() {
     // Fetch all recipes
     const { data: recipes, error } = await supabase
       .from('recipes')
-      .select('id, name')
+      .select('id, name, slug')
       .order('created_at', { ascending: true });
 
     if (error) throw error;
 
     const recipeMap = new Map();
+    const slugMap = new Map();
     const duplicatesToDelete = [];
+    const slugsToUpdate = [];
 
-    // Identify duplicates
+    // Identify duplicates and duplicate slugs
     for (const recipe of recipes) {
-      if (recipeMap.has(recipe.name.toLowerCase())) {
+      const lowerName = recipe.name.toLowerCase();
+      const lowerSlug = recipe.slug ? recipe.slug.toLowerCase() : '';
+
+      if (recipeMap.has(lowerName)) {
         duplicatesToDelete.push(recipe.id);
       } else {
-        recipeMap.set(recipe.name.toLowerCase(), recipe.id);
+        recipeMap.set(lowerName, recipe.id);
+      }
+
+      if (slugMap.has(lowerSlug)) {
+        slugsToUpdate.push(recipe.id);
+      } else {
+        slugMap.set(lowerSlug, recipe.id);
       }
     }
 
     console.log(`Found ${duplicatesToDelete.length} duplicate recipes to delete.`);
+    console.log(`Found ${slugsToUpdate.length} duplicate slugs to update.`);
 
     // Delete duplicates and their related data
     for (const recipeId of duplicatesToDelete) {
+      await deleteRecipeAndRelatedData(recipeId);
+    }
+
+    // Update duplicate slugs
+    for (const recipeId of slugsToUpdate) {
       await deleteRecipeAndRelatedData(recipeId);
     }
 
@@ -122,4 +139,3 @@ async function cleanupIngredientIndex() {
 }
 
 cleanupDatabase();
-

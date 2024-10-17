@@ -17,21 +17,43 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const router = useRouter();
   const { user, subscription } = useApp();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const [menuItems, setMenuItems] = useState<{ name: string; href: string; icon: React.ReactNode }[]>(
-    []
-  );
+  const [menuItems, setMenuItems] = useState<
+    { name: string; href: string; icon: React.ReactNode }[]
+  >([]);
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMenuItems([
-      { name: "Recipe Search", href: "/search", icon: <Search className="w-4 h-4 mr-2" /> },
+      {
+        name: "Recipe Search",
+        href: "/search",
+        icon: <Search className="w-4 h-4 mr-2" />,
+      },
       { name: "Home page", href: "/", icon: <Home className="w-4 h-4 mr-2" /> },
-      { name: "How it works", href: "/#how-it-works", icon: <Info className="w-4 h-4 mr-2" /> },
-      { name: "Pricing", href: "/membership", icon: <CreditCard className="w-4 h-4 mr-2" /> },
-      ...(user ? [
-        { name: "Saved Recipes", href: "/saved", icon: <Bookmark className="w-4 h-4 mr-2" /> },
-        { name: "Profile", href: "/profile", icon: <User className="w-4 h-4 mr-2" /> }
-      ] : []),
+      {
+        name: "How it works",
+        href: "/#how-it-works",
+        icon: <Info className="w-4 h-4 mr-2" />,
+      },
+      {
+        name: "Pricing",
+        href: "/membership",
+        icon: <CreditCard className="w-4 h-4 mr-2" />,
+      },
+      ...(user
+        ? [
+            {
+              name: "Saved Recipes",
+              href: "/saved",
+              icon: <Bookmark className="w-4 h-4 mr-2" />,
+            },
+            {
+              name: "Profile",
+              href: "/profile",
+              icon: <User className="w-4 h-4 mr-2" />,
+            },
+          ]
+        : []),
     ]);
   }, [user]);
 
@@ -59,7 +81,10 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   };
 
   return (
-    <nav ref={navRef} className="fixed z-10 top-0 left-0 w-full bg-background shadow-sm backdrop-blur-[12px] transition-all duration-300">
+    <nav
+      ref={navRef}
+      className="fixed z-10 top-0 left-0 w-full bg-background shadow-sm backdrop-blur-[12px] transition-all duration-300"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -73,7 +98,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
               className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-primary hover:bg-secondary focus:outline-none"
               initial={false}
               animate={isMenuOpen ? "open" : "closed"}
-            >     
+            >
               <motion.svg
                 width="24"
                 height="24"
@@ -153,7 +178,10 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
               <>
                 {!subscription && (
                   <Link href="/membership">
-                    <Button className="w-full bg-primary text-white hover:bg-primary-dark">
+                    <Button
+                      className="w-full bg-primary text-white hover:bg-primary-dark"
+                      variant="outline"
+                    >
                       Upgrade to Premium
                     </Button>
                   </Link>
@@ -161,6 +189,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <Button
                   onClick={handleSignOut}
                   className="w-full bg-primary text-white hover:bg-primary-dark"
+                  variant="outline"
                 >
                   Log Out
                 </Button>

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Settings } from "lucide-react";
 import {
@@ -13,8 +11,6 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useApp } from "@/context/AppContext";
-import Link from "next/link";
 
 interface FilterOptions {
   maxCookTime: number | null;
@@ -25,7 +21,7 @@ interface FilterProps {
   onChange: (newOptions: FilterOptions) => void;
 }
 
-const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
+const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }: FilterProps) => {
   const [localOptions, setLocalOptions] = useState<FilterOptions>(options);
 
   useEffect(() => {
@@ -37,7 +33,7 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
   }, []);
 
   const handleMaxCookTimeChange = (value: number[]) => {
-    setLocalOptions((prevOptions) => ({
+    setLocalOptions((prevOptions: FilterOptions) => ({
       ...prevOptions,
       maxCookTime: value[0],
     }));
@@ -58,7 +54,7 @@ const RecipeFilter: React.FC<FilterProps> = ({ options, onChange }) => {
       <DialogContent className="sm:max-w-[425px]">
         <>
           <DialogHeader>
-            <DialogTitle>Advanced Filters</DialogTitle>
+            <DialogTitle>Filters</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">

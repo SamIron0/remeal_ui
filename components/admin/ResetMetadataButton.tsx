@@ -8,7 +8,7 @@ export default function ResetMetadataButton() {
   const supabase = createClient();
   const handleReset = async () => {
     // Reset page metadata
-    const pageMetadataResponse = await fetch("/api/admin/reset-page-metadata", {
+    const pageMetadataResponse = await fetch("/api/admin/reset-search-page-metadata", {
       method: "POST",
     });
     if (!pageMetadataResponse.ok) {
