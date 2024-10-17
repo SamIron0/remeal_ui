@@ -4,7 +4,7 @@ import { updateRedis, getRedis } from "@/utils/redis";
 import { Recipe } from "@/types";
 
 const BATCH_SIZE = 10;
-const SIMILARITY_THRESHOLD = 0.3;
+const SIMILARITY_THRESHOLD = 0.43;
 
 export async function getRecipes(ingredients: string[]): Promise<Recipe[]> {
   const supabase = createClient(cookies());
@@ -37,11 +37,7 @@ async function processIngredientBatch(batch: string[], supabase: any): Promise<R
 
 async function processIngredient(ingredient: string, supabase: any): Promise<Recipe[]> {
   try {
-    const cachedRecipes = await getCachedRecipes(ingredient, supabase);
-    if (cachedRecipes.length > 0) return cachedRecipes;
-
     const newRecipes = await fetchNewRecipes(ingredient, supabase);
-    await cacheRecipes(ingredient, newRecipes);
     return newRecipes;
   } catch (error) {
     console.error(`Error processing ingredient ${ingredient}:`, error);
@@ -79,16 +75,27 @@ async function fetchNewRecipes(ingredient: string, supabase: any): Promise<Recip
 
   if (error) throw new Error(`Error fetching recipes for ${ingredient}`);
 
-  return data.map((recipe: any) => ({
+  // Find the index of the first recipe that falls below the threshold
+  const endIndex = data.findIndex((recipe: any) => recipe.avg_similarity < SIMILARITY_THRESHOLD);
+  // If all recipes meet the threshold, return the entire array
+  if (endIndex === -1) return data.map((recipe: any) => ({
+    ...recipe,
+    matchedIngredients: [ingredient],
+  }));
+
+  // Slice from 0 to endIndex (exclusive) to get all recipes above the threshold
+  const filteredData = data.slice(0, endIndex);
+
+  return filteredData.map((recipe: any) => ({
     ...recipe,
     matchedIngredients: [ingredient],
   }));
 }
 
-async function cacheRecipes(ingredient: string, recipes: Recipe[]): Promise<void> {
-  const recipeIds = recipes.map(recipe => recipe.id.toString());
-  await updateRedis(ingredient, recipeIds);
-}
+  async function cacheRecipes(ingredient: string, recipes: Recipe[]): Promise<void> {
+    const recipeIds = recipes.map(recipe => recipe.id.toString());
+    await updateRedis(ingredient, recipeIds);
+  }
 
 export async function getRecipesFromSupabase(ingredients: string[]): Promise<any[]> {
   const supabase = createClient(cookies());

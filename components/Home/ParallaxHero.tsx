@@ -33,7 +33,7 @@ export default function ParallaxHero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-xl text-muted-foreground md:text-2xl mb-12"
         >
-          Discover recipes based on the ingredients in your kitchen.
+          Find recipes based on the ingredients in your kitchen.
         </motion.p>
         <motion.form
           initial={{ opacity: 0, y: 20 }}

@@ -47,7 +47,8 @@ async function generateRecipeSEOPages() {
           description: description,
           keywords: formattedTags,
           changefreq: 4,
-          priority: 0.8
+          priority: 0.8,
+          slug: slugify(recipe.name)
         };
 
         // Insert or update the recipe_page_metadata

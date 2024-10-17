@@ -26,7 +26,7 @@ async function generateSitemap() {
     // Fetch recipe page metadata
     const { data: recipePages, error: recipeError } = await supabase
       .from("recipe_page_metadata")
-      .select("recipe_id, changefreq, priority")
+      .select("recipe_id, changefreq, priority, slug")
       .order("recipe_id");
 
     if (recipeError) {
@@ -36,7 +36,7 @@ async function generateSitemap() {
     const recipeIds = recipePages.map(page => page.recipe_id);
     const { data: recipes, error: recipesError } = await supabase
       .from("recipes")
-      .select("id, name,slug")
+      .select("id, name")
       .in("id", recipeIds);
 
     if (recipesError) {
@@ -64,7 +64,7 @@ async function generateSitemap() {
     .map(
       (page) => `
   <url>
-    <loc>${baseUrl}/recipe/${recipes.find(r => r.id === page.recipe_id)?.slug || ''}</loc>
+    <loc>${baseUrl}/recipe/${page.slug}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${page.changefreq || "weekly"}</changefreq>
     <priority>${page.priority || "0.5"}</priority>

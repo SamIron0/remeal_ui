@@ -5,7 +5,7 @@ import "./globals.css";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Database } from "@/supabase/types";
-import Navigation from "@/components/Navigation";
+import Navigation from "@/components/Navbar/Navigation";
 import { AppProvider } from "@/context/AppContext";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from "@next/third-parties/google";
@@ -16,42 +16,53 @@ const defaultUrl = "https://remeal.xyz";
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "Remeal | Recipe Finder App",
+    default: "Remeal | Recipe Finder",
     template: "%s | Remeal",
   },
   description:
-    "Find recipes you can easily make based on ingredients you already have in your kitchen. Get nutritional information and personalized recommendations.",
+    "Remeal is a modern recipe search engine that lets you find the best recipes based on ingredients you have in your fridge. We use AI to match your ingredients to the best recipes for you and give you the best cooking suggestions. Remeal turns your fridge into a smart assistant that helps you cook better and waste less food. We have a wide variety of recipes including Chinese, Italian, Mexican, Mediterranean, and Indian & Thai cuisines. You'll find dishes for every occasion, from Breakfast to Dinner, Quick & Easy meals to Slow Cooker recipes. Our collection covers Breads, Cakes, Casseroles, Dips, Drinks, Fish recipes, Grilling & BBQ,  Meat recipes, Poultry recipes,  Salads, Sandwiches, Sauces, Seafood recipes, Slow Cooker, Soups and more.",
   keywords: [
-    "recipe finder",
-    "food waste reduction",
-    "ingredients in your fridge",
-    "ingredient-based recipes",
-    "ingredients in your kitchen",
+    "tonight",
+    "home",
+    "finder",
+    "breakfast",
+    "grocery",
+    "recipe",
+    "search engine",
+    "fridge",
+    "meal",
+    "ingredients",
+    "pantry",
+    "food",
+    "kitchen",
+    "dinner",
+    "dinner ideas",
+    "dessert",
+    "entree",
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: defaultUrl,
     siteName: "Remeal",
-    title: "Remeal - Cook Smart, Waste Less | Recipe Finder App",
+    title: "Remeal | Find recipes with ingredients in your fridge",
     description:
-      "Discover delicious recipes based on ingredients you have in your kitchen. Reduce food waste and save money with Remeal's smart cooking suggestions.",
+      "Remeal is a modern recipe search engine that lets you find the best recipes based on ingredients you have in your fridge. We use AI to match your ingredients to the best recipes for you and give you the best cooking suggestions. Remeal turns your fridge into a smart assistant that helps you cook better and waste less food.",
     images: [
       {
         url: `${defaultUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "Remeal - Cook Smart, Waste Less",
+        alt: "Remeal | Find recipes with ingredients in your fridge",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@remeal_app",
-    creator: "@remeal_app",
-    title: "Remeal - Cook Smart, Waste Less | Recipe Finder App",
-    description:
-      "Discover recipes, reduce food waste, and save money with Remeal's smart cooking suggestions.",
+    site: "@re_meal",
+    creator: "@re_meal",
+    title: "Remeal - Recipe Finder",
+    description: "Discover recipes, reduce food waste.",
   },
 };
 
@@ -79,9 +90,23 @@ export default async function RootLayout({
   return (
     <html lang="en" className={cn(GeistSans.className, "hide-scrollbar")}>
       <head>
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
@@ -91,7 +116,7 @@ export default async function RootLayout({
       <body className=" text-foreground bg-background antialiased">
         <AppProvider>
           <SpeedInsights />
-          <Navigation isLoggedIn={!!user} />
+          <Navigation />
           <main className="space-y-12 flex flex-col items-center">
             {children}
             <Toaster />

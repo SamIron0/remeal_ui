@@ -25,7 +25,13 @@ const RecipeSearch: React.FC<SearchProps> = ({
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [displayCount, setDisplayCount] = useState(12);
+  const [displayCount, setDisplayCount] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedDisplayCount = localStorage.getItem("displayCount");
+      return savedDisplayCount ? parseInt(savedDisplayCount, 10) : 12;
+    }
+    return 12;
+  });
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(() => {
     if (typeof window !== "undefined") {
       const savedOptions = localStorage.getItem("filterOptions");
@@ -85,6 +91,7 @@ const RecipeSearch: React.FC<SearchProps> = ({
 
     searchRecipes(newIngredientsList);
     setInputValue("");
+    setDisplayCount(12);
   };
 
   const removeIngredient = (index: number) => {
@@ -145,7 +152,7 @@ const RecipeSearch: React.FC<SearchProps> = ({
     applyFilters(filterOptions);
   }, [filterOptions, applyFilters]);
   return (
-    <div className=" max-w-6xl mx-auto py-16">
+    <div className="w-full max-w-6xl min-w-4xl mx-auto py-16">
       <h1 className="text-4xl md:text-5xl font-semibold py-6 text-center">
         Enter Your Ingredients
       </h1>

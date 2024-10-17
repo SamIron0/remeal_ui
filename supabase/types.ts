@@ -320,6 +320,7 @@ export type Database = {
           keywords: string[] | null
           priority: number | null
           recipe_id: number
+          slug: string | null
           title: string
           updated_at: string | null
         }
@@ -330,6 +331,7 @@ export type Database = {
           keywords?: string[] | null
           priority?: number | null
           recipe_id: number
+          slug?: string | null
           title: string
           updated_at?: string | null
         }
@@ -340,6 +342,7 @@ export type Database = {
           keywords?: string[] | null
           priority?: number | null
           recipe_id?: number
+          slug?: string | null
           title?: string
           updated_at?: string | null
         }
@@ -416,7 +419,6 @@ export type Database = {
           name: string
           prep_time: number | null
           servings: number | null
-          slug: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -429,7 +431,6 @@ export type Database = {
           name: string
           prep_time?: number | null
           servings?: number | null
-          slug?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -442,7 +443,6 @@ export type Database = {
           name?: string
           prep_time?: number | null
           servings?: number | null
-          slug?: string | null
           updated_at?: string | null
           user_id?: string | null
         }

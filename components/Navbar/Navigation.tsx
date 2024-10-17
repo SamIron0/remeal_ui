@@ -5,17 +5,17 @@ import { useEffect, useState, useRef } from "react";
 import { Search, Home, Info, CreditCard, User, Bookmark } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useApp } from "@/context/AppContext";
 import { motion } from "framer-motion";
-import Logo from "@/public/text-logo";
 import TextLogo from "@/public/text-logo";
+import NavbarSkeleton from "./NavbarSkeleton";
 
-export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
-  const { user, subscription } = useApp();
+  const { user, subscription, loading } = useApp();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const [menuItems, setMenuItems] = useState<
     { name: string; href: string; icon: React.ReactNode }[]
@@ -30,11 +30,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         icon: <Search className="w-4 h-4 mr-2" />,
       },
       { name: "Home page", href: "/", icon: <Home className="w-4 h-4 mr-2" /> },
-      {
-        name: "How it works",
-        href: "/#how-it-works",
-        icon: <Info className="w-4 h-4 mr-2" />,
-      },
+
       {
         name: "Pricing",
         href: "/membership",
@@ -42,11 +38,6 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
       },
       ...(user
         ? [
-            {
-              name: "Saved Recipes",
-              href: "/saved",
-              icon: <Bookmark className="w-4 h-4 mr-2" />,
-            },
             {
               name: "Profile",
               href: "/profile",
@@ -75,15 +66,18 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
     if (error) {
       console.error("Error signing out:", error);
     } else {
-      isLoggedIn = false;
       router.push("/search");
     }
   };
 
+  if (loading) {
+    return <NavbarSkeleton />;
+  }
+
   return (
     <nav
       ref={navRef}
-      className="fixed z-10 top-0 left-0 w-full bg-background shadow-sm backdrop-blur-[12px] transition-all duration-300"
+      className="fixed z-10 top-0 left-0 w-full bg-background/80 shadow-sm backdrop-blur-[12px] transition-all duration-300"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
@@ -92,7 +86,52 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
               <TextLogo className="w-20 sm:w-20 h-10" />
             </Link>
           </div>
-          <div className="flex items-center">
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-4">
+            {menuItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+              >
+                {item.name}
+              </Link>
+            ))}
+            {user == null ? (
+              <>
+                <Link href="/login">
+                  <Button variant="outline" className="mr-2">
+                    Log In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-primary text-white hover:bg-primary-dark">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                {!subscription && (
+                  <Link href="/membership">
+                    <Button variant="outline" className="mr-2">
+                      Upgrade to Premium
+                    </Button>
+                  </Link>
+                )}
+                <Button
+                  onClick={handleSignOut}
+                  className="bg-primary text-white hover:bg-primary-dark"
+                >
+                  Log Out
+                </Button>
+              </>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex items-center lg:hidden">
             <motion.button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-primary hover:bg-secondary focus:outline-none"
@@ -142,8 +181,9 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         </div>
       </div>
 
+      {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="mx-auto">
+        <div className="lg:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {menuItems.map((item) => (
               <Link
@@ -179,7 +219,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {!subscription && (
                   <Link href="/membership">
                     <Button
-                      className="w-full bg-primary text-white hover:bg-primary-dark"
+                      className="w-full hover:bg-secondary hover:text-primary items-center text-left text-primary"
                       variant="outline"
                     >
                       Upgrade to Premium

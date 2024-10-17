@@ -29,6 +29,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const supabase = createClient();
   useEffect(() => {
     const loadUserAndSubscription = async () => {
+      setLoading(true);
       try {
         const {
           data: { user: authUser },
