@@ -6,7 +6,7 @@ import { Bookmark } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-
+import { useRouter } from "next/navigation";
 export default function SaveRecipeButton({
   recipeId,
   userId,
@@ -14,13 +14,14 @@ export default function SaveRecipeButton({
   recipeId: number; 
   userId: string | undefined;
 }) {
+  const router = useRouter();
   const { savedRecipes, setSavedRecipes } = useApp();
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClient();
   const isSaved = savedRecipes.includes(recipeId);
   const handleSaveUnsave = async () => {
     if (!userId) {
-      toast.error("You must be logged in to save recipes");
+      router.push("/login");
       return;
     }
 
@@ -62,7 +63,7 @@ export default function SaveRecipeButton({
   return (
     <Button
       onClick={handleSaveUnsave}
-      disabled={isLoading || !userId}
+      disabled={isLoading }
       variant={isSaved ? "secondary" : "default"}
     >
       <Bookmark className="w-4 h-4 mr-2" />

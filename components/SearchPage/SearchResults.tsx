@@ -84,7 +84,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <h2 className="text-2xl font-semibold mb-4">Ready to cook?</h2>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">
           Start by adding ingredients you have on hand,
-          <br /> and we'll find matching recipes for you.
+          <br /> and we&apos;ll find matching recipes for you.
         </p>
         <Button
           variant="secondary"
@@ -101,7 +101,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       <div className="text-center p-8">
         <h2 className="text-2xl font-semibold mb-4">No recipes found</h2>
         <p className="text-gray-600 mb-6">
-          We couldn't find any recipes with the current ingredients. Try adding
+          We couldn&apos;t find any recipes with the current ingredients. Try adding
           more or adjusting your search.
         </p>
         <Button onClick={() => document.querySelector("input")?.focus()}>

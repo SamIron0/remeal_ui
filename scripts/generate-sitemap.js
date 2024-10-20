@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const sitemapPath = path.join(process.cwd(), "public", "sitemap.xml");
-const baseUrl = "https://remeal.xyz";
+const baseUrl = "https://www.remeal.xyz";
 
 async function generateSitemap() {
   try {
@@ -33,7 +33,7 @@ async function generateSitemap() {
       console.error("Error fetching recipe pages:", recipeError);
       return;
     }
-    const recipeIds = recipePages.map(page => page.recipe_id);
+    const recipeIds = recipePages.map((page) => page.recipe_id);
     const { data: recipes, error: recipesError } = await supabase
       .from("recipes")
       .select("id, name")
@@ -44,18 +44,29 @@ async function generateSitemap() {
       return;
     }
 
-
     const today = new Date().toISOString().split("T")[0];
 
     const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/search</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
   ${searchPages
     .map(
       (page) => `
   <url>
     <loc>${baseUrl}/search/${page.url}</loc>
     <lastmod>${today}</lastmod>
-    <changefreq>${page.changefreq || "weekly"}</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>${page.priority || "0.5"}</priority>
   </url>`
     )
@@ -66,7 +77,7 @@ async function generateSitemap() {
   <url>
     <loc>${baseUrl}/recipe/${page.slug}</loc>
     <lastmod>${today}</lastmod>
-    <changefreq>${page.changefreq || "weekly"}</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>${page.priority || "0.5"}</priority>
   </url>`
     )

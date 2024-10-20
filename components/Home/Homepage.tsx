@@ -9,7 +9,7 @@ import FloatingCTA from "./FloatingCTA";
 
 export default function Homepage() {
   return (
-    <div className="flex bg-black opacity-95 flex-col w-full items-center bg-page-gradient">
+    <div className="flex mt-[64px] bg-black opacity-95 flex-col w-full items-center bg-page-gradient">
       <ParallaxHero />
 
       <AnimatedStats />

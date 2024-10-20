@@ -88,12 +88,12 @@ export default function Navigation() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center">
             {menuItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-600 hover:text-primary hover:bg-secondary px-3 py-2 rounded-md text-sm font-medium"
               >
                 {item.name}
               </Link>
@@ -101,7 +101,7 @@ export default function Navigation() {
             {user == null ? (
               <>
                 <Link href="/login">
-                  <Button variant="outline" className="mr-2">
+                  <Button variant="outline" className="mx-2">
                     Log In
                   </Button>
                 </Link>

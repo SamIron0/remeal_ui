@@ -17,7 +17,7 @@ export default function ParallaxHero() {
   };
 
   return (
-    <section className="w-full  h-screen relative overflow-hidden text-white">
+    <section className="w-full h-[calc(100vh-96px)] sm:h-[calc(100vh-64px)] relative overflow-hidden text-white">
       <div className="relative flex flex-col items-center justify-center h-full text-center px-4 max-w-4xl mx-auto">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -47,7 +47,9 @@ export default function ParallaxHero() {
             type="email"
             placeholder="Enter your email"
             value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
             className="flex-grow text-[16px] text-primary"
             required
           />
