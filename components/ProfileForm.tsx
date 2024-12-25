@@ -14,41 +14,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Tables } from "@/supabase/types";
 import { useApp } from "@/context/AppContext";
 
-type UserWithSubscription = Tables<"users"> & {
-  subscriptions: Tables<"subscriptions">[] | null;
-};
-
 export default function ProfileForm() {
   const supabase = createClient();
-  const router = useRouter();
   const { user, subscription, loading } = useApp();
-  const [profile, setProfile] = useState<UserWithSubscription | null>(null);
+  const [profile, setProfile] = useState<Tables<"users"> | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (user) {
       setProfile({
         ...user,
-        subscriptions: subscription ? [subscription] : null,
       });
     }
-  }, [user, subscription]);
+  }, [user]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -78,14 +60,8 @@ export default function ProfileForm() {
     }
   };
 
-  const handleCancelSubscription = async () => {
-    toast.success("Subscription cancelled successfully");
-  };
-
   if (loading) return <div>Loading...</div>;
   if (!profile) return <div>Profile not found</div>;
-
-  const subscriptionStatus = subscription?.status || "No active subscription";
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
