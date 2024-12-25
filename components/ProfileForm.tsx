@@ -82,10 +82,6 @@ export default function ProfileForm() {
     toast.success("Subscription cancelled successfully");
   };
 
-  const handleUpgrade = () => {
-    router.push("/membership");
-  };
-
   if (loading) return <div>Loading...</div>;
   if (!profile) return <div>Profile not found</div>;
 
@@ -114,49 +110,7 @@ export default function ProfileForm() {
             disabled={!isEditing}
           />
         </div>
-        <div className="space-y-2">
-          <Label>Membership Status</Label>
-          <div className="flex items-center space-x-2">
-            <Badge
-              variant={
-                subscriptionStatus === "active" ? "default" : "secondary"
-              }
-            >
-              {subscriptionStatus}
-            </Badge>
-            {subscriptionStatus === "active" && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm">
-                    Cancel Membership
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will cancel your
-                      membership and you will lose access to all premium
-                      features.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCancelSubscription}>
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-          </div>
-        </div>
-        <p className="text-sm text-gray-600">
-          Subscription renews on:{" "}
-          {subscription?.current_period_end
-            ? new Date(subscription.current_period_end).toLocaleDateString()
-            : "N/A"}
-        </p>
+       
       </CardContent>
       <CardFooter className="flex justify-between">
         {isEditing ? (

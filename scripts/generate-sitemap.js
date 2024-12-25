@@ -55,7 +55,7 @@ async function generateSitemap() {
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>${baseUrl}/search</loc>
+    <loc>${baseUrl}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -64,7 +64,7 @@ async function generateSitemap() {
     .map(
       (page) => `
   <url>
-    <loc>${baseUrl}/search/${page.url}</loc>
+    <loc>${baseUrl}/${page.url}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${page.priority || "0.5"}</priority>
@@ -85,7 +85,6 @@ async function generateSitemap() {
 </urlset>`;
 
     fs.writeFileSync(sitemapPath, xmlContent, "utf8");
-    console.log("sitemap.xml generated successfully");
   } catch (error) {
     console.error("Error generating sitemap:", error);
   }

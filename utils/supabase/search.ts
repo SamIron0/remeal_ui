@@ -1,6 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { updateRedis, getRedis } from "@/utils/redis";
 import { Recipe } from "@/types";
 
 const BATCH_SIZE = 10;
@@ -45,28 +44,6 @@ async function processIngredient(ingredient: string, supabase: any): Promise<Rec
   }
 }
 
-async function getCachedRecipes(ingredient: string, supabase: any): Promise<Recipe[]> {
-  const cachedRecipeIds = await getRedis(ingredient);
-  if (!Array.isArray(cachedRecipeIds)) return [];
-
-  const { data: cachedRecipes, error } = await supabase
-    .from("recipes")
-    .select(`
-      *,
-      nutrition_info(*),
-      recipe_images(file_path, file_name),
-      recipe_ingredients(quantity, unit, ingredients(name))
-    `)
-    .in("id", cachedRecipeIds);
-
-  if (error) throw new Error(`Error fetching cached recipes for ${ingredient}`);
-
-  return cachedRecipes.map((recipe: any) => ({
-    ...recipe,
-    matchedIngredients: [ingredient],
-  }));
-}
-
 async function fetchNewRecipes(ingredient: string, supabase: any): Promise<Recipe[]> {
   const { data, error } = await supabase.rpc("search_recipes_by_ingredient", {
     p_ingredient: ingredient,
@@ -91,11 +68,6 @@ async function fetchNewRecipes(ingredient: string, supabase: any): Promise<Recip
     matchedIngredients: [ingredient],
   }));
 }
-
-  async function cacheRecipes(ingredient: string, recipes: Recipe[]): Promise<void> {
-    const recipeIds = recipes.map(recipe => recipe.id.toString());
-    await updateRedis(ingredient, recipeIds);
-  }
 
 export async function getRecipesFromSupabase(ingredients: string[]): Promise<any[]> {
   const supabase = createClient(cookies());

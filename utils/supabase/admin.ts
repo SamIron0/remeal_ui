@@ -26,7 +26,6 @@ const upsertProductRecord = async (product: Stripe.Product) => {
     .upsert([productData]);
   if (upsertError)
     throw new Error(`Product insert/update failed: ${upsertError.message}`);
-  console.log(`Product inserted/updated: ${product.id}`);
 };
 
 const upsertPriceRecord = async (
@@ -52,7 +51,6 @@ const upsertPriceRecord = async (
 
   if (upsertError?.message.includes("foreign key constraint")) {
     if (retryCount < maxRetries) {
-      console.log(`Retry attempt ${retryCount + 1} for price ID: ${price.id}`);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await upsertPriceRecord(price, retryCount + 1, maxRetries);
     } else {
@@ -63,7 +61,6 @@ const upsertPriceRecord = async (
   } else if (upsertError) {
     throw new Error(`Price insert/update failed: ${upsertError.message}`);
   } else {
-    console.log(`Price inserted/updated: ${price.id}`);
   }
 };
 
@@ -75,7 +72,6 @@ const deleteProductRecord = async (product: Stripe.Product) => {
     .eq("id", product.id);
   if (deletionError)
     throw new Error(`Product deletion failed: ${deletionError.message}`);
-  console.log(`Product deleted: ${product.id}`);
 };
 
 const deletePriceRecord = async (price: Stripe.Price) => {
@@ -86,7 +82,6 @@ const deletePriceRecord = async (price: Stripe.Price) => {
     .eq("id", price.id);
   if (deletionError)
     throw new Error(`Price deletion failed: ${deletionError.message}`);
-  console.log(`Price deleted: ${price.id}`);
 };
 
 const upsertCustomerToSupabase = async (uuid: string, customerId: string) => {
@@ -262,9 +257,6 @@ const manageSubscriptionStatusChange = async (
     throw new Error(
       `Subscription insert/update failed: ${upsertError.message}`
     );
-  console.log(
-    `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
-  );
 
   if (createAction && subscription.default_payment_method && uuid)
     //@ts-ignore

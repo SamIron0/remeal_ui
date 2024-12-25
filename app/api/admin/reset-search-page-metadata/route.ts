@@ -23,8 +23,7 @@ export async function POST(request: Request) {
       }
       const recipeIds = recipes.map((recipe: any) => recipe.id);
 
-      // Update page metadata with new recipe IDs
-      console.log("recipeIds", recipeIds);
+      // Update page metadata with new result's recipe ID's
       const { error: updateError } = await supabase
         .from("search_page_metadata")
         .update({ recipe_ids: recipeIds })

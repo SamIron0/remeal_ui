@@ -59,7 +59,6 @@ export default function Signup() {
   };
 
   const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("callbackurl", callbackUrl);
     e.preventDefault();
     if (!validateForm()) return;
 

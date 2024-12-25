@@ -24,7 +24,7 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/search" className="hover:text-primary">
+                <Link href="/" className="hover:text-primary">
                   Recipe Search
                 </Link>
               </li>

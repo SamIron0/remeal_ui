@@ -14,6 +14,5 @@ fs.readFile(sitemapPath, "utf8", (err, data) => {
 
   fs.writeFile(sitemapPath, updatedSitemap, "utf8", err => {
     if (err) throw err
-    console.log("sitemap.xml updated with today's date")
   })
 })

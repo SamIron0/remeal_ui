@@ -1,5 +1,5 @@
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config({ path: '.env.local' });
+const { createClient } = require("@supabase/supabase-js");
+require("dotenv").config({ path: ".env.local" });
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -10,9 +10,9 @@ async function cleanupDatabase() {
   try {
     // Fetch all recipes
     const { data: recipes, error } = await supabase
-      .from('recipes')
-      .select('id, name, slug')
-      .order('created_at', { ascending: true });
+      .from("recipes")
+      .select("id, name, slug")
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
 
@@ -24,7 +24,7 @@ async function cleanupDatabase() {
     // Identify duplicates and duplicate slugs
     for (const recipe of recipes) {
       const lowerName = recipe.name.toLowerCase();
-      const lowerSlug = recipe.slug ? recipe.slug.toLowerCase() : '';
+      const lowerSlug = recipe.slug ? recipe.slug.toLowerCase() : "";
 
       if (recipeMap.has(lowerName)) {
         duplicatesToDelete.push(recipe.id);
@@ -39,9 +39,6 @@ async function cleanupDatabase() {
       }
     }
 
-    console.log(`Found ${duplicatesToDelete.length} duplicate recipes to delete.`);
-    console.log(`Found ${slugsToUpdate.length} duplicate slugs to update.`);
-
     // Delete duplicates and their related data
     for (const recipeId of duplicatesToDelete) {
       await deleteRecipeAndRelatedData(recipeId);
@@ -54,22 +51,20 @@ async function cleanupDatabase() {
 
     // Clean up ingredient_index table
     await cleanupIngredientIndex();
-
-    console.log('Database cleanup process completed.');
   } catch (error) {
-    console.error('Error in cleanupDatabase:', error);
+    console.error("Error in cleanupDatabase:", error);
   }
 }
 
 async function deleteRecipeAndRelatedData(recipeId) {
   const tables = [
-    'nutrition_info',
-    'recipe_images',
-    'recipe_ingredients',
-    'recipe_tags',
-    'recipe_vectors',
-    'saved_recipes',
-    'recipe_page_metadata'
+    "nutrition_info",
+    "recipe_images",
+    "recipe_ingredients",
+    "recipe_tags",
+    "recipe_vectors",
+    "saved_recipes",
+    "recipe_page_metadata",
   ];
 
   try {
@@ -78,20 +73,18 @@ async function deleteRecipeAndRelatedData(recipeId) {
       const { error } = await supabase
         .from(table)
         .delete()
-        .eq('recipe_id', recipeId);
-      
+        .eq("recipe_id", recipeId);
+
       if (error) throw error;
     }
 
     // Delete the recipe itself
     const { error } = await supabase
-      .from('recipes')
+      .from("recipes")
       .delete()
-      .eq('id', recipeId);
+      .eq("id", recipeId);
 
     if (error) throw error;
-
-    console.log(`Successfully deleted recipe ${recipeId} and its related data.`);
   } catch (error) {
     console.error(`Error deleting recipe ${recipeId}:`, error);
   }
@@ -101,8 +94,8 @@ async function cleanupIngredientIndex() {
   try {
     // Fetch all ingredient_index entries
     const { data: ingredientIndexes, error } = await supabase
-      .from('ingredient_index')
-      .select('id, recipe_ids');
+      .from("ingredient_index")
+      .select("id, recipe_ids");
 
     if (error) throw error;
 
@@ -110,31 +103,27 @@ async function cleanupIngredientIndex() {
       if (index.recipe_ids && Array.isArray(index.recipe_ids)) {
         // Fetch existing recipes
         const { data: existingRecipes, error: recipeError } = await supabase
-          .from('recipes')
-          .select('id')
-          .in('id', index.recipe_ids);
+          .from("recipes")
+          .select("id")
+          .in("id", index.recipe_ids);
 
         if (recipeError) throw recipeError;
 
-        const validRecipeIds = existingRecipes.map(recipe => recipe.id);
+        const validRecipeIds = existingRecipes.map((recipe) => recipe.id);
 
         // Update ingredient_index if there are changes
         if (validRecipeIds.length !== index.recipe_ids.length) {
           const { error: updateError } = await supabase
-            .from('ingredient_index')
+            .from("ingredient_index")
             .update({ recipe_ids: validRecipeIds })
-            .eq('id', index.id);
+            .eq("id", index.id);
 
           if (updateError) throw updateError;
-
-          console.log(`Updated ingredient_index ${index.id} with valid recipe IDs.`);
         }
       }
     }
-
-    console.log('Ingredient index cleanup completed.');
   } catch (error) {
-    console.error('Error in cleanupIngredientIndex:', error);
+    console.error("Error in cleanupIngredientIndex:", error);
   }
 }
 

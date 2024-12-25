@@ -31,7 +31,6 @@ async function updateSlugs() {
       const newSlug = slugify(record.title);
       
       if (newSlug !== record.slug) {
-        console.log(`Updating slug for recipe_id ${record.recipe_id}: ${newSlug}`);
         const { error: updateError } = await supabase
           .from('recipe_page_metadata')
           .update({ slug: newSlug })
@@ -40,12 +39,10 @@ async function updateSlugs() {
         if (updateError) {
           console.error(`Error updating slug for recipe_id ${record.recipe_id}:`, updateError);
         } else {
-          console.log(`Updated slug for recipe_id ${record.recipe_id}: ${newSlug}`);
         }
       }
     }
 
-    console.log('Slug update process completed.');
   } catch (error) {
     console.error('Error in updateSlugs:', error);
   }

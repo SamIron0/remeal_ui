@@ -48,7 +48,7 @@ export async function generateMetadata(
 
 export default async function SearchPage({ params, searchParams }: Props) {
   const slug = params.slug ? params.slug.join(" ") : "";
-  const url = process.env.NEXT_PUBLIC_URL + "/search/" + slug;
+  const url = process.env.NEXT_PUBLIC_URL + "/" + slug;
   const metadata = await generateMetadata(
     { params, searchParams },
     {} as ResolvingMetadata

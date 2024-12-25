@@ -111,7 +111,7 @@ export default async function RootLayout({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#f7f7f7" />
-        <script src="/smartlook.js" async />
+        <script src="/traftics.js" async />
       </head>
       <GoogleAnalytics gaId="G-8VB6GS4GD1" />
       <body className=" text-foreground bg-background antialiased">

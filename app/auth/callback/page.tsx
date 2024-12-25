@@ -13,7 +13,7 @@ export default function AuthCallbackPage() {
     const handleAuthCallback = async () => {
       const { searchParams } = new URL(window.location.href);
       const code = searchParams.get("code");
-      const callbackUrl = searchParams.get("callbackUrl") || "/search";
+      const callbackUrl = searchParams.get("callbackUrl") || "/";
 
       if (!code) {
         return;

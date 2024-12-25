@@ -1,6 +1,14 @@
 # Remeal UI
 
-Remeal UI is the frontend application for Remeal, an intelligent recipe companion that suggests recipes based on available ingredients.
+Remeal is an intelligent recipe companion that suggests recipes based on available ingredients.
+
+## Project Structure
+
+remeal is composed of 3 parts:
+   - [https://github.com/SamIron0/remeal_ui](remeal_ui), is the frontend of this application which is available in this repository.
+   - [https://github.com/SamIron0/remeal_ingestion](remeal_ingestion), is a microservice that takes in a recipe, normalizes its ingredients, saves the recipe and indexes its ingredients for fast search.
+   - [https://github.com/SamIron0/remeal_generation](remeal_generation), generates standardized recipes using open source models. It reads a txt of recipe titles and generated those recipes.
+
 
 ## Features
 
@@ -15,7 +23,7 @@ Remeal UI is the frontend application for Remeal, an intelligent recipe companio
 
 ### Prerequisites
 
-- Node.js (version 18 or later)
+- Next.js (version 18 or later)
 - npm or yarn
 
 ### Installation
@@ -42,7 +50,7 @@ npm run dev
 
 - Search Page: Allows users to find recipes based on ingredients
 - Recipe Page: Displays detailed recipe information
-- Admin Dashboard: Manages recipes and views site metrics
+- Admin Dashboard: Manages recipes,seo settings and views site metrics
 
 ## Deployment
 

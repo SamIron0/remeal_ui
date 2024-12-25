@@ -15,7 +15,7 @@ const SimilarRecipes: React.FC<SimilarRecipesProps> = ({ recipeId }) => {
     fetch(`/api/similar_recipes?recipeId=${recipeId}`)
       .then((res) => res.json())
       .then((data) => setRecipes(data));
-  }, []);
+  }, [recipeId]);
 
   return (
     <Card>

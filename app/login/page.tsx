@@ -55,7 +55,7 @@ export default function Login() {
       if (error) throw error;
 
       toast.success("Logged in successfully!");
-      router.push(callbackUrl || "/search");
+      router.push(callbackUrl || "/");
     } catch (error: any) {
       setError(error.message || "An error occurred during login");
     } finally {

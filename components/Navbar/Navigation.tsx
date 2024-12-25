@@ -59,7 +59,7 @@ export default function Navigation() {
     if (error) {
       console.error("Error signing out:", error);
     } else {
-      router.push("/search");
+      router.push("/");
     }
   };
 
