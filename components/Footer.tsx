@@ -28,11 +28,6 @@ const Footer: React.FC = () => {
                   Recipe Search
                 </Link>
               </li>
-              <li>
-                <Link href="/membership" className="hover:text-primary">
-                  Pricing
-                </Link>
-              </li>
             </ul>
           </div>
         </div>

@@ -32,7 +32,7 @@ import { useApp } from "@/context/AppContext";
 
 type UserWithSubscription = Tables<"users"> & {
   subscriptions: Tables<"subscriptions">[] | null;
-}
+};
 
 export default function ProfileForm() {
   const supabase = createClient();
@@ -50,7 +50,11 @@ export default function ProfileForm() {
     }
   }, [user, subscription]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setProfile((prev) => (prev ? { ...prev, [name]: value } : null));
   };
@@ -75,12 +79,11 @@ export default function ProfileForm() {
   };
 
   const handleCancelSubscription = async () => {
-
     toast.success("Subscription cancelled successfully");
   };
 
   const handleUpgrade = () => {
-    router.push("/membership"); 
+    router.push("/membership");
   };
 
   if (loading) return <div>Loading...</div>;
@@ -145,11 +148,6 @@ export default function ProfileForm() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-            )}
-            {subscriptionStatus !== "active" && (
-              <Button onClick={handleUpgrade} size="sm">
-                Upgrade to Premium
-              </Button>
             )}
           </div>
         </div>

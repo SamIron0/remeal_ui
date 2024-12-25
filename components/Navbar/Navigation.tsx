@@ -26,15 +26,8 @@ export default function Navigation() {
     setMenuItems([
       {
         name: "Recipe Search",
-        href: "/search",
+        href: "/",
         icon: <Search className="w-4 h-4 mr-2" />,
-      },
-      { name: "Home page", href: "/", icon: <Home className="w-4 h-4 mr-2" /> },
-
-      {
-        name: "Pricing",
-        href: "/membership",
-        icon: <CreditCard className="w-4 h-4 mr-2" />,
       },
       ...(user
         ? [
@@ -113,13 +106,6 @@ export default function Navigation() {
               </>
             ) : (
               <>
-                {!subscription && (
-                  <Link href="/membership">
-                    <Button variant="outline" className="mr-2">
-                      Upgrade to Premium
-                    </Button>
-                  </Link>
-                )}
                 <Button
                   onClick={handleSignOut}
                   className="bg-primary text-white hover:bg-primary-dark"

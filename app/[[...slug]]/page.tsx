@@ -3,7 +3,6 @@ import { Metadata, ResolvingMetadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import SEOMetaTags from "@/components/SEOMetaTags";
-import { Recipe } from "@/types";
 
 type Props = {
   params: { slug?: string[] };

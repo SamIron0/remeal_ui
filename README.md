@@ -1,6 +1,6 @@
 # Remeal UI
 
-Remeal UI is the frontend application for Remeal, an intelligent recipe companion that helps users cook smart and waste less food.
+Remeal UI is the frontend application for Remeal, an intelligent recipe companion that suggests recipes based on available ingredients.
 
 ## Features
 
@@ -8,18 +8,8 @@ Remeal UI is the frontend application for Remeal, an intelligent recipe companio
 - Recipe Filtering
 - Nutritional Information
 - User Authentication
-- Premium Subscription Management
 - Saved Recipes
 - Admin Dashboard
-
-## Tech Stack
-
-- Next.js 14
-- React
-- TypeScript
-- Tailwind CSS
-- Supabase
-- Stripe (for payments)
 
 ## Getting Started
 
@@ -48,29 +38,11 @@ npm run dev
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-## Project Structure
-
-- `/app`: Next.js app router pages and API routes
-- `/components`: Reusable React components
-- `/utils`: Utility functions and helpers
-- `/context`: React context providers
-- `/types`: TypeScript type definitions
-- `/public`: Static assets
-
 ## Key Components
 
 - Search Page: Allows users to find recipes based on ingredients
 - Recipe Page: Displays detailed recipe information
-- Pricing Page: Shows subscription options for premium features
 - Admin Dashboard: Manages recipes and views site metrics
-
-## Styling
-
-The project uses Tailwind CSS for styling. Custom components are built using the shadcn/ui library.
-
-## API Integration
-
-The UI interacts with backend services for recipe matching, user management, and subscription handling.
 
 ## Deployment
 

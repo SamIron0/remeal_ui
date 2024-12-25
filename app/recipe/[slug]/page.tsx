@@ -1,7 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { Clock, Users } from "lucide-react";
 import NutritionCard from "@/components/RecipePage/NutritionCard";
 import IngredientList from "@/components/RecipePage/IngredientList";
@@ -12,6 +11,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import SEOMetaTags from "@/components/SEOMetaTags";
 import { ResolvingMetadata } from "next";
 import { Metadata } from "next";
+import SimilarRecipes from "@/components/RecipePage/SimilarRecipes";
+
 type Props = {
   params: { slug?: string };
   searchParams: { [key: string]: string | string[] | undefined };
@@ -93,7 +94,6 @@ export default async function RecipePage({ params, searchParams }: Props) {
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
-            { label: "Search", href: "/search" },
             { label: recipe.name, href: `/recipe/${recipe.name}` },
           ]}
         />
@@ -182,6 +182,9 @@ export default async function RecipePage({ params, searchParams }: Props) {
             </div>
           </div>
         </div>
+      </div>
+      <div className="mt-12">
+        <SimilarRecipes recipeId={recipe.id} />
       </div>
     </div>
   );
