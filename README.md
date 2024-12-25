@@ -2,13 +2,13 @@
 
 Remeal is an intelligent recipe companion that suggests recipes based on available ingredients.
 
-## Project Structure
+## Remeal Structure
 
 remeal is composed of 3 parts:
 
 - [remeal_ui](https://github.com/SamIron0/remeal_ui), is the frontend of this application which is available in this repository.
 - [remeal_ingestion](https://github.com/SamIron0/remeal_ingestion), is a microservice that takes in a recipe, normalizes its ingredients, saves the recipe and indexes its ingredients for fast search.
-- [remeal_generation](https://github.com/SamIron0/remeal_generation), generates standardized recipes using open source models. It reads a txt of recipe titles and generated those recipes.
+- [remeal_generation](https://github.com/SamIron0/remeal_generation), generates standardized recipes using open source models. It reads a txt of recipe titles and generates those recipes.
 
 ## Features
 
