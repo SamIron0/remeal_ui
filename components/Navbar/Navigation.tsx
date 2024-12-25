@@ -108,7 +108,7 @@ export default function Navigation() {
               <>
                 <Button
                   onClick={handleSignOut}
-                  className="bg-primary text-white hover:bg-primary-dark"
+                  className="bg-primary text-white hover:bg-primary-dark ml-2"
                 >
                   Log Out
                 </Button>
@@ -185,7 +185,7 @@ export default function Navigation() {
               </Link>
             ))}
             {user == null ? (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 mt-1">
                 <Link href="/login" onClick={toggleMenu}>
                   <Button
                     variant="outline"
@@ -202,19 +202,9 @@ export default function Navigation() {
               </div>
             ) : (
               <>
-                {!subscription && (
-                  <Link href="/membership">
-                    <Button
-                      className="w-full hover:bg-secondary hover:text-primary items-center text-left text-primary"
-                      variant="outline"
-                    >
-                      Upgrade to Premium
-                    </Button>
-                  </Link>
-                )}
                 <Button
                   onClick={handleSignOut}
-                  className="w-full bg-primary text-white hover:bg-primary-dark"
+                  className="w-full bg-primary text-white hover:bg-primary-dark mt-1"
                   variant="outline"
                 >
                   Log Out
