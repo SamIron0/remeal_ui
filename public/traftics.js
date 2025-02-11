@@ -4,6 +4,6 @@
   };
   var s = d.createElement("script");
   s.async = true;
-  s.src = "https://2633d0cc.session-recorder-tracker.pages.dev/tracker.js";
+  s.src = "https://b1350a33.session-recorder-tracker.pages.dev/tracker.js";
   d.head.appendChild(s);
 })(document, window);
